@@ -1,0 +1,7 @@
+{
+  "extends": "@vtex-us-se/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [".storybook", "stories"]
+}

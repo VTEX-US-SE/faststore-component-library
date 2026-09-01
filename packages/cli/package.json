@@ -1,0 +1,31 @@
+{
+  "name": "@vtex-us-se/cli",
+  "version": "0.0.0",
+  "description": "CLI interna: `equipo-components add <ComponentName>` copia el .schema.jsonc de un componente de @vtex-us-se/ui hacia cms/faststore/ del proyecto FastStore que lo consume.",
+  "bin": {
+    "equipo-components": "./bin/equipo-components.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src",
+    "test": "echo \"no tests yet\""
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@vtex-us-se/config": "workspace:*",
+    "@types/node": "^22.7.0",
+    "typescript": "^5.6.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

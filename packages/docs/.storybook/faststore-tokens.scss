@@ -1,0 +1,13 @@
+// @faststore/ui's own base/tokens.scss uses the `media()` mixin without importing it itself —
+// a real FastStore build pipeline injects that globally, but this Storybook sandbox doesn't,
+// so we provide it explicitly before pulling in the tokens partial.
+@import 'include-media/dist/include-media';
+$breakpoints: (
+  'phone': 320px,
+  'phonemid': 375px,
+  'tablet': 768px,
+  'notebook': 1280px,
+  'desktop': 1440px,
+);
+
+@import '@faststore/ui/src/styles/base/tokens.scss';

@@ -1,0 +1,31 @@
+{
+  "name": "@vtex-us-se/components",
+  "version": "0.0.0",
+  "description": "Lógica y accesibilidad de componentes React para FastStore v4, sin estilos.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src",
+    "test": "echo \"no tests yet\""
+  },
+  "dependencies": {
+    "sanitize-html": "^2.13.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@vtex-us-se/config": "workspace:*",
+    "@types/react": "^18.3.0",
+    "@types/sanitize-html": "^2.13.0",
+    "typescript": "^5.6.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

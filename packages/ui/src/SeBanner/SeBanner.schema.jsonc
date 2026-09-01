@@ -1,0 +1,95 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeBanner",
+  "$componentTitle": "SE Banner",
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "isFullModeStyle": {
+      "title": "Image as background",
+      "description": "If true, the provided image will be used as background image and text will be displayed over it",
+      "type": "boolean",
+      "default": true
+    },
+    "mobileOverlayTextPos": {
+      "title": "mobile overlay text position",
+      "description": "Adjust the text position (Top and Bottom) on mobile devices when not in full mode .",
+      "type": "string",
+      "default": "bottom",
+      "enum": ["top", "bottom"],
+      "enumNames": ["Top", "Bottom"]
+    },
+    "overlayTextPos": {
+      "title": "overlay text pos",
+      "description": "Adjust the text alignment (Left and Right) in full image mode.",
+      "type": "string",
+      "default": "left",
+      "enum": ["left", "center", "right"],
+      "enumNames": ["Left", "Center", "Right"]
+    },
+    "textAlignment": {
+      "title": "Text alignment",
+      "description": "Controls the text alignment inside component",
+      "type": "string",
+      "default": "center",
+      "enum": ["left", "center", "right"],
+      "enumNames": ["Left", "Center", "Right"]
+    },
+    "textPosition": {
+      "title": "Text position",
+      "description": "Choose the component position where the text will be displayed: left, center, or right",
+      "type": "string",
+      "default": "left",
+      "enum": ["left", "center", "right"],
+      "enumNames": ["Left", "Center", "Right"]
+    },
+    "textMode": {
+      "title": "Text mode",
+      "description": "Text mode SE Banner will receive. HTML is currently the only supported mode; rich text/markdown is not implemented yet.",
+      "type": "string",
+      "default": "html",
+      "enum": ["html"],
+      "enumNames": ["HTML"]
+    },
+    "uploadMobileImage": {
+      "type": "object",
+      "title": "Mobile image",
+      "properties": {
+        "src": { "type": "string", "title": "Mobile image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative Label" }
+      }
+    },
+    "title": { "title": "Title", "type": "string" },
+    "subtitle": { "title": "Subtitle", "type": "string" },
+    "link": {
+      "title": "Call to Action",
+      "type": "object",
+      "properties": {
+        "show": { "type": "boolean", "title": "Show CTA Link", "default": false },
+        "text": { "type": "string", "title": "Text" },
+        "url": { "type": "string", "title": "URL" },
+        "linkTargetBlank": { "type": "boolean", "title": "Open link in new window?", "default": false }
+      }
+    },
+    "image": {
+      "type": "object",
+      "title": "Image",
+      "properties": {
+        "src": { "type": "string", "title": "Image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative Label" }
+      }
+    },
+    "colorVariant": {
+      "type": "string",
+      "title": "Color variant",
+      "enumNames": ["Main", "Light", "Accent"],
+      "enum": ["main", "light", "accent"]
+    },
+    "variant": {
+      "type": "string",
+      "title": "Variant",
+      "enumNames": ["Primary", "Secondary"],
+      "enum": ["primary", "secondary"]
+    }
+  }
+}
