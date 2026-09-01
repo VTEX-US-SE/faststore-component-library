@@ -5,7 +5,7 @@ const program = new Command()
 
 program
   .name('equipo-components')
-  .description('CLI interna del equipo de Solutions Engineering para consumir componentes de FastStore v4')
+  .description('Internal CLI for the Solutions Engineering team to consume FastStore v4 components')
   .version('0.0.0')
 
 program.addCommand(addCommand)

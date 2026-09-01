@@ -50,26 +50,27 @@ packages/ui/src/<ComponentName>/
 └── <ComponentName>.schema.jsonc
 ```
 
-`packages/cli` (the `equipo-components add <ComponentName>` command) exists to copy that
-`.schema.jsonc` into the consuming project's `cms/faststore/`, instead of relying on every team
-to copy it by hand. **For now it's only the command's scaffolding** — the actual copy logic
-(`copySchema()`) is still pending.
+`packages/cli` (the `equipo-components add <ComponentName>` command) copies that `.schema.jsonc`
+into the consuming project's `cms/faststore/components/`, instead of relying on every team to
+copy it by hand — see [its README](packages/cli/README.md).
 
-## Versioning and publishing
+## CI/CD
 
+- **`.github/workflows/ci.yml`** — build+lint+test on every PR and push to `main`, required to
+  pass before merging (branch protection on `main`).
+- **`.github/workflows/release.yml`** — Changesets-driven versioning and publishing to GitHub
+  Packages under the `@vtex-us-se` scope, on push to `main`.
 - **Changesets** (`.changeset/`) handles independent semver per package. Every publishable
-  change is declared with `pnpm changeset`.
-- Every publishable `package.json` already has `publishConfig` pointing at GitHub Packages with
-  the placeholder scope `@vtex-us-se` — **actual publishing isn't configured yet** (the
-  definitive registry/org and the CI workflow that triggers it are still missing).
+  change is declared with `pnpm changeset`; merging the resulting "Version Packages" PR
+  triggers the actual publish.
 
 ## Current status
 
 - **`SeBanner`** is the first real component, ported end-to-end from `faststore-demoanalyst`
-  (logic in `components`, styles + CMS schema in `ui`, a Storybook story in `docs`).
-- CLI still has no real copy logic (`copySchema()` is a placeholder).
-- No CI/CD yet.
-- No real publishing to any registry yet.
+  (logic in `components`, styles + CMS schema in `ui`, a Storybook story in `docs`), and
+  installable today via `@vtex-us-se/ui` on GitHub Packages.
+- CLI copies real schemas end-to-end (`equipo-components add <ComponentName>`).
+- Real rich-text/markdown support (`textMode`) isn't implemented yet.
 
 ## Development
 

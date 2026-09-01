@@ -30,6 +30,9 @@ importers:
       '@vtex-us-se/config':
         specifier: workspace:*
         version: link:../config
+      '@vtex-us-se/ui':
+        specifier: workspace:*
+        version: link:../ui
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

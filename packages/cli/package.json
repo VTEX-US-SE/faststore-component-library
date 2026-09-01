@@ -19,8 +19,12 @@
   "dependencies": {
     "commander": "^12.1.0"
   },
+  "peerDependencies": {
+    "@vtex-us-se/ui": "workspace:*"
+  },
   "devDependencies": {
     "@vtex-us-se/config": "workspace:*",
+    "@vtex-us-se/ui": "workspace:*",
     "@types/node": "^22.7.0",
     "typescript": "^5.6.0"
   },
