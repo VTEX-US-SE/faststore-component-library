@@ -1,7 +1,7 @@
 {
   "name": "@vtex-us-se/components",
   "version": "0.0.0",
-  "description": "Lógica y accesibilidad de componentes React para FastStore v4, sin estilos.",
+  "description": "Logic and accessibility for React components for FastStore v4, no styles.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [

@@ -2,7 +2,7 @@
   "name": "@vtex-us-se/docs",
   "version": "0.0.0",
   "private": true,
-  "description": "Storybook — documentación viva de qué componentes existen en @vtex-us-se/components y @vtex-us-se/ui.",
+  "description": "Storybook — living documentation of the components that exist in @vtex-us-se/components and @vtex-us-se/ui.",
   "scripts": {
     "dev": "storybook dev -p 6006",
     "build": "storybook build",

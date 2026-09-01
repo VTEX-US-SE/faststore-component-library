@@ -2,7 +2,7 @@
   "name": "faststore-component-library",
   "version": "0.0.0",
   "private": true,
-  "description": "Librería interna de componentes reutilizables para FastStore v4 — VTEX Solutions Engineering (Rocketlane 1442908, fase P6).",
+  "description": "Internal library of reusable components for FastStore v4 — VTEX Solutions Engineering (Rocketlane 1442908, phase P6).",
   "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": ">=18"

@@ -1,22 +1,28 @@
 # @vtex-us-se/ui
 
-Estilos y tokens que consumen la lógica de [`@vtex-us-se/components`](../components/README.md).
+Styles and tokens that consume the logic from
+[`@vtex-us-se/components`](../components/README.md).
 
-## Convención: schema de CMS colocado junto al componente
+## Convention: CMS schema colocated with the component
 
-FastStore v4 **solo** lee schemas de CMS desde la carpeta local del proyecto consumidor
-(`cms/faststore/*.jsonc`) — no los detecta automáticamente desde `node_modules`. Por eso,
-cada componente publicado desde este paquete debe vivir junto a su archivo de schema:
+FastStore v4 **only** reads CMS schemas from the consuming project's local folder
+(`cms/faststore/*.jsonc`) — it does not auto-detect them from `node_modules`. That's why every
+component published from this package must live alongside its schema file:
 
 ```
 packages/ui/src/<ComponentName>/
 ├── <ComponentName>.tsx
-├── <ComponentName>.module.css   (o .scss)
+├── <ComponentName>.module.css   (or .scss)
 └── <ComponentName>.schema.jsonc
 ```
 
-Esto permite que [`@vtex-us-se/cli`](../cli/README.md) copie el `.schema.jsonc` correspondiente
-hacia `cms/faststore/` del proyecto que consume el componente, sin que el equipo tenga que
-mantenerlo sincronizado a mano.
+This lets [`@vtex-us-se/cli`](../cli/README.md) copy the corresponding `.schema.jsonc` into the
+consuming project's `cms/faststore/`, without the team having to keep it in sync by hand.
 
-Sin componentes reales todavía — solo el esqueleto del paquete y esta convención documentada.
+## Components
+
+- **`SeBanner`** — hero/banner section with a full-bleed image mode and a text+CTA mode.
+  Ported from `faststore-demoanalyst`'s `Banner` component, decoupled from Next.js
+  (`next/router`/`next/image` replaced with native `<a>`/`<img>` + an optional `imageLoader`
+  prop). See [`SeBanner.tsx`](src/SeBanner/SeBanner.tsx) and
+  [`SeBanner.schema.jsonc`](src/SeBanner/SeBanner.schema.jsonc).

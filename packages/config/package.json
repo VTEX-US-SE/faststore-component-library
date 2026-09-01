@@ -2,7 +2,7 @@
   "name": "@vtex-us-se/config",
   "version": "0.0.0",
   "private": true,
-  "description": "Configuración compartida de TypeScript, ESLint y Prettier para todos los paquetes del monorepo.",
+  "description": "Shared TypeScript, ESLint and Prettier configuration for every package in the monorepo.",
   "files": [
     "tsconfig.base.json",
     "eslint.config.js",

@@ -1,12 +1,13 @@
 # @vtex-us-se/docs
 
-Storybook del monorepo. Documenta qué componentes existen en `@vtex-us-se/components` y
-`@vtex-us-se/ui` — no reemplaza el código como fuente de verdad, solo lo hace navegable.
+Monorepo Storybook. Documents which components exist in `@vtex-us-se/components` and
+`@vtex-us-se/ui` — it doesn't replace the code as the source of truth, it just makes it
+browsable.
 
-Inicializado sin stories todavía. Una vez existan componentes reales en `packages/ui/src/`,
-agregar sus `*.stories.tsx` en `stories/`.
+Stories live in `stories/`, one `*.stories.tsx` per component in `packages/ui/src/`.
 
 ```bash
 pnpm install
+pnpm build    # required at least once — the dev server resolves @vtex-us-se/ui via its dist
 pnpm --filter @vtex-us-se/docs dev
 ```
