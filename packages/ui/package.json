@@ -1,6 +1,6 @@
 {
   "name": "@vtex-us-se/ui",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Styles and tokens on top of @vtex-us-se/components, with the FastStore v4 CMS schema for each component colocated alongside it.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
