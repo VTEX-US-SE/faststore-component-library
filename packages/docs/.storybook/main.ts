@@ -14,6 +14,18 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(viteConfig) {
+    // Vite/Rollup only runs CJS→ESM interop on files whose resolved path contains
+    // "node_modules" — true for real external deps (their pnpm store path always does),
+    // but false for our own pnpm-symlinked workspace packages, since their *real* path is
+    // just packages/ui/dist, packages/components/dist (no "node_modules" segment at all).
+    // Without this, their compiled CommonJS output gets parsed as plain ESM source and
+    // named imports (e.g. `SeBanner`) silently fail to resolve.
+    viteConfig.build ??= {}
+    viteConfig.build.commonjsOptions = {
+      ...viteConfig.build.commonjsOptions,
+      include: [/node_modules/, /packages\/(ui|components)\/dist\//],
+    }
+
     viteConfig.css ??= {}
     viteConfig.css.preprocessorOptions ??= {}
     viteConfig.css.preprocessorOptions.scss = {
