@@ -50,7 +50,7 @@ packages/ui/src/<ComponentName>/
 └── <ComponentName>.schema.jsonc
 ```
 
-`packages/cli` (the `equipo-components add <ComponentName>` command) copies that `.schema.jsonc`
+`packages/cli` (the `se-components add <ComponentName>` command) copies that `.schema.jsonc`
 into the consuming project's `cms/faststore/components/`, instead of relying on every team to
 copy it by hand — see [its README](packages/cli/README.md).
 
@@ -69,7 +69,7 @@ copy it by hand — see [its README](packages/cli/README.md).
 - **`SeBanner`** is the first real component, ported end-to-end from `faststore-demoanalyst`
   (logic in `components`, styles + CMS schema in `ui`, a Storybook story in `docs`), and
   installable today via `@vtex-us-se/ui` on GitHub Packages.
-- CLI copies real schemas end-to-end (`equipo-components add <ComponentName>`).
+- CLI copies real schemas end-to-end (`se-components add <ComponentName>`).
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.
 
 ## Development

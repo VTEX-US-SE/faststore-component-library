@@ -1,6 +1,6 @@
 # @vtex-us-se/cli
 
-Internal team CLI. Main command: `equipo-components add <ComponentName>`.
+Internal team CLI. Main command: `se-components add <ComponentName>`.
 
 Copies `<ComponentName>.schema.jsonc` from whichever `@vtex-us-se/ui` is installed in the
 **consuming project** (resolved from the current working directory, not from this CLI's own
@@ -9,9 +9,9 @@ dependency tree) into that project's `cms/faststore/components/`, renamed to the
 
 ```bash
 # from the FastStore project that already has @vtex-us-se/ui installed
-equipo-components add SeBanner
-equipo-components add SeBanner --target-dir cms/faststore   # default
-equipo-components add SeBanner --force                       # overwrite an existing schema
+se-components add SeBanner
+se-components add SeBanner --target-dir cms/faststore   # default
+se-components add SeBanner --force                       # overwrite an existing schema
 ```
 
 Refuses to overwrite an existing schema file unless `--force` is passed, so a manually edited
@@ -25,5 +25,5 @@ if it can't be resolved.
 
 ```bash
 pnpm --filter @vtex-us-se/cli build
-node packages/cli/bin/equipo-components.js add SeBanner
+node packages/cli/bin/se-components.js add SeBanner
 ```
