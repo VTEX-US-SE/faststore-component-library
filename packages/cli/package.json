@@ -1,6 +1,6 @@
 {
   "name": "@vtex-us-se/cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Internal CLI: `se-components add <ComponentName>` copies a @vtex-us-se/ui component's .schema.jsonc into cms/faststore/ of the FastStore project that consumes it.",
   "bin": {
     "se-components": "./bin/se-components.js"
