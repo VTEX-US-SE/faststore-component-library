@@ -9,9 +9,9 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     permissions:
       contents: write
-      pull-requests: write
       packages: write
     steps:
       - name: Checkout
@@ -33,18 +33,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # On every push to main:
-      # - if there are unreleased changesets, opens/updates a "Version Packages" PR
-      #   (bumps versions + changelogs, doesn't publish anything yet)
-      # - once that PR is merged (no pending changesets, versions already bumped),
-      #   runs the `publish` command below and pushes the resulting git tags
-      - name: Version or publish
-        uses: changesets/action@v1
-        with:
-          version: pnpm version-packages
-          publish: pnpm release
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Versions and publishes directly on push to main, in one step — no intermediate
+      # "Version Packages" PR (changesets/action's usual flow), because the VTEX-US-SE org
+      # disallows GitHub Actions from creating pull requests, org-wide. Trade-off: a version
+      # bump lands on main without a review step of its own; acceptable for this low-stakes
+      # internal library. If there are no pending changesets, this is a no-op.
+      - name: Version and publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(ls .changeset/*.md 2>/dev/null)" ]; then
+            echo "No pending changesets — nothing to version or publish."
+            exit 0
+          fi
+
+          pnpm version-packages
+          git add -A
+          git commit -m "chore: version packages [skip ci]"
+          pnpm release
+          git push --follow-tags
