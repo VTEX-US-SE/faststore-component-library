@@ -4,7 +4,7 @@ import { addCommand } from './commands/add'
 const program = new Command()
 
 program
-  .name('equipo-components')
+  .name('se-components')
   .description('Internal CLI for the Solutions Engineering team to consume FastStore v4 components')
   .version('0.0.0')
 

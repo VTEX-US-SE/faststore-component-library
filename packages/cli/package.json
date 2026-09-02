@@ -1,9 +1,9 @@
 {
   "name": "@vtex-us-se/cli",
   "version": "0.0.1",
-  "description": "Internal CLI: `equipo-components add <ComponentName>` copies a @vtex-us-se/ui component's .schema.jsonc into cms/faststore/ of the FastStore project that consumes it.",
+  "description": "Internal CLI: `se-components add <ComponentName>` copies a @vtex-us-se/ui component's .schema.jsonc into cms/faststore/ of the FastStore project that consumes it.",
   "bin": {
-    "equipo-components": "./bin/equipo-components.js"
+    "se-components": "./bin/se-components.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
