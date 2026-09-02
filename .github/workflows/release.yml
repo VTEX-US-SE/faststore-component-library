@@ -47,12 +47,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(ls .changeset/*.md 2>/dev/null)" ]; then
+          pnpm version-packages
+
+          # `changeset version` is a no-op (prints "No unreleased changesets found") when
+          # .changeset/ has nothing but its own README.md — checking the actual working
+          # tree here (rather than globbing .changeset/*.md, which always matches that
+          # README) is what correctly detects "nothing pending" in that case.
+          if [ -z "$(git status --porcelain)" ]; then
             echo "No pending changesets — nothing to version or publish."
             exit 0
           fi
 
-          pnpm version-packages
           git add -A
           git commit -m "chore: version packages [skip ci]"
           pnpm release
