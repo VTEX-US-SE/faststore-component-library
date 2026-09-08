@@ -14,16 +14,22 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(viteConfig) {
-    // Vite/Rollup only runs CJS→ESM interop on files whose resolved path contains
-    // "node_modules" — true for real external deps (their pnpm store path always does),
-    // but false for our own pnpm-symlinked workspace packages, since their *real* path is
-    // just packages/ui/dist, packages/components/dist (no "node_modules" segment at all).
-    // Without this, their compiled CommonJS output gets parsed as plain ESM source and
-    // named imports (e.g. `SeBanner`) silently fail to resolve.
-    viteConfig.build ??= {}
-    viteConfig.build.commonjsOptions = {
-      ...viteConfig.build.commonjsOptions,
-      include: [/node_modules/, /packages\/(ui|components)\/dist\//],
+    // Storybook resolves our own workspace packages straight to their TS source instead of
+    // their compiled dist/ (CommonJS, for real external Next.js/webpack consumers). This
+    // sidesteps a real rabbit hole: Vite/Rollup's CJS→ESM interop keys off the resolved
+    // path containing "node_modules" (true for real deps, false for pnpm-symlinked
+    // workspace packages — their *real* path is just packages/ui/dist, no "node_modules"
+    // segment), and esbuild's dev-server pre-bundler has an equivalent but separate gap
+    // (it only produces a `default` export for these, dropping named exports like
+    // `SeBanner`) — chasing each Vite subsystem's version of this bug isn't worth it when
+    // Storybook can just compile TS source directly, which it already knows how to do.
+    viteConfig.resolve ??= {}
+    viteConfig.resolve.alias = {
+      ...(viteConfig.resolve.alias as Record<string, string> | undefined),
+      '@vtex-us-se/ui': fileURLToPath(new URL('../../ui/src/index.ts', import.meta.url)),
+      '@vtex-us-se/components': fileURLToPath(
+        new URL('../../components/src/index.ts', import.meta.url),
+      ),
     }
 
     viteConfig.css ??= {}

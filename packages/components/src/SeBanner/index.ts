@@ -1,5 +1,6 @@
 export * from './types'
 export * from './getImageUrl'
+export * from './buildResponsiveImage'
 export * from './useIsMobile'
 export * from './useBannerStyles'
 export * from './useBannerContext'

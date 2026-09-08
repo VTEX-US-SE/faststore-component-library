@@ -1,13 +1,21 @@
 import { forwardRef } from 'react'
 import type { HTMLAttributes, Ref } from 'react'
-import { BannerContext, type ImageUrl } from '@vtex-us-se/components'
+import { BannerContext } from '@vtex-us-se/components'
+
+export interface SeBannerRootTextImage {
+  src: string
+  alt: string
+  srcSet?: string
+  width?: number
+  height?: number
+}
 
 export interface SeBannerRootProps extends HTMLAttributes<HTMLElement> {
   variant?: 'primary' | 'secondary'
   colorVariant?: 'main' | 'light' | 'accent'
   testId?: string
   imageWithText?: boolean
-  textImage?: ImageUrl
+  textImage?: SeBannerRootTextImage
   isFullModeStyle?: boolean
   link?: { url?: string; linkTargetBlank?: boolean }
 }
@@ -49,7 +57,14 @@ export const SeBannerRoot = forwardRef<
             {...dataAttrs}
             {...otherProps}
           >
-            <img alt={textImage?.alt ?? ''} src={textImage?.src ?? ''} />
+            <img
+              alt={textImage?.alt ?? ''}
+              src={textImage?.src ?? ''}
+              srcSet={textImage?.srcSet}
+              sizes={textImage?.srcSet ? '100vw' : undefined}
+              width={textImage?.width}
+              height={textImage?.height}
+            />
           </a>
         ) : (
           <img
@@ -58,6 +73,10 @@ export const SeBannerRoot = forwardRef<
             {...otherProps}
             alt={textImage?.alt ?? ''}
             src={textImage?.src ?? ''}
+            srcSet={textImage?.srcSet}
+            sizes={textImage?.srcSet ? '100vw' : undefined}
+            width={textImage?.width}
+            height={textImage?.height}
           />
         )}
       </BannerContext.Provider>

@@ -43,3 +43,25 @@ export const ImageWithText: Story = {
     link: { show: false, text: '', url: '#', linkTargetBlank: false },
   },
 }
+
+// A mock `imageLoader` (standing in for a real Thumbor/VTEX loader) so this story renders
+// a real `srcSet` with one entry per requested width — verifies buildResponsiveImage's
+// output end-to-end instead of just unit-testing it in isolation.
+const mockImageLoader = ({ src, width }: { src: string; width: number }) =>
+  `${src}?w=${width}`
+
+export const WithImageLoaderSrcSet: Story = {
+  args: {
+    isFullModeStyle: false,
+    textPosition: TextPosition.LEFT,
+    overlayTextPos: OverlayTextPos.LEFT,
+    textAlignment: TextAlignment.LEFT,
+    textMode: 'html',
+    mobileOverlayTextPos: MobileOverlayTextPosition.BOTTOM,
+    title: 'Con imageLoader — srcset responsivo',
+    subtitle: 'Inspeccioná el <img> en el DOM: debería tener src/srcSet con 4 anchos (360/768/1200/1920)',
+    image: PLACEHOLDER_IMAGE,
+    link: { show: true, text: 'Ver más', url: '#', linkTargetBlank: false },
+    imageLoader: mockImageLoader,
+  },
+}
