@@ -1,5 +1,12 @@
 # @vtex-us-se/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [f50b530]
+  - @vtex-us-se/ui@0.0.2
+
 ## 0.1.0
 
 ### Minor Changes
