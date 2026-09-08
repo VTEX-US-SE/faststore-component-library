@@ -1,6 +1,6 @@
 {
   "name": "@vtex-us-se/components",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Logic and accessibility for React components for FastStore v4, no styles.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,8 +21,12 @@
   },
   "typesVersions": {
     "*": {
-      "b2c": ["./dist/b2c/index.d.ts"],
-      "b2b": ["./dist/b2b/index.d.ts"]
+      "b2c": [
+        "./dist/b2c/index.d.ts"
+      ],
+      "b2b": [
+        "./dist/b2b/index.d.ts"
+      ]
     }
   },
   "files": [
