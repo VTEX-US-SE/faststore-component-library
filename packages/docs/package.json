@@ -14,6 +14,7 @@
     "@vtex-us-se/ui": "workspace:*",
     "@faststore/ui": "^3.99.4",
     "@faststore/components": "^3.99.4",
+    "@faststore/core": "^4.4.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },

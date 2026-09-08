@@ -4,6 +4,27 @@
   "description": "Styles and tokens on top of @vtex-us-se/components, with the FastStore v4 CMS schema for each component colocated alongside it.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./b2c": {
+      "types": "./dist/b2c/index.d.ts",
+      "default": "./dist/b2c/index.js"
+    },
+    "./b2b": {
+      "types": "./dist/b2b/index.d.ts",
+      "default": "./dist/b2b/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "b2c": ["./dist/b2c/index.d.ts"],
+      "b2b": ["./dist/b2b/index.d.ts"]
+    }
+  },
   "files": [
     "dist"
   ],
