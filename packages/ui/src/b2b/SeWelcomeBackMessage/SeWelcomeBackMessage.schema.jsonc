@@ -1,0 +1,21 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeWelcomeBackMessage",
+  "$componentTitle": "SE Welcome Back",
+  "title": "Welcome Back",
+  "description": "Welcome Back message configuration",
+  "type": "object",
+  "required": ["greetings"],
+  "properties": {
+    "greetings": {
+      "type": "string",
+      "title": "Welcome back message",
+      "default": "Welcome back"
+    },
+    "text": {
+      "type": "string",
+      "title": "Welcome back text",
+      "default": "Here's your operational summary and quick actions."
+    }
+  }
+}

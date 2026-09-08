@@ -1,2 +1,1 @@
-export { SeBanner } from './SeBanner/SeBanner'
-export type { SeBannerProps } from './SeBanner/SeBanner'
+export * from './b2c'

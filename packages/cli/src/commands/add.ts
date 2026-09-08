@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
 interface AddOptions {
@@ -22,6 +22,25 @@ export const addCommand = new Command('add')
   })
 
 /**
+ * Looks for <componentName>/<componentName>.schema.jsonc directly under `dist`, and — since
+ * components live under a segment folder (dist/b2c/<Name>, dist/b2b/<Name>) — one level down
+ * inside each of dist's immediate subdirectories. Not recursive beyond that: components aren't
+ * nested more than one segment deep.
+ */
+function findSchemaPath(distRoot: string, componentName: string): string | undefined {
+  const direct = join(distRoot, componentName, `${componentName}.schema.jsonc`)
+  if (existsSync(direct)) return direct
+
+  for (const entry of readdirSync(distRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue
+    const nested = join(distRoot, entry.name, componentName, `${componentName}.schema.jsonc`)
+    if (existsSync(nested)) return nested
+  }
+
+  return undefined
+}
+
+/**
  * Resolves <ComponentName>.schema.jsonc from whichever @vtex-us-se/ui is installed in the
  * CONSUMING project (resolved from cwd, not from this CLI's own node_modules) — that's the
  * version whose schema should actually be copied.
@@ -36,10 +55,11 @@ function resolveSchemaPath(componentName: string): string {
     throw new Error('@vtex-us-se/ui is not installed in this project. Run `pnpm add @vtex-us-se/ui` first.')
   }
 
-  const schemaPath = join(dirname(uiPackageJsonPath), 'dist', componentName, `${componentName}.schema.jsonc`)
-  if (!existsSync(schemaPath)) {
+  const distRoot = join(dirname(uiPackageJsonPath), 'dist')
+  const schemaPath = findSchemaPath(distRoot, componentName)
+  if (!schemaPath) {
     throw new Error(
-      `No schema found for "${componentName}" at ${schemaPath}. Check the component name — it must match ` +
+      `No schema found for "${componentName}" under ${distRoot}. Check the component name — it must match ` +
         'the component folder name under @vtex-us-se/ui/src exactly (case-sensitive).',
     )
   }

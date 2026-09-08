@@ -1,0 +1,27 @@
+@layer components {
+  .welcomeBackMessage {
+    display: flex;
+    flex-direction: column;
+
+    max-width: var(--fs-grid-max-width);
+    margin: 24px auto;
+
+    @media screen and (max-width: 1023px) {
+      padding-inline: var(--fs-grid-padding);
+    }
+
+    h2 {
+      font-family: var(--fs-text-face-body);
+      font-size: var(--fs-text-size-4);
+      font-weight: var(--fs-text-weight-semibold);
+      line-height: 140%;
+      color: var(--fs-color-text);
+    }
+
+    p {
+      font-size: var(--fs-text-size-1);
+      font-weight: var(--fs-text-weight-regular);
+      color: var(--fs-color-text);
+    }
+  }
+}
