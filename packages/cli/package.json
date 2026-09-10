@@ -1,7 +1,7 @@
 {
   "name": "@vtex-us-se/cli",
   "version": "1.0.0",
-  "description": "Internal CLI: `se-components add <ComponentName>` copies a @vtex-us-se/ui component's .schema.jsonc into cms/faststore/ of the FastStore project that consumes it.",
+  "description": "Internal CLI: `se-components add <ComponentName>` copies a @vtex-us-se/ui component's .schema.jsonc into cms/faststore/, and `se-components add-resolver <operationName>` copies a @vtex-us-se/resolvers GraphQL operation (typeDef + client query) into the FastStore project that consumes it.",
   "bin": {
     "se-components": "./bin/se-components.js"
   },
@@ -20,11 +20,21 @@
     "commander": "^12.1.0"
   },
   "peerDependencies": {
-    "@vtex-us-se/ui": "workspace:*"
+    "@vtex-us-se/ui": "workspace:*",
+    "@vtex-us-se/resolvers": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@vtex-us-se/ui": {
+      "optional": true
+    },
+    "@vtex-us-se/resolvers": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@vtex-us-se/config": "workspace:*",
     "@vtex-us-se/ui": "workspace:*",
+    "@vtex-us-se/resolvers": "workspace:*",
     "@types/node": "^22.7.0",
     "typescript": "^5.6.0"
   },

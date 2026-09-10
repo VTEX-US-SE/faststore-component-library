@@ -1,0 +1,12 @@
+type OrganizationRequestResponse {
+  success: Boolean!
+}
+type Mutation {
+  submitOrganizationRequest(
+    companyName: String!
+    contactName: String!
+    email: String!
+    phone: String
+    message: String
+  ): OrganizationRequestResponse
+}

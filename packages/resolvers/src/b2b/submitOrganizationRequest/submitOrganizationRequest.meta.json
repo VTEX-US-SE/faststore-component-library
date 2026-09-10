@@ -1,0 +1,9 @@
+{
+  "operationType": "Mutation",
+  "fieldName": "submitOrganizationRequest",
+  "factoryExport": "createSubmitOrganizationRequestResolver",
+  "configParams": ["storeId", "environment?"],
+  "clientQueryExport": "SUBMIT_ORGANIZATION_REQUEST_MUTATION",
+  "clientFileName": "organizationRequest.ts",
+  "clientConstantName": "ORGANIZATION_REQUEST_MUTATION"
+}
