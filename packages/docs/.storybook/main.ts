@@ -26,10 +26,30 @@ const config: StorybookConfig = {
     viteConfig.resolve ??= {}
     viteConfig.resolve.alias = {
       ...(viteConfig.resolve.alias as Record<string, string> | undefined),
+      // @faststore/core ships raw TS source with no compiled artifact — importing its real
+      // /experimental or /api subpaths drags in internal SDK modules that only resolve inside a
+      // real FastStore project's own bundler config, crashing Vite's dependency scan for every
+      // story (not just the one that needs it). See mocks/faststore-core-*.ts.
+      '@faststore/core/experimental': fileURLToPath(
+        new URL('./mocks/faststore-core-experimental.ts', import.meta.url),
+      ),
+      '@faststore/core/api': fileURLToPath(new URL('./mocks/faststore-core-api.ts', import.meta.url)),
+      '@vtex-us-se/ui/b2c': fileURLToPath(new URL('../../ui/src/b2c/index.ts', import.meta.url)),
+      '@vtex-us-se/ui/b2b': fileURLToPath(new URL('../../ui/src/b2b/index.ts', import.meta.url)),
       '@vtex-us-se/ui': fileURLToPath(new URL('../../ui/src/index.ts', import.meta.url)),
+      '@vtex-us-se/components/b2c': fileURLToPath(
+        new URL('../../components/src/b2c/index.ts', import.meta.url),
+      ),
+      '@vtex-us-se/components/b2b': fileURLToPath(
+        new URL('../../components/src/b2b/index.ts', import.meta.url),
+      ),
       '@vtex-us-se/components': fileURLToPath(
         new URL('../../components/src/index.ts', import.meta.url),
       ),
+      '@vtex-us-se/resolvers/b2b': fileURLToPath(
+        new URL('../../resolvers/src/b2b/index.ts', import.meta.url),
+      ),
+      '@vtex-us-se/resolvers': fileURLToPath(new URL('../../resolvers/src/index.ts', import.meta.url)),
     }
 
     viteConfig.css ??= {}

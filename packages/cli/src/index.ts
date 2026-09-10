@@ -1,5 +1,6 @@
 import { Command } from 'commander'
 import { addCommand } from './commands/add'
+import { addResolverCommand } from './commands/add-resolver'
 
 const program = new Command()
 
@@ -9,5 +10,6 @@ program
   .version('0.0.0')
 
 program.addCommand(addCommand)
+program.addCommand(addResolverCommand)
 
 program.parse(process.argv)

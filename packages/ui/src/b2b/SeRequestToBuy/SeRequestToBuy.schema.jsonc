@@ -1,0 +1,25 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeRequestToBuy",
+  "$componentTitle": "SE Request To Buy",
+  "title": "Request to Buy",
+  "description": "Form for companies to request buyer access to the B2B portal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Section title",
+      "default": "Request buyer access"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "default": "Fill out the form below and we'll get back to you."
+    },
+    "ctaLabel": {
+      "type": "string",
+      "title": "Button label",
+      "default": "Request to Buy"
+    }
+  }
+}
