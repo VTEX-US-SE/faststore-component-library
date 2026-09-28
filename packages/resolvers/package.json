@@ -1,6 +1,6 @@
 {
   "name": "@vtex-us-se/resolvers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Server-only GraphQL resolvers, typeDefs and client query strings for FastStore v4 operations, consumed via the FastStore GraphQL extension convention (src/graphql/<namespace>/{typeDefs,resolvers}).",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
