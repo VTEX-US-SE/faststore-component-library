@@ -38,12 +38,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # Versions and publishes directly on push to main, in one step — no intermediate
-      # "Version Packages" PR (changesets/action's usual flow), because the VTEX-US-SE org
-      # disallows GitHub Actions from creating pull requests, org-wide. Trade-off: a version
-      # bump lands on main without a review step of its own; acceptable for this low-stakes
-      # internal library. If there are no pending changesets, this is a no-op.
+      # Versions and publishes to npm.pkg.github.com in one step. If there are no pending
+      # changesets, this is a no-op.
       - name: Version and publish
+        id: version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -55,10 +53,54 @@ jobs:
           # README) is what correctly detects "nothing pending" in that case.
           if [ -z "$(git status --porcelain)" ]; then
             echo "No pending changesets — nothing to version or publish."
+            echo "published=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git add -A
           git commit -m "chore: version packages [skip ci]"
           pnpm release
-          git push --follow-tags
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      # Tags aren't covered by main's branch protection (only branch refs are), so this pushes
+      # fine with the default token even though the version-bump commit itself can't (next step).
+      - name: Push release tags
+        if: steps.version.outputs.published == 'true'
+        run: git push origin --tags
+
+      # main requires every change to go through a PR, and the default GITHUB_TOKEN identity
+      # (github-actions[bot]) has no bypass for that rule — only users with this repo's Admin
+      # role do (enforce_admins is off), which is why a human's direct push works but a plain
+      # `git push` from this job doesn't. So instead of pushing the version-bump commit to main
+      # directly, this opens it as a PR, authenticated as an actual user via the RELEASE_PR_TOKEN
+      # secret (a PAT with `repo` scope, belonging to someone with write access to this repo) —
+      # same effect as the manual "sync" PRs this repo needed three times before
+      # (739a3fb, c0b8f98, and the PR this step replaces having to open by hand).
+      # Reuses one stable branch name (force-pushed) so repeated releases update the same PR
+      # instead of accumulating a new one each time.
+      - name: Open PR with the version bump
+        if: steps.version.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::RELEASE_PR_TOKEN is not set. Packages were published to the registry" \
+                 "successfully, but the version-bump commit could not be opened as a PR." \
+                 "Add a PAT (classic 'repo' scope, or fine-grained Contents+Pull requests" \
+                 "read/write) belonging to a user with write access to this repo as the" \
+                 "RELEASE_PR_TOKEN repository secret, then re-run this workflow — or sync" \
+                 "package.json/CHANGELOG.md by hand in the meantime (see AGENTS.md/README for" \
+                 "the 'chore: version packages (sync ...)' pattern used by prior releases)."
+            exit 1
+          fi
+
+          BRANCH="chore/sync-published-versions"
+          git checkout -b "$BRANCH"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:$BRANCH"
+
+          gh pr create \
+            --title "chore: version packages (sync repo with published versions)" \
+            --body "Automated version bump for the package(s) this Release run just published to the registry (run: ${GITHUB_SERVER_URL}/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID}). Merge to bring package.json/CHANGELOG.md back in line with what's live." \
+            --base main \
+            --head "$BRANCH" \
+            || echo "A PR for $BRANCH was already open — force-pushed the updated commit onto it instead of opening a new one."
