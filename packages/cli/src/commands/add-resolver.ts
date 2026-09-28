@@ -29,17 +29,28 @@ interface OperationMeta {
    * `export default factory(...)` as-is, unwrapped.
    */
   resolverShape?: 'field' | 'map'
+  /**
+   * For "map"-shaped resolvers only: which top-level keys of the returned map extend an
+   * *existing* FastStore/VTEX type (e.g. "StoreProduct") using data already available in the
+   * resolver context -- FastStore's own convention calls this a "vtex" extension, kept apart
+   * from "thirdParty" extensions (new types/queries/mutations, calling an external API). When
+   * present, `add-resolver` writes two resolver files instead of one -- `vtex/resolvers/` gets
+   * these keys, `thirdParty/resolvers/` gets everything else -- ignoring --namespace for
+   * resolver placement (that split is fixed by FastStore's own convention, not renameable per
+   * project). --namespace still controls where the typeDef itself is copied.
+   */
+  typeExtensionKeys?: string[]
 }
 
 export const addResolverCommand = new Command('add-resolver')
   .description(
     'Copies a @vtex-us-se/resolvers operation (typeDef + client query) into the consuming project, ' +
-      'and scaffolds the server resolver index and client query wrapper if they do not exist yet.',
+      'and scaffolds (or safely merges into) the server resolver index and client query wrapper.',
   )
   .argument('<operationName>', 'Name of the GraphQL operation to add (must exist in @vtex-us-se/resolvers)')
   .option('-t, --target-dir <path>', "Consuming project's src/graphql/ folder", 'src/graphql')
   .option('-c, --client-dir <path>', "Consuming project's client query folder", 'src/utils')
-  .option('-n, --namespace <name>', 'GraphQL extension namespace to write under', 'b2c')
+  .option('-n, --namespace <name>', 'GraphQL extension namespace to write the typeDef under', 'b2c')
   .option('-f, --force', 'overwrite the typeDef file if it already exists (never overwrites scaffolded resolver/client files)', false)
   .action((operationName: string, options: AddResolverOptions) => {
     try {
@@ -120,6 +131,31 @@ function resolveOperationAssets(operationName: string): { graphqlPath: string; m
 }
 
 /**
+ * Requires `@vtex-us-se/resolvers/<packageSubpath>` from the CONSUMING project (from cwd) and
+ * returns one named export's runtime value, asserting it's a string. Used to embed a
+ * query/mutation's actual text literally into a generated file, rather than importing the
+ * constant: this project's own GraphQL codegen only registers `gql(\`...\`)` calls whose
+ * argument is literal text inside its own src/ -- a `gql(IMPORTED_CONST)` call can never be
+ * seen by it, no matter that the import itself resolves fine at runtime.
+ */
+function resolveStringExport(packageSubpath: string, exportName: string): string {
+  const modulePath = require.resolve(`@vtex-us-se/resolvers/${packageSubpath}`, { paths: [process.cwd()] })
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require(modulePath)
+  const value = mod[exportName]
+
+  if (typeof value !== 'string') {
+    throw new Error(`Expected @vtex-us-se/resolvers/${packageSubpath}'s "${exportName}" export to be a string, got ${typeof value}.`)
+  }
+
+  return value
+}
+
+function escapeForTemplateLiteral(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
+}
+
+/**
  * Best-effort read of the consuming project's own discovery.config.js (assumed at cwd, same
  * convention already relied on by --target-dir's default). Never throws — a missing file or
  * missing api.storeId just means the generated snippet falls back to a placeholder.
@@ -139,16 +175,6 @@ function detectVtexApiConfig(): { storeId?: string; environment?: string } {
   } catch {
     return {}
   }
-}
-
-/** A resolver file's own base name, so a "map"-shaped operation doesn't collide with, or get
- *  mislabeled as, a single "mutationResolver.ts"/"queryResolver.ts" for the same namespace. */
-function resolverFileNameFor(operationName: string, meta: OperationMeta): string {
-  if (meta.resolverShape === 'map') {
-    return `${operationName}Resolver.ts`
-  }
-
-  return meta.operationType === 'Mutation' ? 'mutationResolver.ts' : 'queryResolver.ts'
 }
 
 /**
@@ -218,12 +244,92 @@ export default ${resolverVarName}
 `
 }
 
-function buildClientWrapperSnippet(meta: OperationMeta, packageSubpath: string): string {
-  return `import { gql } from '@faststore/core/api'
-import { ${meta.clientQueryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
+/** Same factory call as buildResolverSnippet's "map" branch, but only re-exporting `keys` of
+ *  the returned map — used to split a map-shaped resolver across vtex/ and thirdParty/. */
+function buildSplitResolverSnippet(
+  operationName: string,
+  meta: OperationMeta,
+  packageSubpath: string,
+  vtexConfig: { storeId?: string; environment?: string },
+  keys: string[],
+): string {
+  const keyLines = keys.map((key) => `  ${key}: ${operationName}.${key},`).join('\n')
 
-export const ${meta.clientConstantName} = gql(${meta.clientQueryExport})
+  return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
+
+const ${operationName} = ${meta.factoryExport}({
+  ${buildConfigLines(meta, vtexConfig, '  ')}
+})
+
+export default {
+${keyLines}
+}
 `
+}
+
+function buildClientWrapperSnippet(meta: OperationMeta, packageSubpath: string, operationName: string): string {
+  const queryText = escapeForTemplateLiteral(resolveStringExport(packageSubpath, meta.clientQueryExport))
+
+  return `import { gql } from '@faststore/core/api'
+
+// Embedded literally, not imported from @vtex-us-se/resolvers: this project's GraphQL codegen
+// only registers a gql() call whose argument is literal template-string text inside its own
+// src/, so an imported constant is invisible to it even though the import itself resolves fine
+// at runtime. Re-run "se-components add-resolver ${operationName}" after a @vtex-us-se/resolvers
+// upgrade that changes this operation -- it never overwrites an existing copy of this file.
+export const ${meta.clientConstantName} = gql(\`${queryText}\`)
+`
+}
+
+/**
+ * Creates `aggregatorPath` if missing (a plain re-export of `resolverModuleName`), or safely
+ * merges into it if it already holds either shape this CLI itself produces: a single re-export,
+ * or an already-merged `{ ...a, ...b }` spread object. Anything else is left untouched with
+ * instructions printed instead — silently mis-merging a consumer's own file is worse than
+ * asking them to add a few lines by hand.
+ */
+function writeOrMergeAggregator(aggregatorPath: string, resolverModuleName: string): string {
+  if (!existsSync(aggregatorPath)) {
+    mkdirSync(dirname(aggregatorPath), { recursive: true })
+    writeFileSync(aggregatorPath, `export { default } from './${resolverModuleName}'\n`)
+    return `✔ Created ${aggregatorPath} (re-exports ./${resolverModuleName})`
+  }
+
+  const content = readFileSync(aggregatorPath, 'utf-8')
+
+  if (content.includes(`./${resolverModuleName}'`) || content.includes(`./${resolverModuleName}"`)) {
+    return `ℹ ${aggregatorPath} already references ./${resolverModuleName} — left untouched.`
+  }
+
+  const singleReExportMatch = content.trim().match(/^export\s*\{\s*default\s*\}\s*from\s*(['"])(\.\/[A-Za-z0-9_-]+)\1;?$/)
+  if (singleReExportMatch) {
+    const existingModule = singleReExportMatch[2] as string
+    const existingVar = existingModule.replace(/^\.\//, '')
+    const merged =
+      `import ${existingVar} from '${existingModule}'\n` +
+      `import ${resolverModuleName} from './${resolverModuleName}'\n\n` +
+      `export default {\n  ...${existingVar},\n  ...${resolverModuleName},\n}\n`
+    writeFileSync(aggregatorPath, merged)
+    return `✔ Merged ${aggregatorPath} into a combined export (added ./${resolverModuleName})`
+  }
+
+  const spreadShapeMatch = content.match(
+    /^((?:import\s+[A-Za-z0-9_$]+\s+from\s+(['"])\.\/[A-Za-z0-9_-]+\2\s*\n)+)\s*export default\s*\{\s*((?:\.\.\.[A-Za-z0-9_$]+,?\s*)+)\}\s*;?\s*$/,
+  )
+  if (spreadShapeMatch) {
+    const importsBlock = spreadShapeMatch[1] as string
+    const spreadsBlock = (spreadShapeMatch[3] as string).trim()
+    const merged =
+      `${importsBlock}import ${resolverModuleName} from './${resolverModuleName}'\n\n` +
+      `export default {\n  ${spreadsBlock}${spreadsBlock.endsWith(',') ? '' : ','}\n  ...${resolverModuleName},\n}\n`
+    writeFileSync(aggregatorPath, merged)
+    return `✔ Merged ${aggregatorPath} into its existing combined export (added ./${resolverModuleName})`
+  }
+
+  return (
+    `⚠ ${aggregatorPath} already exists in a shape this CLI won't risk merging automatically — add this by hand: ` +
+    `import ${resolverModuleName} from './${resolverModuleName}', then spread ...${resolverModuleName} into its default export.`
+  )
 }
 
 function addResolver(operationName: string, options: AddResolverOptions): void {
@@ -243,60 +349,88 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   copyFileSync(graphqlPath, typeDefDest)
   summary.push(`✔ Copied typeDef → ${typeDefDest}`)
 
-  // 2. server resolver (create only if missing, never overwrite)
+  // 2. server resolver(s)
   const vtexConfig = detectVtexApiConfig()
-  const resolverFileName = resolverFileNameFor(operationName, meta)
-  const resolverPath = join(targetDir, namespace, 'resolvers', resolverFileName)
-  const resolverSnippet = buildResolverSnippet(meta, packageSubpath, vtexConfig)
+  const resolverFileName = `${operationName}Resolver.ts`
+  const resolverModuleName = operationName
 
-  if (existsSync(resolverPath)) {
-    const note =
-      meta.resolverShape === 'map'
-        ? `⚠ ${resolverPath} already exists — not touched.`
-        : `⚠ ${resolverPath} already exists — not touched. Add this to its "${meta.operationType}" object by hand:\n\n${resolverSnippet}`
-    summary.push(note)
+  if (meta.resolverShape === 'map' && meta.typeExtensionKeys && meta.typeExtensionKeys.length > 0) {
+    // Split across FastStore's two fixed namespaces (see FastStore's own extending-GraphQL
+    // convention) -- not driven by --namespace, since these two folder names aren't a per-
+    // project choice.
+    const vtexKeys = meta.typeExtensionKeys
+    // Every other key this factory's map actually has is a "thirdParty" key. We don't have the
+    // full key list without calling the factory, so probe it once here (side-effect free) --
+    // silencing its own runtime warnings (e.g. missing checkoutBaseUrl) since a placeholder
+    // probe call isn't the moment to surface those.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const factoryModule = require(require.resolve(`@vtex-us-se/resolvers/${packageSubpath}`, { paths: [process.cwd()] }))
+    const originalWarn = console.warn
+    console.warn = () => {}
+    let probe: Record<string, unknown>
+    try {
+      probe = factoryModule[meta.factoryExport]({ storeId: 'probe' })
+    } finally {
+      console.warn = originalWarn
+    }
+    const thirdPartyKeys = Object.keys(probe).filter((key) => !vtexKeys.includes(key))
+
+    const placements: Array<{ ns: string; keys: string[] }> = [
+      { ns: 'vtex', keys: vtexKeys },
+      { ns: 'thirdParty', keys: thirdPartyKeys },
+    ].filter((placement) => placement.keys.length > 0)
+
+    for (const { ns, keys } of placements) {
+      const resolverPath = join(targetDir, ns, 'resolvers', resolverFileName)
+      const snippet = buildSplitResolverSnippet(operationName, meta, packageSubpath, vtexConfig, keys)
+
+      if (existsSync(resolverPath)) {
+        summary.push(`⚠ ${resolverPath} already exists — not touched.`)
+      } else {
+        mkdirSync(dirname(resolverPath), { recursive: true })
+        writeFileSync(resolverPath, snippet)
+        summary.push(`✔ Created ${resolverPath} (${keys.join(', ')})`)
+      }
+
+      const aggregatorPath = join(targetDir, ns, 'resolvers', 'index.ts')
+      summary.push(writeOrMergeAggregator(aggregatorPath, resolverModuleName))
+    }
   } else {
-    mkdirSync(dirname(resolverPath), { recursive: true })
-    writeFileSync(resolverPath, resolverSnippet)
-    const storeIdNote = vtexConfig.storeId ? ` (storeId auto-detected: ${vtexConfig.storeId})` : ' (storeId left as a TODO placeholder)'
-    summary.push(`✔ Created ${resolverPath}${storeIdNote}`)
-  }
+    const resolverPath = join(targetDir, namespace, 'resolvers', resolverFileName)
+    const resolverSnippet = buildResolverSnippet(meta, packageSubpath, vtexConfig)
 
-  if (meta.resolverShape === 'map') {
-    summary.push(
-      `ℹ ${resolverFileName} exports a full resolver map (it may cover more than "${meta.operationType}.${meta.fieldName}" — ` +
-        'check its other top-level keys, e.g. a field extension on an existing type, before assuming this namespace is the right home for all of them).',
-    )
-  }
+    if (existsSync(resolverPath)) {
+      const note =
+        meta.resolverShape === 'map'
+          ? `⚠ ${resolverPath} already exists — not touched.`
+          : `⚠ ${resolverPath} already exists — not touched. Add this to its "${meta.operationType}" object by hand:\n\n${resolverSnippet}`
+      summary.push(note)
+    } else {
+      mkdirSync(dirname(resolverPath), { recursive: true })
+      writeFileSync(resolverPath, resolverSnippet)
+      const storeIdNote = vtexConfig.storeId ? ` (storeId auto-detected: ${vtexConfig.storeId})` : ' (storeId left as a TODO placeholder)'
+      summary.push(`✔ Created ${resolverPath}${storeIdNote}`)
+    }
 
-  // 3. resolvers aggregator — the actual file FastStore's GraphQL server loads for this
-  // namespace (see AGENTS.md/the resolvers README: "Aggregates all resolvers"). Only created
-  // when missing; never overwritten, since a namespace with more than one operation already
-  // has one merging several imports, and blindly overwriting it would drop those.
-  const aggregatorPath = join(targetDir, namespace, 'resolvers', 'index.ts')
-  const resolverModuleName = resolverFileName.replace(/\.ts$/, '')
+    if (meta.resolverShape === 'map') {
+      summary.push(
+        `ℹ ${resolverFileName} exports a full resolver map (it may cover more than "${meta.operationType}.${meta.fieldName}" — ` +
+          'declare typeExtensionKeys in this operation\'s meta.json to have this command split it across vtex/ and thirdParty/ automatically).',
+      )
+    }
 
-  if (existsSync(aggregatorPath)) {
-    summary.push(
-      `⚠ ${aggregatorPath} already exists — not touched. Make sure its default export merges in ` +
-        `./${resolverModuleName}'s default export (spread its keys — e.g. Mutation, or a type name — ` +
-        'alongside whatever this namespace already registers).',
-    )
-  } else {
-    mkdirSync(dirname(aggregatorPath), { recursive: true })
-    writeFileSync(aggregatorPath, `export { default } from './${resolverModuleName}'\n`)
-    summary.push(`✔ Created ${aggregatorPath} (re-exports ./${resolverModuleName})`)
+    const aggregatorPath = join(targetDir, namespace, 'resolvers', 'index.ts')
+    summary.push(writeOrMergeAggregator(aggregatorPath, resolverModuleName))
   }
 
   // 3. client query wrapper (create only if missing, never overwrite)
   const clientPath = join(clientDir, meta.clientFileName)
-  const clientSnippet = buildClientWrapperSnippet(meta, packageSubpath)
 
   if (existsSync(clientPath)) {
-    summary.push(`⚠ ${clientPath} already exists — not touched. Expected content:\n\n${clientSnippet}`)
+    summary.push(`⚠ ${clientPath} already exists — not touched.`)
   } else {
     mkdirSync(dirname(clientPath), { recursive: true })
-    writeFileSync(clientPath, clientSnippet)
+    writeFileSync(clientPath, buildClientWrapperSnippet(meta, packageSubpath, operationName))
     summary.push(`✔ Created ${clientPath}`)
   }
 

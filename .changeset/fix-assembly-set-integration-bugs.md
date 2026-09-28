@@ -1,48 +1,84 @@
 ---
 "@vtex-us-se/resolvers": patch
 "@vtex-us-se/ui": patch
+"@vtex-us-se/components": patch
 "@vtex-us-se/cli": minor
 ---
 
-Fix five integration bugs surfaced by a real consumer wiring up `SeAssemblySet` in a fresh
-FastStore v4.7.0 project (`vtex-sites/starter.store`).
+Fix every integration bug found wiring `SeAssemblySet` into two real FastStore v4 projects
+(v4.7.0, `vtex-sites/starter.store`), and resolve the underlying architectural problem those
+bugs kept surfacing: a component whose logic calls a custom GraphQL operation cannot work as a
+plain npm import, no matter how the CLI scaffolds around it, because FastStore's GraphQL
+codegen can only see a `gql(...)` call whose argument is literal text physically inside the
+consuming project's own `src/` — never an imported constant, and never code living in
+`node_modules`.
 
-- **`@vtex-us-se/resolvers`**: `assemblySet.graphql` had a `"""..."""` description directly
-  above `extend type StoreProduct { ... }` — graphql-js rejects descriptions on type
-  extensions (`Syntax Error: Unexpected description, only GraphQL definitions support
-  descriptions`), so every consumer's GraphQL server failed to boot. Moved the description
-  onto the `assemblyOptions` field itself. Added `packages/resolvers/scripts/validate-graphql.mjs`
-  (wired as this package's `test` script) so a `.graphql` file that doesn't parse fails in CI
-  instead of surfacing only inside a consumer's build.
-- **`@vtex-us-se/resolvers`**: `createAssemblySetResolver` now warns when `checkoutBaseUrl` is
-  omitted, since the default (calling the VTEX platform host directly) is often wrong for
-  projects that proxy `/api/checkout/*` through their own storefront domain.
+**The fix for that (new `@vtex-us-se/cli` capability):** `se-components add <ComponentName>`
+now detects, per component, whether its logic (in `@vtex-us-se/components`) touches
+`@vtex-us-se/resolvers`. If it does, `add` copies the component's **full source** — both its
+`@vtex-us-se/ui` files and the matching folder in `@vtex-us-se/components`, flattened into one
+directory under `src/components/sections/<Name>/` — instead of just its schema, rewriting
+cross-package imports as it goes: `@vtex-us-se/components(/segment)` becomes a relative import
+to the copied local barrel, and any `@vtex-us-se/resolvers/<subpath>` import that resolves to a
+**string** (a query/mutation constant) gets inlined as a literal template string wherever it's
+passed to `gql(...)`, with the import itself dropped. This is why `@vtex-us-se/ui` and
+`@vtex-us-se/components` now ship their raw `src/` (not just `dist/`) — the CLI needs readable
+source to copy. Components with no GraphQL dependency (`SeBanner`) are unaffected — still a
+plain npm import.
+
+Other bugs, all found in the same integration pass:
+
+- **`assemblySet.graphql`**: a `"""..."""` description sat directly above
+  `extend type StoreProduct { ... }` — graphql-js rejects descriptions on type extensions
+  (`Syntax Error: Unexpected description, only GraphQL definitions support descriptions`),
+  breaking every consumer's GraphQL server boot. Moved onto the field. Added
+  `packages/resolvers/scripts/validate-graphql.mjs` (now this package's `test` script) so this
+  class of bug fails in CI going forward.
 - **`@vtex-us-se/ui`**: `@faststore/ui`/`@faststore/components` were regular `dependencies`
-  pinned to `^3.99.4`. In a project whose `@faststore/core` demands `4.7.0` (any current
-  FastStore v4 project), this left two copies installed — one hoisted at 3.99.4, one nested
-  under `@faststore/core` at 4.7.0 — and the hoisted 3.99.4 copy's Sass partials got compiled
-  against 4.7.0's utilities, breaking with `Undefined mixin. @include focus-ring;`. Moved both
-  to `peerDependencies` (`>=3.99.4 <5`) with pinned `devDependencies` for this repo's own build;
-  a consuming project's own `@faststore/ui`/`@faststore/components` now wins, as it should.
-- **`@vtex-us-se/cli`**: `add-resolver` generated `from '@vtex-us-se/resolvers/${namespace}'`
-  using the consuming project's own `--namespace` (its target folder, e.g. `vtex`/`thirdParty`)
-  instead of the package's actual export subpath (e.g. `b2c`) — a real bug our own guide's
-  `--namespace thirdParty` example triggered directly, since `@vtex-us-se/resolvers` only ever
-  declared a `/b2c` export. The subpath is now derived from where the operation was actually
-  found under the installed package's own `dist/`, completely independent of `--namespace`.
-- **`@vtex-us-se/cli`**: both `add` and `add-resolver` now scaffold the aggregator file a fresh
-  namespace/registry actually needs (`src/graphql/<namespace>/resolvers/index.ts`,
-  `src/components/index.tsx`) when it doesn't exist yet, instead of leaving it to be
-  hand-written — this is exactly where the reported bugs (`index.ts` containing the literal
-  word `resolvers`, an empty `components/index.ts`) came from. Existing files are still never
-  touched; a not-empty aggregator gets a merge hint instead.
-- **`@vtex-us-se/cli`**: `add-resolver`'s generated resolver snippet now surfaces every
-  `configParams` entry declared in an operation's `meta.json`, not just the hardcoded
-  `storeId`/`environment` pair — `checkoutBaseUrl` (and any future param) now appears as a
-  commented suggestion instead of being silently dropped from the scaffold.
+  pinned to `^3.99.4`, conflicting with `@faststore/core`'s `4.7.0` in any current FastStore v4
+  project (two copies installed, Sass compiled across the mismatch —
+  `Undefined mixin. @include focus-ring;`). Moved both to `peerDependencies` (`>=3.99.4 <5`).
+- **`add-resolver`**: used the consuming project's own `--namespace` (its target folder) as the
+  package's actual npm export subpath too — broke exactly the way our own earlier guide's
+  `--namespace thirdParty` example did, since `@vtex-us-se/resolvers` only ever exports `/b2c`.
+  The subpath is now derived from where the operation actually lives under the installed
+  package's `dist/`, independent of `--namespace`.
+- **`add-resolver`**, full fix for map-shaped operations: `meta.json` can now declare
+  `typeExtensionKeys` (fields that extend an existing FastStore type, e.g. `StoreProduct`) —
+  when present, the resolver is automatically **split** across FastStore's two fixed namespaces
+  (`src/graphql/vtex/resolvers/`, `src/graphql/thirdParty/resolvers/`), and both namespaces'
+  `resolvers/index.ts` aggregators are created or **safely merged into** (not just created once
+  and left to rot): a fresh single re-export gets promoted to a spread-merge object on the
+  second operation, and a third operation appends to that. Previously this file was left
+  entirely hand-written, which is exactly where a reported bug (`index.ts` containing the
+  literal word `resolvers`) came from.
+- **`add`**: `src/components/index.tsx`'s registration now gets a real merge attempt (not just
+  a "not touched, here's a snippet" message) when its existing default export is a plain
+  `{ A, B, C }` object of bare names — the common case (including `@faststore/core`'s own
+  starter stub, `export default {}`). Anything more elaborate is still left untouched with
+  instructions, rather than risk corrupting it.
+- **`add-resolver`**'s client query wrapper (`src/utils/<file>.ts`) now embeds the operation's
+  query/mutation text **literally** instead of importing the constant from
+  `@vtex-us-se/resolvers` — the same codegen-visibility fix as the component copy-paste mode,
+  for anyone writing their own component directly against a resolvers operation.
+- **`add-resolver`**'s generated resolver snippet now surfaces every `configParams` entry
+  declared in an operation's `meta.json`, not just the hardcoded `storeId`/`environment` pair —
+  `checkoutBaseUrl` now appears as a commented suggestion instead of being silently dropped, and
+  `createAssemblySetResolver` itself warns at runtime when it's omitted (its default calls the
+  VTEX platform host directly, which is often wrong for a project proxying `/api/checkout/*`
+  through its own domain).
 
-Verified end-to-end against a symlinked local build simulating a real consuming project: the
-generated `add-resolver`/`add` output resolves and runs correctly (`@vtex-us-se/resolvers/b2c`
-imports resolve, the factory produces the expected `StoreProduct`/`Mutation`/`SeAssemblyItem`
-map, the checkoutBaseUrl warning fires), and re-running either command against existing files
-is a no-op that leaves them untouched.
+New: `IMPLEMENTATION.md` (step-by-step setup, a troubleshooting table with the exact error
+messages this pass found, and a verification checklist) and `packages/resolvers/README.md`
+(didn't exist before). `packages/cli/README.md`, `packages/ui/README.md`, and
+`packages/components/README.md` updated to match current behavior and to document
+`SeAssemblySet`.
+
+Verified end-to-end against a symlinked local build simulating a real consuming project:
+`add SeAssemblySet` copies working, standalone source with both operations correctly inlined
+(confirmed with a syntax/type probe and a grep for leftover `@vtex-us-se/*` references — none);
+`add-resolver assemblySet` produces the correct `vtex`/`thirdParty` split; the aggregator merge
+logic (both `resolvers/index.ts` and `components/index.tsx`) was exercised directly for the
+single→spread and spread→spread-with-a-third-entry cases. Not yet re-verified against a live
+VTEX account's real Checkout/Catalog APIs — see the verification checklist in
+`IMPLEMENTATION.md`.

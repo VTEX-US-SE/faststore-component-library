@@ -30,7 +30,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.{scss,jsonc}\" dist",

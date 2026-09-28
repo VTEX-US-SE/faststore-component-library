@@ -45,6 +45,15 @@ packages/ui/src/
 └── b2b/<ComponentName>/...
 ```
 
+### `packages/resolvers` — GraphQL for custom operations
+
+Server-only GraphQL resolvers, typeDefs, and client query strings — no React, no styles,
+organized by operation rather than by component (a component and the operations it needs
+aren't always 1:1). See [its README](packages/resolvers/README.md), especially the note on why
+a component whose logic touches this package can't just be `import`ed from `@vtex-us-se/ui` —
+it has to be added with the CLI instead, which copies its source with the operation text
+inlined so FastStore's own GraphQL codegen can see it.
+
 ### `packages/docs` — Storybook
 
 Living documentation of what exists in `components` and `ui`.
@@ -69,7 +78,11 @@ packages/ui/src/<segment>/<ComponentName>/
 
 `packages/cli` (the `se-components add <ComponentName>` command) copies that `.schema.jsonc`
 into the consuming project's `cms/faststore/components/`, instead of relying on every team to
-copy it by hand — see [its README](packages/cli/README.md).
+copy it by hand — see [its README](packages/cli/README.md). For a component whose logic calls
+a `packages/resolvers` operation, `add` copies the component's **full source** instead (with
+the operation's query/mutation text inlined) rather than letting the consumer `import` it from
+`node_modules` — see [`packages/resolvers/README.md`](packages/resolvers/README.md) for why a
+plain npm import can never work for those.
 
 ## CI/CD
 
@@ -94,10 +107,24 @@ copy it by hand — see [its README](packages/cli/README.md).
   `@faststore/core` is Next.js-server-coupled) outside an actual FastStore + Buyer Portal
   project. The rest of that kit's components (most need custom GraphQL resolvers our CLI
   doesn't copy yet) are out of scope for now.
-- Both are installable today via `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages.
+- **B2C**: `SeAssemblySet`, a customisable set builder ported from `poc-arbonne-clone`'s
+  `AssemblySet`. First component needing its own `packages/resolvers` operation
+  (`assemblySet`) — which is also why `se-components add` grew a second distribution mode: a
+  component whose logic calls a GraphQL operation gets its full source copied into the
+  consuming project (query/mutation text inlined at copy time), instead of a plain npm import,
+  because FastStore's own GraphQL codegen can never see a `gql()` call made from inside
+  `node_modules`. See [`packages/resolvers/README.md`](packages/resolvers/README.md).
+- Both B2C components and `SeWelcomeBackMessage` are installable today via
+  `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages (`SeAssemblySet` still needs
+  `se-components add`, not a plain import — see above).
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.
+
+## Using this library in a project
+
+See [`IMPLEMENTATION.md`](IMPLEMENTATION.md) for the step-by-step setup, a troubleshooting
+table with exact error messages, and a verification checklist.
 
 ## Development
 
