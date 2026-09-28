@@ -109,6 +109,16 @@ function uncomposedParentIndex(orderForm: OrderForm, parentSku: string) {
  */
 export function createAssemblySetResolver(config: VtexApiConfig) {
   const environment = config.environment ?? 'vtexcommercestable'
+
+  if (!config.checkoutBaseUrl) {
+    console.warn(
+      '[@vtex-us-se/resolvers] createAssemblySetResolver: no checkoutBaseUrl configured — composing a set will ' +
+        `call the VTEX platform host directly (https://${config.storeId}.${environment}.com.br). If this project ` +
+        "proxies /api/checkout/* through its own storefront domain (common, to keep checkout cookies same-origin), " +
+        'pass that domain as checkoutBaseUrl instead.',
+    )
+  }
+
   const checkoutBase = config.checkoutBaseUrl ?? `https://${config.storeId}.${environment}.com.br`
 
   /**

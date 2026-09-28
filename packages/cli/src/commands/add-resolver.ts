@@ -53,15 +53,22 @@ export const addResolverCommand = new Command('add-resolver')
 /**
  * Same two-probe-level convention as findSchemaPath() in add.ts (direct, or one segment down),
  * generalized over the file extension since here we look for both .graphql and .meta.json.
+ * Also returns which segment folder (e.g. "b2c") the asset was found under, if any — that
+ * segment is the package's real export subpath, which is NOT necessarily the same string as
+ * the consuming project's own --namespace option (see resolveOperationAssets).
  */
-function findAssetPath(distRoot: string, operationName: string, extension: string): string | undefined {
+function findAssetPath(
+  distRoot: string,
+  operationName: string,
+  extension: string,
+): { path: string; segment?: string } | undefined {
   const direct = join(distRoot, operationName, `${operationName}${extension}`)
-  if (existsSync(direct)) return direct
+  if (existsSync(direct)) return { path: direct }
 
   for (const entry of readdirSync(distRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue
     const nested = join(distRoot, entry.name, operationName, `${operationName}${extension}`)
-    if (existsSync(nested)) return nested
+    if (existsSync(nested)) return { path: nested, segment: entry.name }
   }
 
   return undefined
@@ -69,9 +76,18 @@ function findAssetPath(distRoot: string, operationName: string, extension: strin
 
 /**
  * Resolves the .graphql and .meta.json for <operationName> from whichever @vtex-us-se/resolvers
- * is installed in the CONSUMING project (resolved from cwd, not from this CLI's own node_modules).
+ * is installed in the CONSUMING project (resolved from cwd, not from this CLI's own node_modules),
+ * plus the package's real export subpath for that operation (e.g. "b2c", from
+ * `@vtex-us-se/resolvers/b2c`) — derived from where the operation actually lives under `dist/`,
+ * not from the consumer's own --namespace option. Those are unrelated: --namespace only controls
+ * the folder structure this command writes into the CONSUMING project (e.g. `src/graphql/vtex/`
+ * vs `src/graphql/thirdParty/`), while the package subpath is fixed by how @vtex-us-se/resolvers
+ * itself is organized and packaged. Using --namespace for the import path was a real bug here
+ * (e.g. `--namespace thirdParty` used to generate `from '@vtex-us-se/resolvers/thirdParty'`, a
+ * subpath the package's `exports` map never declared) — this only trusts the package's own
+ * layout.
  */
-function resolveOperationAssets(operationName: string): { graphqlPath: string; metaPath: string } {
+function resolveOperationAssets(operationName: string): { graphqlPath: string; metaPath: string; packageSubpath: string } {
   let resolversPackageJsonPath: string
   try {
     resolversPackageJsonPath = require.resolve('@vtex-us-se/resolvers/package.json', {
@@ -82,17 +98,25 @@ function resolveOperationAssets(operationName: string): { graphqlPath: string; m
   }
 
   const distRoot = join(dirname(resolversPackageJsonPath), 'dist')
-  const graphqlPath = findAssetPath(distRoot, operationName, '.graphql')
-  const metaPath = findAssetPath(distRoot, operationName, '.meta.json')
+  const graphql = findAssetPath(distRoot, operationName, '.graphql')
+  const meta = findAssetPath(distRoot, operationName, '.meta.json')
 
-  if (!graphqlPath || !metaPath) {
+  if (!graphql || !meta) {
     throw new Error(
       `No operation found for "${operationName}" under ${distRoot}. Check the operation name — it must match ` +
         'the operation folder name under @vtex-us-se/resolvers/src exactly (case-sensitive).',
     )
   }
 
-  return { graphqlPath, metaPath }
+  if (!graphql.segment || graphql.segment !== meta.segment) {
+    throw new Error(
+      `Could not determine @vtex-us-se/resolvers' export subpath for "${operationName}" ` +
+        `(found its .graphql and .meta.json under inconsistent or top-level-only paths in ${distRoot}). ` +
+        'This operation may be packaged incorrectly.',
+    )
+  }
+
+  return { graphqlPath: graphql.path, metaPath: meta.path, packageSubpath: graphql.segment }
 }
 
 /**
@@ -127,29 +151,65 @@ function resolverFileNameFor(operationName: string, meta: OperationMeta): string
   return meta.operationType === 'Mutation' ? 'mutationResolver.ts' : 'queryResolver.ts'
 }
 
-function buildResolverSnippet(meta: OperationMeta, namespace: string, vtexConfig: { storeId?: string; environment?: string }): string {
-  const storeIdLine = vtexConfig.storeId
-    ? `storeId: '${vtexConfig.storeId}',`
-    : `storeId: 'YOUR_STORE_ID', // TODO: replace with your VTEX account id (see discovery.config.js -> api.storeId)`
-  const environmentLine = vtexConfig.environment ? `\n      environment: '${vtexConfig.environment}',` : ''
+/**
+ * Renders one config line per entry in `meta.configParams` (a `?` suffix marks it optional),
+ * joined at `indent`. `storeId`/`environment` are auto-detected from the consuming project's
+ * own discovery.config.js when present; any other declared param (e.g. `checkoutBaseUrl`) has
+ * no such source, so it's surfaced as a commented-out suggestion instead of silently omitted —
+ * a param a factory declares but this snippet never mentions is easy to miss entirely.
+ */
+function buildConfigLines(meta: OperationMeta, vtexConfig: { storeId?: string; environment?: string }, indent: string): string {
+  const lines = meta.configParams
+    .map((param) => {
+      const optional = param.endsWith('?')
+      const name = optional ? param.slice(0, -1) : param
 
+      if (name === 'storeId') {
+        return vtexConfig.storeId
+          ? `storeId: '${vtexConfig.storeId}',`
+          : `storeId: 'YOUR_STORE_ID', // TODO: replace with your VTEX account id (see discovery.config.js -> api.storeId)`
+      }
+
+      if (name === 'environment') {
+        return vtexConfig.environment ? `environment: '${vtexConfig.environment}',` : undefined
+      }
+
+      if (name === 'checkoutBaseUrl') {
+        return (
+          `// checkoutBaseUrl: 'https://your-store-domain.com', // optional -- defaults to calling the VTEX\n${indent}` +
+          '// platform host directly. Set this if your project proxies /api/checkout/* through its own domain.'
+        )
+      }
+
+      return `// ${name}: 'TODO', // ${optional ? 'optional' : 'required'} config param -- see @vtex-us-se/resolvers' source for what this does`
+    })
+    .filter((line): line is string => line !== undefined)
+
+  return lines.join(`\n${indent}`)
+}
+
+function buildResolverSnippet(
+  meta: OperationMeta,
+  packageSubpath: string,
+  vtexConfig: { storeId?: string; environment?: string },
+): string {
   if (meta.resolverShape === 'map') {
-    return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${namespace}'
+    return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
 
 export default ${meta.factoryExport}({
-  ${storeIdLine}${environmentLine}
+  ${buildConfigLines(meta, vtexConfig, '  ')}
 })
 `
   }
 
   const resolverVarName = meta.operationType === 'Mutation' ? 'mutationResolver' : 'queryResolver'
 
-  return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${namespace}'
+  return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
 
 const ${resolverVarName} = {
   ${meta.operationType}: {
     ${meta.fieldName}: ${meta.factoryExport}({
-      ${storeIdLine}${environmentLine}
+      ${buildConfigLines(meta, vtexConfig, '      ')}
     }),
   },
 }
@@ -158,9 +218,9 @@ export default ${resolverVarName}
 `
 }
 
-function buildClientWrapperSnippet(meta: OperationMeta, namespace: string): string {
+function buildClientWrapperSnippet(meta: OperationMeta, packageSubpath: string): string {
   return `import { gql } from '@faststore/core/api'
-import { ${meta.clientQueryExport} } from '@vtex-us-se/resolvers/${namespace}'
+import { ${meta.clientQueryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
 
 export const ${meta.clientConstantName} = gql(${meta.clientQueryExport})
 `
@@ -168,7 +228,7 @@ export const ${meta.clientConstantName} = gql(${meta.clientQueryExport})
 
 function addResolver(operationName: string, options: AddResolverOptions): void {
   const { targetDir, clientDir, namespace, force } = options
-  const { graphqlPath, metaPath } = resolveOperationAssets(operationName)
+  const { graphqlPath, metaPath, packageSubpath } = resolveOperationAssets(operationName)
   const meta: OperationMeta = JSON.parse(readFileSync(metaPath, 'utf-8'))
 
   const summary: string[] = []
@@ -187,7 +247,7 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   const vtexConfig = detectVtexApiConfig()
   const resolverFileName = resolverFileNameFor(operationName, meta)
   const resolverPath = join(targetDir, namespace, 'resolvers', resolverFileName)
-  const resolverSnippet = buildResolverSnippet(meta, namespace, vtexConfig)
+  const resolverSnippet = buildResolverSnippet(meta, packageSubpath, vtexConfig)
 
   if (existsSync(resolverPath)) {
     const note =
@@ -204,14 +264,33 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
 
   if (meta.resolverShape === 'map') {
     summary.push(
-      `⚠ ${resolverFileName} exports a full resolver map (it may cover more than "${meta.operationType}.${meta.fieldName}") — ` +
-        'merge it into your GraphQL server config alongside any other resolver maps for this namespace by hand; this CLI does not merge resolver maps automatically.',
+      `ℹ ${resolverFileName} exports a full resolver map (it may cover more than "${meta.operationType}.${meta.fieldName}" — ` +
+        'check its other top-level keys, e.g. a field extension on an existing type, before assuming this namespace is the right home for all of them).',
     )
+  }
+
+  // 3. resolvers aggregator — the actual file FastStore's GraphQL server loads for this
+  // namespace (see AGENTS.md/the resolvers README: "Aggregates all resolvers"). Only created
+  // when missing; never overwritten, since a namespace with more than one operation already
+  // has one merging several imports, and blindly overwriting it would drop those.
+  const aggregatorPath = join(targetDir, namespace, 'resolvers', 'index.ts')
+  const resolverModuleName = resolverFileName.replace(/\.ts$/, '')
+
+  if (existsSync(aggregatorPath)) {
+    summary.push(
+      `⚠ ${aggregatorPath} already exists — not touched. Make sure its default export merges in ` +
+        `./${resolverModuleName}'s default export (spread its keys — e.g. Mutation, or a type name — ` +
+        'alongside whatever this namespace already registers).',
+    )
+  } else {
+    mkdirSync(dirname(aggregatorPath), { recursive: true })
+    writeFileSync(aggregatorPath, `export { default } from './${resolverModuleName}'\n`)
+    summary.push(`✔ Created ${aggregatorPath} (re-exports ./${resolverModuleName})`)
   }
 
   // 3. client query wrapper (create only if missing, never overwrite)
   const clientPath = join(clientDir, meta.clientFileName)
-  const clientSnippet = buildClientWrapperSnippet(meta, namespace)
+  const clientSnippet = buildClientWrapperSnippet(meta, packageSubpath)
 
   if (existsSync(clientPath)) {
     summary.push(`⚠ ${clientPath} already exists — not touched. Expected content:\n\n${clientSnippet}`)
