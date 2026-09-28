@@ -38,7 +38,8 @@
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "sanitize-html": "^2.13.0"
+    "sanitize-html": "^2.13.0",
+    "@vtex-us-se/resolvers": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",

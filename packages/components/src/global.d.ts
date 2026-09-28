@@ -12,6 +12,32 @@ declare module '@faststore/core/experimental' {
 
   export function useSession_unstable(): {
     b2b?: B2bInfo | null
+    channel?: string
+    locale?: string
     [key: string]: unknown
   }
+
+  export function useLazyQuery_unstable<TData = unknown, TVariables = unknown>(
+    query: unknown,
+    variables: TVariables,
+  ): [(variables: TVariables) => Promise<void>, { data: TData | undefined }]
+
+  export function useQuery_unstable<TData = unknown, TVariables = unknown>(
+    query: unknown,
+    variables: TVariables,
+    options?: { doNotRun?: boolean; [key: string]: unknown },
+  ): { data: TData | undefined; isLoading: boolean; isValidating: boolean; error: unknown }
+
+  export function useCart_unstable(): {
+    id?: string
+    [key: string]: unknown
+  }
+}
+
+// Same rationale as above, for @faststore/core/api: `gql` there reexports from the consuming
+// project's own generated codegen output, which doesn't exist outside a real FastStore project.
+// We only need `gql` to accept a plain query string and hand back something a GraphQL client
+// hook can consume — we never rely on its real generated result/variable types.
+declare module '@faststore/core/api' {
+  export function gql(query: string): unknown
 }

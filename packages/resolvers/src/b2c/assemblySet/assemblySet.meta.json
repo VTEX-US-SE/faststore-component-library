@@ -1,0 +1,10 @@
+{
+  "operationType": "Mutation",
+  "resolverShape": "map",
+  "fieldName": "seAddComposedSet",
+  "factoryExport": "createAssemblySetResolver",
+  "configParams": ["storeId", "environment?", "checkoutBaseUrl?"],
+  "clientQueryExport": "SE_ADD_COMPOSED_SET_MUTATION",
+  "clientFileName": "assemblySet.ts",
+  "clientConstantName": "ADD_COMPOSED_SET_MUTATION"
+}

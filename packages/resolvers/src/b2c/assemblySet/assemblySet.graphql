@@ -1,0 +1,85 @@
+"""
+Assembly options (customisable set composition) declared on this SKU via a VTEX
+catalog attachment. Empty for products that are not customisable sets.
+"""
+extend type StoreProduct {
+  assemblyOptions: [SeAssemblyOption!]!
+}
+
+"""
+One VTEX assembly option. `id` is the attachment name and doubles as the
+`assemblyId` the Checkout API expects when composing the set.
+"""
+type SeAssemblyOption {
+  id: String!
+  name: String!
+  required: Boolean!
+  groups: [SeAssemblyGroup!]!
+}
+
+"""
+A selectable group within an assembly option. `minQuantity`/`maxQuantity` are
+the gate -- the total quantity picked across the group must fall inside them.
+"""
+type SeAssemblyGroup {
+  name: String!
+  minQuantity: Int!
+  maxQuantity: Int!
+  items: [SeAssemblyItem!]!
+}
+
+"""
+One eligible SKU inside a group, with its own quantity bounds. `product` is
+hydrated from the catalog and is null when the SKU no longer resolves.
+"""
+type SeAssemblyItem {
+  skuId: String!
+  minQuantity: Int!
+  maxQuantity: Int!
+  initialQuantity: Int!
+  product: StoreProduct
+}
+
+extend type Mutation {
+  """
+  Composes a customisable set into the cart: adds the parent SKU and binds the
+  chosen children to it through Checkout's assembly endpoint. Server-side so the
+  whole set lands atomically -- a half-finished sequence from the browser leaves
+  orphan parent lines in the shopper's cart.
+  """
+  seAddComposedSet(data: SeComposedSetInput!): SeComposedSetResult!
+}
+
+input SeComposedSetInput {
+  """
+  Existing cart to compose into. A new orderForm is created when omitted.
+  """
+  orderFormId: String
+  """
+  Parent SKU carrying the assembly attachment.
+  """
+  parentSku: String!
+  """
+  How many copies of the set. Each becomes its own parent line.
+  """
+  sets: Int!
+  items: [SeComposedSetItemInput!]!
+}
+
+input SeComposedSetItemInput {
+  skuId: String!
+  quantity: Int!
+  seller: String!
+}
+
+type SeComposedSetResult {
+  orderFormId: String!
+  """
+  Cart total in cents, as Checkout reports it.
+  """
+  value: Int!
+  """
+  Checkout warnings, e.g. a quantity limit that was clamped.
+  """
+  messages: [String!]!
+}

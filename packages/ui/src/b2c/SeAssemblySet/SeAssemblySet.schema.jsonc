@@ -1,0 +1,47 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeAssemblySet",
+  "$componentTitle": "SE Assembly Set",
+  "title": "Assembly Set",
+  "description": "Customisable set builder for a parent SKU with a VTEX assembly option (catalog attachment)",
+  "type": "object",
+  "required": ["skuId"],
+  "properties": {
+    "skuId": {
+      "type": "string",
+      "title": "Parent SKU ID",
+      "description": "The SKU carrying the VTEX assembly option to build"
+    },
+    "headline": {
+      "type": "string",
+      "title": "Group headline",
+      "description": "Overrides each group's own name. Supports {min}/{max}/{selected} tokens."
+    },
+    "hint": {
+      "type": "string",
+      "title": "Group hint",
+      "description": "Shown under the progress bar while a group is incomplete. Supports {min}/{max}/{selected} tokens."
+    },
+    "completeHint": {
+      "type": "string",
+      "title": "Group complete hint",
+      "description": "Shown under the progress bar once a group's gate is met. Supports {min}/{max}/{selected} tokens."
+    },
+    "ctaLabel": {
+      "type": "string",
+      "title": "Button label",
+      "default": "Add to cart"
+    },
+    "initialSets": {
+      "type": "number",
+      "title": "Initial number of sets",
+      "default": 1
+    },
+    "checkoutUrl": {
+      "type": "string",
+      "title": "Checkout URL",
+      "description": "Where the confirmation modal's Checkout action sends the shopper",
+      "default": "/checkout"
+    }
+  }
+}
