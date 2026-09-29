@@ -124,6 +124,14 @@ the printed summary line:**
 - [ ] If the operation is `resolverShape: "map"` with `typeExtensionKeys`: confirm the split
       landed in the right folders (`vtex/` got the declared keys, `thirdParty/` got the rest) —
       open both generated files and read the keys, don't infer from the console summary.
+- [ ] **The typeDef landed in the same namespace folder its resolver actually loads from.**
+      A split resolver only fixes half the problem if the typeDef still goes wherever
+      `--namespace` points (`b2c` by default) — a folder FastStore's GraphQL server never scans.
+      The failure mode is `X defined in resolvers, but not in schema` at query time, not a build
+      error, so nothing here or in Storybook catches it — only checking where the `.graphql`
+      file physically landed does. `find src/graphql -name '*.graphql'` and confirm it's under
+      `vtex/typeDefs/` or `thirdParty/typeDefs/`, matching wherever the resolver that answers its
+      fields actually lives.
 
 None of this proves the GraphQL codegen visibility problem is solved for a *new* component the
 same way it is for `SeAssemblySet` — that's structural (Step 0), not something this harness can
