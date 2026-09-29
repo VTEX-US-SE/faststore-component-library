@@ -106,7 +106,7 @@ generated resolver file if they weren't auto-detected from `discovery.config.js`
 ## 8. Generate and upload the CMS schema
 
 ```bash
-vtex content generate-schema -o cms/faststore/schema.json -b vtex.faststore4
+vtex content generate-schema cms/faststore/components cms/faststore/pages -o cms/faststore/schema.json
 grep -A 5 '"SeAssemblySet"' cms/faststore/schema.json   # confirm it's in there
 
 node -e "console.log(require('./discovery.config.js').api.storeId)"
@@ -140,6 +140,7 @@ attachment). Without one, `assemblyOptions` resolves to `[]` and the component r
 
 | Error / symptom | Cause | Fix |
 |---|---|---|
+| `vtex content generate-schema -o cms/faststore/schema.json -b vtex.faststore4` errors out | That invocation (no explicit input paths, `-b` branch flag) isn't valid for this command. | Pass the input directories explicitly instead: `vtex content generate-schema cms/faststore/components cms/faststore/pages -o cms/faststore/schema.json`. |
 | `GraphQLError: Syntax Error: Unexpected description, only GraphQL definitions support descriptions.` | A `"""..."""` doc block was placed directly over an `extend type`/`extend input` in a `.graphql` file — graphql-js only allows descriptions on definitions, not extensions. | Fixed in `@vtex-us-se/resolvers` ≥0.2.1. If you still hit this in a **custom** `.graphql` file of your own, move the description onto the field instead of the `extend type` line. |
 | `Undefined mixin. @include focus-ring;` (or similar Sass error inside `@faststore/ui`'s compiled styles) | Two copies of `@faststore/ui`/`@faststore/components` installed at different versions — one hoisted, one nested under `@faststore/core` — and Sass compiled across the mismatch. | Fixed in `@vtex-us-se/ui` ≥0.2.1 (moved to `peerDependencies`). On 0.2.0, add to your project's `package.json` and reinstall: `"resolutions": { "@faststore/ui": "<your @faststore/core version>", "@faststore/components": "<same>" }`. |
 | `Cannot find module '@vtex-us-se/resolvers/thirdParty'` (or any subpath the package doesn't export) | `add-resolver` used to conflate `--namespace` (your project's folder) with the package's own npm export subpath. | Fixed in `@vtex-us-se/cli` ≥2.1.0 — the subpath is now derived from the installed package, independent of `--namespace`. Upgrade the CLI. |
