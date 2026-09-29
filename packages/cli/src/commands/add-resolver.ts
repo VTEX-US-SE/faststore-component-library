@@ -352,7 +352,7 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   // 2. server resolver(s)
   const vtexConfig = detectVtexApiConfig()
   const resolverFileName = `${operationName}Resolver.ts`
-  const resolverModuleName = operationName
+  const resolverModuleName = resolverFileName.replace(/\.ts$/, '')
 
   if (meta.resolverShape === 'map' && meta.typeExtensionKeys && meta.typeExtensionKeys.length > 0) {
     // Split across FastStore's two fixed namespaces (see FastStore's own extending-GraphQL
