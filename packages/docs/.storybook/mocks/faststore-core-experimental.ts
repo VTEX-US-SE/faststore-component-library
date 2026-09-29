@@ -89,13 +89,13 @@ const FIXTURE_QUERY_DATA = {
   },
 }
 
-/* eslint-disable @typescript-eslint/no-unused-vars -- signature must match the real hook's */
+// `query`/`variables` are unused (this mock ignores what's asked and always returns the same
+// fixture), but kept in the signature since it must match the real hook's.
 export function useQuery_unstable<TData = unknown, TVariables = unknown>(
-  query: unknown,
-  variables: TVariables,
+  _query: unknown,
+  _variables: TVariables,
   options?: { doNotRun?: boolean },
 ) {
-  /* eslint-enable @typescript-eslint/no-unused-vars */
   if (options?.doNotRun) {
     return { data: undefined, isLoading: false, isValidating: false, error: undefined }
   }
