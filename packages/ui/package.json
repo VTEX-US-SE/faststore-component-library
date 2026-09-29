@@ -30,7 +30,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.{scss,jsonc}\" dist",
@@ -38,19 +39,21 @@
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "@vtex-us-se/components": "workspace:*",
-    "@faststore/ui": "^3.99.4",
-    "@faststore/components": "^3.99.4"
+    "@vtex-us-se/components": "workspace:*"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "@faststore/ui": ">=3.99.4 <5",
+    "@faststore/components": ">=3.99.4 <5"
   },
   "devDependencies": {
     "@vtex-us-se/config": "workspace:*",
     "@types/react": "^18.3.0",
     "typescript": "^5.6.0",
     "include-media": "^1.4.10",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "@faststore/ui": "^3.99.4",
+    "@faststore/components": "^3.99.4"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",

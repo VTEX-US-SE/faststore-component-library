@@ -18,6 +18,14 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
   calculation, shared context, HTML sanitization, responsive image `srcSet`). See
   [`@vtex-us-se/ui`](../ui/README.md#components) for the rendered component.
 
+- **`useAssemblySet`** — orchestrates `SeAssemblySet`: reads the parent SKU's assembly option
+  via [`@vtex-us-se/resolvers`](../resolvers/README.md), tracks the shopper's selection against
+  each group's min/max gate, and composes the set into the cart. **This is never imported
+  directly in a real project** — its `gql()` calls only work when this hook's source is copied
+  into the consuming project with its query/mutation text inlined, which
+  [`se-components add SeAssemblySet`](../cli/README.md#add) does automatically. See
+  [`@vtex-us-se/ui`](../ui/README.md#seassemblyset) for the rendered component.
+
 ### B2B
 
 - **`SeWelcomeBackMessage`** — `useB2bSession()`, a thin wrapper around FastStore's own

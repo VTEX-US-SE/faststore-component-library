@@ -1,8 +1,8 @@
-"""
-Assembly options (customisable set composition) declared on this SKU via a VTEX
-catalog attachment. Empty for products that are not customisable sets.
-"""
 extend type StoreProduct {
+  """
+  Assembly options (customisable set composition) declared on this SKU via a VTEX
+  catalog attachment. Empty for products that are not customisable sets.
+  """
   assemblyOptions: [SeAssemblyOption!]!
 }
 

@@ -19,6 +19,15 @@ packages/ui/src/<segment>/<ComponentName>/
 This lets [`@vtex-us-se/cli`](../cli/README.md) copy the corresponding `.schema.jsonc` into the
 consuming project's `cms/faststore/`, without the team having to keep it in sync by hand.
 
+**A component whose logic (in `@vtex-us-se/components`) calls a GraphQL operation from
+[`@vtex-us-se/resolvers`](../resolvers/README.md) must always be added with
+`se-components add <ComponentName>`, never imported directly from this package** — `add`
+detects this and copies the component's full source instead of just its schema, so its
+`gql(...)` calls end up as literal text inside your own project (see
+[`packages/resolvers/README.md`](../resolvers/README.md#read-this-first-two-ways-a-component-reaches-this-package)
+for why a plain `import` can't work for these). `SeAssemblySet` below needs this; `SeBanner`
+doesn't.
+
 ## B2C vs. B2B entry points
 
 - `@vtex-us-se/ui` (root) — B2C only. `import { SeBanner } from '@vtex-us-se/ui'`.
@@ -38,6 +47,17 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   prop, with a real `srcSet` — see `imageWidths`). See
   [`SeBanner.tsx`](src/b2c/SeBanner/SeBanner.tsx) and
   [`SeBanner.schema.jsonc`](src/b2c/SeBanner/SeBanner.schema.jsonc).
+  No GraphQL — safe to `import` directly, or add via the CLI.
+
+- **`SeAssemblySet`** <a id="seassemblyset"></a> — customisable set builder ("build your own
+  kit") for a parent SKU with a VTEX assembly option (catalog attachment). Ported from
+  `poc-arbonne-clone`'s `AssemblySet`. Takes a `skuId` prop rather than a router query param, so
+  page composition stays the consuming project's own decision. **Must be added with
+  `se-components add SeAssemblySet`** (copies full source with its GraphQL operations inlined —
+  see the note above and [`packages/resolvers/README.md`](../resolvers/README.md)); a plain
+  `import` from this package will render but never actually fetch data. See
+  [`SeAssemblySet.tsx`](src/b2c/SeAssemblySet/SeAssemblySet.tsx) and
+  [`SeAssemblySet.schema.jsonc`](src/b2c/SeAssemblySet/SeAssemblySet.schema.jsonc).
 
 ### B2B
 

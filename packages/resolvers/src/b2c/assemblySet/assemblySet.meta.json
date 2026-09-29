@@ -1,6 +1,7 @@
 {
   "operationType": "Mutation",
   "resolverShape": "map",
+  "typeExtensionKeys": ["StoreProduct"],
   "fieldName": "seAddComposedSet",
   "factoryExport": "createAssemblySetResolver",
   "configParams": ["storeId", "environment?", "checkoutBaseUrl?"],
