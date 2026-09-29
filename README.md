@@ -126,6 +126,12 @@ plain npm import can never work for those.
 See [`IMPLEMENTATION.md`](IMPLEMENTATION.md) for the step-by-step setup, a troubleshooting
 table with exact error messages, and a verification checklist.
 
+## Adding or changing a component
+
+See [`CLAUDE.md`](CLAUDE.md) — the process to follow, especially for a component with its own
+GraphQL operation, so it actually works in a real consuming project (not just in this repo's
+own build/lint/test/Storybook) before it ships.
+
 ## Development
 
 ```bash
