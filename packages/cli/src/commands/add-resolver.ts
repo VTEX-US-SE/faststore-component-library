@@ -338,9 +338,21 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   const meta: OperationMeta = JSON.parse(readFileSync(metaPath, 'utf-8'))
 
   const summary: string[] = []
+  const isSplitOperation = meta.resolverShape === 'map' && !!meta.typeExtensionKeys && meta.typeExtensionKeys.length > 0
 
-  // 1. typeDef
-  const typeDefsDir = join(targetDir, namespace, 'typeDefs')
+  // 1. typeDef. A split operation's resolver is hardcoded into vtex/ + thirdParty/ (below) --
+  // not driven by --namespace, since FastStore only ever scans those two exact folder names for
+  // custom GraphQL, not an arbitrary --namespace value. The typeDef has to land in one of the
+  // SAME two folders for the same reason, or the schema this project's GraphQL server actually
+  // loads never gains the field/type the resolver map is prepared to answer -- which surfaces at
+  // runtime as "X defined in resolvers, but not in schema", not a parse error, so it's easy to
+  // miss until something actually queries the field. One copy is enough even though the
+  // typeDef's content spans both namespaces conceptually (a StoreProduct extension + a new
+  // Mutation/types): GraphQL doesn't care which file a definition's text lives in, only that
+  // it's loaded exactly once -- copying the same file under both folders would instead register
+  // every type in it twice and fail to build the schema at all.
+  const typeDefNamespace = isSplitOperation ? 'thirdParty' : namespace
+  const typeDefsDir = join(targetDir, typeDefNamespace, 'typeDefs')
   const typeDefDest = join(typeDefsDir, `${operationName}.graphql`)
   if (existsSync(typeDefDest) && !force) {
     throw new Error(`${typeDefDest} already exists. Pass --force to overwrite it (discards any manual edits).`)
@@ -354,11 +366,12 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   const resolverFileName = `${operationName}Resolver.ts`
   const resolverModuleName = resolverFileName.replace(/\.ts$/, '')
 
-  if (meta.resolverShape === 'map' && meta.typeExtensionKeys && meta.typeExtensionKeys.length > 0) {
+  if (isSplitOperation) {
     // Split across FastStore's two fixed namespaces (see FastStore's own extending-GraphQL
     // convention) -- not driven by --namespace, since these two folder names aren't a per-
     // project choice.
-    const vtexKeys = meta.typeExtensionKeys
+    // Non-null: `isSplitOperation` already established meta.typeExtensionKeys is a non-empty array.
+    const vtexKeys = meta.typeExtensionKeys as string[]
     // Every other key this factory's map actually has is a "thirdParty" key. We don't have the
     // full key list without calling the factory, so probe it once here (side-effect free) --
     // silencing its own runtime warnings (e.g. missing checkoutBaseUrl) since a placeholder
