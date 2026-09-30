@@ -122,58 +122,63 @@
     font-weight: var(--fs-text-weight-semibold);
   }
 
-  [data-fs-banner-carousel-arrows] {
-    button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 50%;
-      background: var(--fs-color-body-bkg, #fff);
-      color: var(--fs-color-body-fg, #000);
-      cursor: pointer;
+  // Nested under `.bannerCarousel` (a local class) rather than left as top-level attribute
+  // selectors — css-loader's CSS Modules mode rejects a selector with no local class/id
+  // anywhere in it ("selector is not pure"), and these target `data-fs-*` hooks only.
+  .bannerCarousel {
+    [data-fs-banner-carousel-arrows] {
+      button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background: var(--fs-color-body-bkg, #fff);
+        color: var(--fs-color-body-fg, #000);
+        cursor: pointer;
 
-      &:hover {
-        opacity: 0.85;
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+
+      [data-fs-banner-carousel-arrow='prev'] {
+        left: 16px;
+      }
+
+      [data-fs-banner-carousel-arrow='next'] {
+        right: 16px;
       }
     }
 
-    [data-fs-banner-carousel-arrow='prev'] {
-      left: 16px;
-    }
+    [data-fs-banner-carousel-dots] {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
 
-    [data-fs-banner-carousel-arrow='next'] {
-      right: 16px;
-    }
-  }
+      [data-fs-banner-carousel-dot] {
+        width: 8px;
+        height: 8px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: var(--fs-color-body-bkg, #fff);
+        opacity: 0.5;
+        cursor: pointer;
 
-  [data-fs-banner-carousel-dots] {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 12px;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-
-    [data-fs-banner-carousel-dot] {
-      width: 8px;
-      height: 8px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: var(--fs-color-body-bkg, #fff);
-      opacity: 0.5;
-      cursor: pointer;
-
-      &[data-active] {
-        opacity: 1;
+        &[data-active] {
+          opacity: 1;
+        }
       }
     }
   }
