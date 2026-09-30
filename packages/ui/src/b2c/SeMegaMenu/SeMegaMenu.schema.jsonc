@@ -1,0 +1,76 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeMegaMenu",
+  "$componentTitle": "SE Mega Menu",
+  "type": "object",
+  "required": ["menuItems"],
+  "properties": {
+    "logo": {
+      "title": "Mobile logo",
+      "description": "Brand logo shown at the top of the mobile drawer. Leave the image empty to hide it.",
+      "type": "object",
+      "properties": {
+        "src": { "type": "string", "title": "Logo image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative label" },
+        "link": { "type": "string", "title": "Link", "default": "/" }
+      }
+    },
+    "menuItems": {
+      "title": "Menu items",
+      "description": "Top-level navigation items shown in the navbar. Each one can optionally nest up to 3 levels of categories, shown in the desktop dropdown / mobile drill-down.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "title": "Menu item",
+        "required": ["text", "url"],
+        "properties": {
+          "text": { "type": "string", "title": "Label" },
+          "url": { "type": "string", "title": "URL" },
+          "level1": {
+            "title": "Level 1 categories",
+            "description": "Shown as columns in the desktop dropdown / first drill-down screen on mobile when this menu item is opened.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Level 1 category",
+              "required": ["text", "url"],
+              "properties": {
+                "text": { "type": "string", "title": "Label" },
+                "url": { "type": "string", "title": "URL" },
+                "level2": {
+                  "title": "Level 2 categories",
+                  "description": "Shown next to the level 1 column when it's active.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "title": "Level 2 category",
+                    "required": ["text", "url"],
+                    "properties": {
+                      "text": { "type": "string", "title": "Label" },
+                      "url": { "type": "string", "title": "URL" },
+                      "level3": {
+                        "title": "Level 3 items",
+                        "description": "Leaf links shown under their level 2 category.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "title": "Level 3 item",
+                          "required": ["text", "url"],
+                          "properties": {
+                            "text": { "type": "string", "title": "Label" },
+                            "url": { "type": "string", "title": "URL" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

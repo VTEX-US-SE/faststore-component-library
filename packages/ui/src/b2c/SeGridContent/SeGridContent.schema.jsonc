@@ -1,0 +1,39 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeGridContent",
+  "$componentTitle": "SE Grid Content",
+  "type": "object",
+  "properties": {
+    "bannerImage": {
+      "title": "Banner image",
+      "description": "Optional full-width image displayed below the grid.",
+      "type": "object",
+      "properties": {
+        "src": { "type": "string", "title": "Image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative Label" }
+      }
+    },
+    "items": {
+      "title": "Cards",
+      "description": "Grid cards, each with an image, title, and call-to-action links.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "eyebrow": { "title": "Eyebrow", "type": "string" },
+          "title": { "title": "Title", "type": "string" },
+          "image": {
+            "title": "Background image",
+            "type": "string",
+            "widget": { "ui:widget": "media-gallery" }
+          },
+          "href": { "title": "Primary link URL", "type": "string" },
+          "ctaLabel": { "title": "Primary button label", "type": "string" },
+          "secondaryHref": { "title": "Secondary link URL", "type": "string" },
+          "secondaryCtaLabel": { "title": "Secondary button label", "type": "string" }
+        }
+      }
+    }
+  }
+}

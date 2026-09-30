@@ -1,0 +1,49 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeImageTiles",
+  "$componentTitle": "SE Image Tiles",
+  "description": "Displays 2 to 4 large, side-by-side clickable image tiles, each redirecting to its own URL.",
+  "type": "object",
+  "required": ["tiles"],
+  "properties": {
+    "tiles": {
+      "title": "Image Tiles",
+      "description": "Add between 2 and 4 tiles. Each tile is a full clickable image.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["src", "url", "alt"],
+        "properties": {
+          "src": {
+            "title": "Image",
+            "description": "Image to display",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": {
+                "video": true,
+                "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"]
+              }
+            }
+          },
+          "url": {
+            "title": "Link URL",
+            "description": "URL to redirect to when the tile is clicked",
+            "type": "string"
+          },
+          "alt": {
+            "title": "Alternative Label",
+            "description": "Alternative text for accessibility",
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "readOnly": false,
+  "writeOnly": false,
+  "deprecated": false,
+  "$abstract": false
+}

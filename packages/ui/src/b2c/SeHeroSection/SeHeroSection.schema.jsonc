@@ -1,0 +1,42 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeHeroSection",
+  "$componentTitle": "SE Hero Section",
+  "type": "object",
+  "required": ["title", "description"],
+  "properties": {
+    "title": {
+      "title": "Heading",
+      "description": "Main hero heading.",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "description": "Supporting text displayed next to the heading.",
+      "type": "string",
+      "widget": { "ui:widget": "textarea" }
+    },
+    "backgroundImage": {
+      "title": "Background image",
+      "type": "object",
+      "properties": {
+        "src": { "type": "string", "title": "Image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative Label" }
+      }
+    },
+    "sectionId": {
+      "title": "Section ID",
+      "description": "Optional HTML id for anchor navigation, e.g. learnmore.",
+      "type": "string"
+    },
+    "cta": {
+      "title": "Call to Action",
+      "type": "object",
+      "properties": {
+        "text": { "title": "Button text", "type": "string" },
+        "href": { "title": "Button URL", "type": "string" },
+        "linkTargetBlank": { "title": "Open link in new window?", "type": "boolean", "default": false }
+      }
+    }
+  }
+}

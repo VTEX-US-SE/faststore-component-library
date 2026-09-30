@@ -1,0 +1,32 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeCardsCarousel",
+  "$componentTitle": "SE Cards Carousel",
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "title": { "title": "Title", "type": "string" },
+    "banners": {
+      "title": "Banners",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "Card",
+        "properties": {
+          "image": {
+            "title": "Image",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "title": { "title": "Title", "type": "string" },
+          "description": { "title": "Description", "type": "string" },
+          "button": { "title": "Button text", "type": "string" },
+          "link": { "title": "Link", "type": "string", "format": "uri" }
+        }
+      }
+    }
+  }
+}

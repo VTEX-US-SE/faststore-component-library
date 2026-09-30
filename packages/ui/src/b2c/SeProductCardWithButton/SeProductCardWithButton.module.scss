@@ -1,0 +1,61 @@
+@layer components {
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    // `LinkButton` styles are imported here the same way `SeBanner.module.scss` does,
+    // since this repo's build pipeline doesn't globally inject @faststore/ui's
+    // component styles outside of the real FastStore theme build.
+    @import '@faststore/ui/src/components/molecules/LinkButton/styles.scss';
+  }
+
+  .imageLink {
+    display: block;
+    text-decoration: none;
+  }
+
+  .image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .title {
+    color: var(--fs-color-text);
+    text-decoration: none;
+    font-size: var(--fs-text-size-1, 1rem);
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .listPrice {
+    color: var(--fs-color-text-secondary, #767676);
+    text-decoration: line-through;
+    font-size: var(--fs-text-size-0, 0.875rem);
+  }
+
+  .currentPrice {
+    font-weight: var(--fs-text-weight-bold, 700);
+  }
+
+  .cta {
+    margin-top: 0.75rem;
+
+    [data-fs-button-wrapper] {
+      width: 100%;
+    }
+  }
+}

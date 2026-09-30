@@ -1,0 +1,119 @@
+@layer components {
+  // `media()` is used below but not brought in automatically — a real FastStore build
+  // pipeline injects @faststore/ui's own utilities globally (via a `~`-prefixed import
+  // that only resolves in that pipeline's webpack/sass-loader setup, not here), so this
+  // component defines the mixin it actually needs itself, same approach as SeBanner.
+  // Imported at the top of the layer (not nested in a single selector) so every
+  // selector below can use the mixin, not just the one it happened to be declared in.
+  @import 'include-media/dist/include-media';
+  $breakpoints: (
+    'phone': 320px,
+    'phonemid': 375px,
+    'tablet': 768px,
+    'notebook': 1280px,
+    'desktop': 1440px,
+  );
+
+  .section {
+    background: var(--fs-color-body-bkg-secondary, #f0f0f0);
+    padding: 4rem 0;
+    max-width: var(--fs-grid-max-width);
+    margin: 0 auto;
+  }
+
+  .heading {
+    text-align: center;
+    font-family: var(--fs-text-face-primary);
+    font-size: var(--fs-text-size-32);
+    font-weight: var(--fs-text-weight-bold);
+    margin-bottom: 2rem;
+  }
+
+  .carousel {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .centered {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .card {
+    flex: 1 1 0;
+    min-height: 480px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65%;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.75));
+    pointer-events: none;
+  }
+
+  .cardContent {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+  }
+
+  .cardTitle {
+    font-size: var(--fs-text-size-24);
+    font-weight: var(--fs-text-weight-bold);
+    color: #fff;
+    margin-bottom: 0.75rem;
+  }
+
+  .cardDescription {
+    font-size: var(--fs-text-size-16);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 0.65rem 1.5rem;
+    background: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: var(--fs-text-weight-medium);
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+
+  .button:hover {
+    background: #fff;
+    color: var(--fs-color-body-fg, #222);
+  }
+
+  @include media('<tablet') {
+    .carousel,
+    .centered {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .card {
+      min-height: 350px;
+      margin-bottom: 1rem;
+    }
+  }
+}

@@ -26,6 +26,18 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
   [`se-components add SeAssemblySet`](../cli/README.md#add) does automatically. See
   [`@vtex-us-se/ui`](../ui/README.md#seassemblyset) for the rendered component.
 
+- **`SeMegaMenu`** — hover state, mobile drawer navigation, hamburger-button wiring, and
+  escape-to-close behavior for the mega menu. No GraphQL.
+
+- **`SeBannerCarousel`** — carousel index/autoplay state and touch-swipe navigation. No GraphQL.
+
+- **`SeCardsCarousel`**, **`SeGridContent`**, **`SeHeroSection`**, **`SeLearnMoreSection`**,
+  **`SeImageTiles`** — presentational, no dedicated hooks beyond shared types.
+
+- **`useFormattedPrice`** — price formatting for `SeProductCardWithButton`. No GraphQL.
+
+See [`@vtex-us-se/ui`](../ui/README.md#components) for each component's rendered UI.
+
 ### B2B
 
 - **`SeWelcomeBackMessage`** — `useB2bSession()`, a thin wrapper around FastStore's own
