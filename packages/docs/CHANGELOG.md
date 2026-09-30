@@ -1,5 +1,12 @@
 # @vtex-us-se/docs
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [33f056a]
+  - @vtex-us-se/ui@0.3.1
+
 ## 0.0.6
 
 ### Patch Changes
