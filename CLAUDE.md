@@ -188,7 +188,7 @@ that carries a changeset:
 1. Check `gh run list --branch main` for a failed `Release` run
 2. If failed, confirm what actually published (`gh run view <id> --log | grep "success packages published"`)
 3. Branch off `main`, run `pnpm changeset version`, confirm the resulting versions match what
-   published, commit, PR — same pattern as `#3`, `#6`, `#8`, `#10`, `#12`, `#15`.
+   published, commit, PR — same pattern as `#3`, `#6`, `#8`, `#10`, `#12`, `#15`, `#19`, `#21`, `#23`.
 
 This is expected, recurring, and fine — it is not a sign something went wrong with the feature
 PR itself.
