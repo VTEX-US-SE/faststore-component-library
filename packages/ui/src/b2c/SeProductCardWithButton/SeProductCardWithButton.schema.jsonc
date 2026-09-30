@@ -1,0 +1,58 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeProductCardWithButton",
+  "$componentTitle": "SE Product Card With Button",
+  "description": "Product card that adds a persistent action button (e.g. \"Choose option\") below the price, instead of only making the whole card clickable. `product` is normally supplied at render time by the shelf/PLP integration rather than authored via CMS.",
+  "type": "object",
+  "required": ["product", "buttonLabel"],
+  "properties": {
+    "buttonLabel": {
+      "title": "Button label",
+      "description": "Text displayed on the action button",
+      "type": "string",
+      "default": "Choose option"
+    },
+    "outOfStock": {
+      "title": "Out of stock",
+      "description": "When true, hides the action button (mirrors the native card's out-of-stock behavior)",
+      "type": "boolean",
+      "default": false
+    },
+    "linkTargetBlank": {
+      "title": "Open link in new window?",
+      "type": "boolean",
+      "default": false
+    },
+    "product": {
+      "title": "Product",
+      "description": "Product data (typically injected by the shelf/PLP slot, not authored via CMS)",
+      "type": "object",
+      "properties": {
+        "name": { "title": "Name", "type": "string" },
+        "href": { "title": "Product URL", "type": "string" },
+        "image": {
+          "title": "Image",
+          "type": "object",
+          "properties": {
+            "src": { "title": "Image", "type": "string", "widget": { "ui:widget": "media-gallery" } },
+            "alt": { "title": "Alternative Label", "type": "string" }
+          }
+        },
+        "price": {
+          "title": "Price",
+          "type": "object",
+          "properties": {
+            "current": { "title": "Current price", "type": "number" },
+            "listPrice": { "title": "List price", "type": "number" },
+            "currencyCode": { "title": "Currency code", "description": "ISO 4217 code, e.g. USD", "type": "string", "default": "USD" },
+            "currencyLocale": { "title": "Currency locale", "description": "BCP 47 locale, e.g. en-US", "type": "string", "default": "en-US" }
+          }
+        }
+      }
+    }
+  },
+  "readOnly": false,
+  "writeOnly": false,
+  "deprecated": false,
+  "$abstract": false
+}

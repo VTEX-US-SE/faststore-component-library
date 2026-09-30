@@ -1,0 +1,70 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeBannerCarousel",
+  "$componentTitle": "SE Banner Carousel",
+  "description": "Image banner carousel with optional title, text and CTA per slide.",
+  "type": "object",
+  "required": ["banners"],
+  "properties": {
+    "autoplay": {
+      "title": "Enable autoplay",
+      "description": "Automatically advance between slides.",
+      "type": "boolean",
+      "default": true
+    },
+    "autoplayDelay": {
+      "title": "Autoplay delay (ms)",
+      "description": "Time between slides in milliseconds.",
+      "type": "integer",
+      "default": 5000
+    },
+    "showNavigation": {
+      "title": "Show navigation arrows",
+      "type": "boolean",
+      "default": true
+    },
+    "showPagination": {
+      "title": "Show pagination dots",
+      "type": "boolean",
+      "default": true
+    },
+    "banners": {
+      "title": "Banners",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "title": "Banner",
+        "required": ["image"],
+        "properties": {
+          "image": {
+            "title": "Desktop image",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "imageMobile": {
+            "title": "Mobile image (optional)",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "alt": { "title": "Image alt text", "type": "string" },
+          "title": { "title": "Title", "type": "string" },
+          "text": { "title": "Text", "type": "string" },
+          "linkText": { "title": "Link text", "type": "string", "default": "Shop Now" },
+          "url": { "title": "URL", "type": "string" }
+        }
+      }
+    }
+  },
+  "readOnly": false,
+  "writeOnly": false,
+  "deprecated": false,
+  "$abstract": false
+}

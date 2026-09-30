@@ -114,8 +114,13 @@ plain npm import can never work for those.
   consuming project (query/mutation text inlined at copy time), instead of a plain npm import,
   because FastStore's own GraphQL codegen can never see a `gql()` call made from inside
   `node_modules`. See [`packages/resolvers/README.md`](packages/resolvers/README.md).
-- Both B2C components and `SeWelcomeBackMessage` are installable today via
-  `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages (`SeAssemblySet` still needs
+- **B2C**: eight more presentational components ported from various demo accounts, none needing
+  their own GraphQL operation: `SeMegaMenu` (`fs-mega-menu`), `SeBannerCarousel`
+  (`faststore-usb2b9`), `SeCardsCarousel` (`faststore-demoanalyst`), `SeGridContent`,
+  `SeHeroSection`, `SeLearnMoreSection` (all three from `faststore-usb2b5c`), `SeImageTiles`
+  (`faststore-hughtestenv`), and `SeProductCardWithButton` (`demo-poc-grill-house`).
+- All B2C components except `SeAssemblySet` and `SeWelcomeBackMessage` are installable today via
+  `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages (`SeAssemblySet` needs
   `se-components add`, not a plain import — see above).
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.

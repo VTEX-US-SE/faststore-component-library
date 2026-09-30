@@ -1,0 +1,50 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeLearnMoreSection",
+  "$componentTitle": "SE Learn More Section",
+  "type": "object",
+  "required": ["heading"],
+  "properties": {
+    "eyebrow": {
+      "title": "Eyebrow",
+      "description": "Small label displayed above the heading.",
+      "type": "string"
+    },
+    "heading": {
+      "title": "Heading",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string",
+      "widget": { "ui:widget": "textarea" }
+    },
+    "blurbs": {
+      "title": "Highlights",
+      "description": "List of highlight items with an optional icon, a title, and a description.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "icon": { "title": "Icon", "type": "string", "description": "Emoji or icon identifier." },
+          "title": { "title": "Title", "type": "string" },
+          "description": { "title": "Description", "type": "string" }
+        }
+      }
+    },
+    "image": {
+      "title": "Image",
+      "type": "object",
+      "properties": {
+        "src": { "type": "string", "title": "Image", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "type": "string", "title": "Alternative Label" }
+      }
+    },
+    "sectionId": {
+      "title": "Section ID",
+      "description": "Optional HTML id for anchor navigation.",
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,180 @@
+@layer components {
+  // `media()` is used below but not brought in automatically — a real FastStore build
+  // pipeline injects @faststore/ui's own utilities globally (via a `~`-prefixed import
+  // that only resolves in that pipeline's webpack/sass-loader setup, not here), so this
+  // component defines the mixin it actually needs itself, same approach as SeBanner.
+  // Imported at the top of the layer (not nested in a single selector) so every
+  // selector below can use the mixin, not just the one it happened to be declared in.
+  @import 'include-media/dist/include-media';
+  $breakpoints: (
+    'phone': 320px,
+    'phonemid': 375px,
+    'tablet': 768px,
+    'notebook': 1280px,
+    'desktop': 1440px,
+  );
+
+  .bannerCarousel {
+    position: relative;
+    margin: 0 auto 10px;
+    width: 100%;
+    max-width: var(--fs-grid-max-width);
+  }
+
+  .viewport {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .slides {
+    display: flex;
+    width: 100%;
+    transition: transform 0.4s ease;
+    touch-action: pan-y;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    height: auto;
+  }
+
+  .bannerLink {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .media {
+    display: block;
+    width: 100%;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: cover;
+      object-position: center;
+
+      @include media('<tablet') {
+        max-height: 280px;
+      }
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 40px 48px;
+    max-width: 560px;
+    background: linear-gradient(
+      105deg,
+      rgba(17, 37, 54, 0.72) 0%,
+      rgba(33, 84, 133, 0.35) 55%,
+      rgba(50, 42, 84, 0) 100%
+    );
+    pointer-events: none;
+
+    @include media('<tablet') {
+      padding: 24px;
+      max-width: 100%;
+    }
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--fs-text-face-primary);
+    font-size: var(--fs-text-size-36);
+    font-weight: var(--fs-text-weight-black);
+    color: var(--fs-color-body-bkg, #fff);
+    line-height: 1.15;
+
+    @include media('<tablet') {
+      font-size: var(--fs-text-size-24);
+    }
+  }
+
+  .text {
+    margin: 0;
+    font-size: var(--fs-text-size-16);
+    color: var(--fs-color-body-bkg, #fff);
+    line-height: 1.45;
+  }
+
+  .cta {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 10px 20px;
+    background-color: var(--fs-color-primary-main);
+    border-radius: var(--fs-border-radius);
+    color: var(--fs-color-primary-bkg, #fff);
+    font-size: var(--fs-text-size-14);
+    font-weight: var(--fs-text-weight-semibold);
+  }
+
+  [data-fs-banner-carousel-arrows] {
+    button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: var(--fs-color-body-bkg, #fff);
+      color: var(--fs-color-body-fg, #000);
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+
+    [data-fs-banner-carousel-arrow='prev'] {
+      left: 16px;
+    }
+
+    [data-fs-banner-carousel-arrow='next'] {
+      right: 16px;
+    }
+  }
+
+  [data-fs-banner-carousel-dots] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+
+    [data-fs-banner-carousel-dot] {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--fs-color-body-bkg, #fff);
+      opacity: 0.5;
+      cursor: pointer;
+
+      &[data-active] {
+        opacity: 1;
+      }
+    }
+  }
+}

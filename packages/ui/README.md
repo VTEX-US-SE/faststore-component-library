@@ -59,6 +59,29 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   [`SeAssemblySet.tsx`](src/b2c/SeAssemblySet/SeAssemblySet.tsx) and
   [`SeAssemblySet.schema.jsonc`](src/b2c/SeAssemblySet/SeAssemblySet.schema.jsonc).
 
+- **`SeMegaMenu`** — desktop hover mega menu + mobile drawer navigation, up to 3 levels of
+  categories. Ported from `fs-mega-menu`. No GraphQL — safe to `import` directly, or add via
+  the CLI.
+
+- **`SeBannerCarousel`** — auto-playing banner carousel with arrows, dots, and touch swipe.
+  Ported from `faststore-usb2b9`, navigation/autoplay/swipe reimplemented natively (no added
+  `swiper` dependency). No GraphQL.
+
+- **`SeCardsCarousel`** — static row of promo cards (no scroll/drag behavior in the original,
+  ported faithfully). Ported from `faststore-demoanalyst`. No GraphQL.
+
+- **`SeGridContent`**, **`SeHeroSection`**, **`SeLearnMoreSection`** — presentational content
+  sections ported from `faststore-usb2b5c`, with hardcoded client content replaced by CMS props
+  and `--fs-*` design tokens. No GraphQL.
+
+- **`SeImageTiles`** — grid of 2–4 image tiles. Ported from `faststore-hughtestenv` (merges what
+  were two near-identical components, `imagetiles`/`imagetiles3`, differing only in tile count).
+  No GraphQL.
+
+- **`SeProductCardWithButton`** — product card with an image, price, and a CTA button. Ported
+  from `demo-poc-grill-house`, rebuilt self-contained (the original wrapped a `DefaultProductCard`
+  that doesn't exist in this library). No GraphQL.
+
 ### B2B
 
 - **`SeWelcomeBackMessage`** — signed-in B2B greeting (`Welcome back, <name>`). Ported from
