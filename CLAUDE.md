@@ -72,7 +72,7 @@ it.
 pnpm --filter @vtex-us-se/resolvers build test   # validate-graphql.mjs parses every .graphql
 pnpm --filter @vtex-us-se/cli build lint
 pnpm --filter @vtex-us-se/components build lint
-pnpm --filter @vtex-us-se/ui build lint
+pnpm --filter @vtex-us-se/ui build lint test      # test = validate-css-module-purity.mjs, see below
 pnpm --filter @vtex-us-se/docs build              # Storybook build, not just dev — catches Sass/dependency issues dev mode won't
 ```
 
@@ -80,6 +80,20 @@ A Storybook story rendering correctly proves the **UI and hook logic** work. It 
 about GraphQL codegen visibility — Storybook mocks `gql`/`useQuery_unstable` entirely, so a
 story can pass with 100% green while the real component is completely broken in an actual
 FastStore project. Don't stop here for a GraphQL-dependent component.
+
+**A green Storybook build also proves nothing about CSS Modules validity in a real Next.js
+project.** `SeBannerCarousel` shipped with a `[data-fs-banner-carousel-arrows]` selector
+declared at the top level of its `.module.scss` — no local class anywhere in the chain — which
+compiled and rendered fine in Storybook (Vite doesn't enforce this) but broke immediately in the
+real project with `Syntax error: Selector "[data-fs-banner-carousel-arrows] button" is not pure
+(pure selectors must contain at least one local class or id)`, which is webpack's `css-loader`
+(what Next.js actually uses) rejecting it. `pnpm --filter @vtex-us-se/ui test` runs
+`validate-css-module-purity.mjs`, which compiles every `.module.scss` with the real Sass compiler
+and re-applies that exact rule — run it for any component whose styles use a `[data-fs-*]` or
+other attribute/tag-only selector, not just the ones with obvious global-looking selectors. If
+you hit this by hand instead: nest the offending selector inside the component's own local class
+block (see `SeBanner`'s or the fixed `SeBannerCarousel`'s `[data-fs-*]` selectors for the
+pattern) — never leave an attribute/tag selector as a sibling of the local classes.
 
 ## Step 4 — Verify the CLI's *actual output*, against a real symlinked project
 

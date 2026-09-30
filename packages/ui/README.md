@@ -28,6 +28,34 @@ detects this and copies the component's full source instead of just its schema, 
 for why a plain `import` can't work for these). `SeAssemblySet` below needs this; `SeBanner`
 doesn't.
 
+## Convention: every CSS Modules selector needs a local class or id
+
+Never write a `.module.scss` selector — including a `[data-fs-*]` attribute hook — as a
+top-level rule with no local class anywhere in its chain. Storybook's Vite build accepts it, but
+webpack's `css-loader` (what Next.js actually uses for CSS Modules) throws `Syntax error:
+Selector "..." is not pure (pure selectors must contain at least one local class or id)`, which
+only surfaces once a real project tries to build — this is exactly what happened with
+`SeBannerCarousel`'s `[data-fs-banner-carousel-arrows]`. Nest the selector inside the
+component's own local class instead:
+
+```scss
+// Wrong — top-level, no local class in the chain:
+[data-fs-my-thing] {
+  button { ... }
+}
+
+// Right — nested inside the component's own class:
+.myComponent {
+  [data-fs-my-thing] {
+    button { ... }
+  }
+}
+```
+
+`pnpm --filter @vtex-us-se/ui test` runs `scripts/validate-css-module-purity.mjs`, which compiles
+every `.module.scss` with the real Sass compiler and re-applies this exact rule — run it before
+assuming a new component's styles are fine just because Storybook renders them.
+
 ## B2C vs. B2B entry points
 
 - `@vtex-us-se/ui` (root) — B2C only. `import { SeBanner } from '@vtex-us-se/ui'`.
