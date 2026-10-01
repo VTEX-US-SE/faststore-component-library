@@ -3,6 +3,13 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    // Defensive default: this component is designed to be sized by a shelf/PLP grid cell
+    // (the same way @faststore/ui's own ProductCard only gets its real width from
+    // ProductShelf's grid-template-columns, not from anything in the card's own CSS) — but
+    // with no grid around it (e.g. dropped in as a single CMS section), `width: 100%` alone
+    // expands it to its full parent's width. A real grid cell is normally already narrower
+    // than this, so it doesn't change actual shelf usage.
+    max-width: 20rem;
 
     // `LinkButton` styles are imported here the same way `SeBanner.module.scss` does,
     // since this repo's build pipeline doesn't globally inject @faststore/ui's
