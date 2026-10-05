@@ -1,0 +1,76 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeHeader",
+  "$componentTitle": "SE Header",
+  "description": "Static site header with a top bar, logo, search box and account area.",
+  "type": "object",
+  "properties": {
+    "topbar": {
+      "title": "Top bar",
+      "type": "object",
+      "properties": {
+        "leftText": { "title": "Left text", "type": "string" },
+        "rightItems": {
+          "title": "Right items",
+          "description": "Links or labels shown on the right side of the top bar.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "Item",
+            "required": ["label"],
+            "properties": {
+              "label": { "title": "Label", "type": "string" },
+              "href": { "title": "URL (optional)", "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "logo": {
+      "title": "Logo",
+      "type": "object",
+      "properties": {
+        "imageUrl": { "title": "Logo image", "type": "string", "widget": { "ui:widget": "media-gallery" } },
+        "text": { "title": "Logo text / image alternative label", "type": "string" },
+        "href": { "title": "Logo link URL", "type": "string" }
+      }
+    },
+    "search": {
+      "title": "Search",
+      "type": "object",
+      "properties": {
+        "placeholder": { "title": "Input placeholder", "type": "string" },
+        "action": {
+          "title": "Search page URL",
+          "description": "Optional. The search form submits a GET request to this URL with the term as the 'term' query parameter.",
+          "type": "string"
+        },
+        "categories": {
+          "title": "Categories",
+          "description": "Options for the category selector. Leave empty to hide the selector.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "Category",
+            "required": ["label"],
+            "properties": {
+              "label": { "title": "Label", "type": "string" },
+              "value": { "title": "Value (defaults to label)", "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "account": {
+      "title": "Account",
+      "type": "object",
+      "properties": {
+        "welcome": { "title": "Welcome text", "type": "string" },
+        "guestLabel": { "title": "Guest name label", "type": "string" },
+        "loginLabel": { "title": "Login label", "type": "string" },
+        "loginHref": { "title": "Login URL", "type": "string" },
+        "showAvatar": { "title": "Show avatar placeholder", "type": "boolean", "default": true }
+      }
+    }
+  }
+}

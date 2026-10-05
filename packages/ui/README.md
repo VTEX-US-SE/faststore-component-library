@@ -110,6 +110,15 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   from `demo-poc-grill-house`, rebuilt self-contained (the original wrapped a `DefaultProductCard`
   that doesn't exist in this library). No GraphQL.
 
+- **`SeHeader`** — static site header: optional topbar, logo, search form (`onSearch` callback or
+  `search.action` GET URL) and account/login area. Ported from `faststore-usb2b5c`; every block
+  renders only if its props are given. No GraphQL.
+
+- **`SeValuePropCards`** — responsive grid of value-proposition cards (icon, title, text,
+  optional CTA) with optional per-card `languagesToShow`/`clustersToShow` filtering driven by
+  `locale`/`customerClass` props. Ported from `faststore-usb2b6`; Swiper replaced by a native CSS
+  grid, and the source's custom cluster query replaced by the `customerClass` prop. No GraphQL.
+
 ### B2B
 
 - **`SeWelcomeBackMessage`** — signed-in B2B greeting (`Welcome back, <name>`). Ported from

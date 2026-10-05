@@ -36,6 +36,11 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
 
 - **`useFormattedPrice`** — price formatting for `SeProductCardWithButton`. No GraphQL.
 
+- **`SeHeader`** — types only (`SeHeaderTopbar`, `SeHeaderLogo`, `SeHeaderSearch`, ...). No GraphQL.
+
+- **`SeValuePropCards`** — `useSeValuePropCardsFilter` / `filterSeValuePropCards`: language and
+  customer-class filtering of the cards. No GraphQL.
+
 See [`@vtex-us-se/ui`](../ui/README.md#components) for each component's rendered UI.
 
 ### B2B
