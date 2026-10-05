@@ -48,3 +48,17 @@ See [`@vtex-us-se/ui`](../ui/README.md#components) for each component's rendered
 - **`SeWelcomeBackMessage`** — `useB2bSession()`, a thin wrapper around FastStore's own
   (experimental) `useSession_unstable` that extracts just the B2B slice. See
   [`@vtex-us-se/ui`](../ui/README.md#components) for the rendered component.
+- **`SeActionHubBulletinBoard`**, **`SeCategoryBanners`** — types only. No GraphQL.
+- **`SeFooterB2B`** — types + `useNewsletterSubscription()`: email state and submit for FastStore's
+  native `subscribeToNewsletter` mutation (via `useNewsletter_unstable`), surfacing both a rejected
+  call and the hook's own `error` as `failed`.
+- **`SeCustomProductCard`** — `SeProductSummary` (the subset of FastStore's product-summary
+  fragment the card reads) + `useB2bProductCard()`: login state, product link, and min/max price
+  formatted through `useFormattedPrice_unstable`.
+- **`SeCustomShelfProduct`** — `useB2bShelfProducts()`, over FastStore's native `useProductsQuery`
+  (imported from the `@faststore/core` root, typed through `shims/faststore-core.d.ts` — see the
+  comment there for why the root needs a `paths` mapping when `/experimental` doesn't).
+- **`SeCustomCrossSellingShelf`** — `useCrossSellingShelfOverride()`: FastStore's native
+  `CrossSellingShelf` section with only its product card replaced, memoized.
+
+None of the B2B hooks above call a custom GraphQL operation, so they all ship as plain npm imports.

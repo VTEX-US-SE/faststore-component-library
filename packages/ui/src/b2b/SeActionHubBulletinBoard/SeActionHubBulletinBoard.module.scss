@@ -1,0 +1,178 @@
+// Fallbacks on the kit's own custom tokens (`--background-color-*`): the kit expects every store
+// to define them in its theme, and without them these backgrounds silently render transparent.
+@layer components {
+  .actionHubBulletinBoard {
+    font-family: var(--fs-text-face-body, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: var(--fs-grid-max-width);
+    margin: 24px auto;
+
+    @media screen and (max-width: 1023px) {
+      grid-template-columns: 1fr;
+      padding: 0 var(--fs-grid-padding);
+    }
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: fit-content;
+    padding: 24px;
+    border: 1px solid var(--fs-border-color);
+    border-radius: var(--fs-border-radius-medium);
+    background-color: var(--background-color-white, #fff);
+    box-shadow:
+      0 4px 12px 0 rgba(0, 0, 0, 0.1),
+      0 0 1px 0 rgba(0, 0, 0, 0.15);
+
+    @media screen and (max-width: 1023px) {
+      padding: 16px;
+    }
+  }
+
+  .actionHub {
+    @media screen and (max-width: 1023px) {
+      display: none;
+    }
+  }
+
+  .heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--fs-color-primary-bkg);
+
+    h3 {
+      margin: 0;
+      font-family: var(--fs-text-face-body);
+      font-size: var(--fs-text-size-4);
+      font-weight: var(--fs-text-weight-semibold);
+      line-height: 1.4;
+      color: var(--fs-color-text);
+    }
+  }
+
+  .actionList {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid var(--fs-border-color);
+    border-radius: var(--fs-border-radius-medium);
+    background-color: var(--background-color-light, #f7f7f7);
+    font-size: var(--fs-text-size-1);
+    font-weight: var(--fs-text-weight-semibold);
+    line-height: 1.4;
+    color: var(--fs-color-text);
+    text-decoration: none;
+
+    img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    &:hover {
+      border-color: var(--fs-color-primary-bkg);
+      background-color: var(--background-color-hover, #d5e8ff);
+      color: var(--fs-color-primary-bkg);
+    }
+  }
+
+  .bulletinList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bulletinItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 8px;
+    border-bottom: 1px solid var(--fs-border-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    @media screen and (max-width: 1023px) {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+
+  .bulletinHeading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    h4 {
+      margin: 0;
+      font-size: var(--fs-text-size-1);
+      font-weight: var(--fs-text-weight-semibold);
+      line-height: 1.4;
+      color: var(--fs-color-text);
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--fs-text-size-0);
+      line-height: 1.5;
+      color: var(--fs-color-text-light);
+    }
+  }
+
+  .bulletinMetaData {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .date {
+    font-size: var(--fs-text-size-0);
+    line-height: 1.5;
+    color: var(--fs-color-text-light);
+    white-space: nowrap;
+  }
+
+  .label {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-family: var(--fs-text-face-body);
+    font-size: var(--fs-text-size-0);
+    font-weight: var(--fs-text-weight-medium);
+    line-height: 1.5;
+    text-transform: capitalize;
+
+    &[data-label='platform'],
+    &[data-label='supplier'] {
+      background-color: var(--background-color-top-bar, #eef2f3);
+      color: var(--fs-color-tertiary-text);
+    }
+
+    &[data-label='compliance'] {
+      background-color: #fff1d9;
+      color: #ae3a0c;
+    }
+
+    &[data-label='product'] {
+      background-color: var(--background-color-hover, #d5e8ff);
+      color: var(--fs-color-primary-bkg);
+    }
+  }
+}

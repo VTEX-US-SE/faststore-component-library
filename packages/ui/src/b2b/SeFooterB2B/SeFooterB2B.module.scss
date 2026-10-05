@@ -1,0 +1,264 @@
+// Fallbacks on the kit's own custom tokens (`--background-color-*`): the kit expects every store
+// to define them in its theme, and without them the footer background silently renders transparent.
+@layer components {
+  .footer {
+    font-family: var(--fs-text-face-body, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+    margin-top: 24px;
+    background-color: var(--background-color-primary, #061425);
+    color: var(--fs-color-text-inverse);
+  }
+
+  .footerTop {
+    display: grid;
+    grid-template-columns: 7.63fr 2.37fr;
+    gap: 100px;
+    max-width: var(--fs-grid-max-width);
+    margin: 0 auto;
+    padding: 36px 0;
+
+    @media screen and (max-width: 1023px) {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px var(--fs-grid-padding);
+    }
+  }
+
+  .footerRight {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+
+    @media screen and (max-width: 1023px) {
+      gap: 24px;
+    }
+  }
+
+  .links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px;
+
+    @media screen and (max-width: 1023px) {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 120px;
+
+    @media screen and (max-width: 1023px) {
+      gap: 16px;
+
+      &[data-open='false'] .columnLinks {
+        display: none;
+      }
+    }
+  }
+
+  .columnToggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: default;
+    pointer-events: none;
+
+    h4 {
+      margin: 0;
+      font-size: var(--fs-text-size-2);
+      font-weight: var(--fs-text-weight-semibold);
+      line-height: 1.5;
+      color: var(--fs-color-text-inverse);
+    }
+
+    @media screen and (max-width: 1023px) {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+  }
+
+  .toggleIcon {
+    display: none;
+    font-size: var(--fs-text-size-3);
+    line-height: 1;
+
+    @media screen and (max-width: 1023px) {
+      display: block;
+    }
+  }
+
+  .columnLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media screen and (max-width: 1023px) {
+      padding: 0 8px 8px;
+    }
+
+    a {
+      font-size: var(--fs-text-size-1);
+      line-height: 1.4;
+      color: var(--fs-color-text-inverse);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .newsletter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .newsletterHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media screen and (max-width: 1023px) {
+      gap: 8px;
+    }
+
+    h4 {
+      margin: 0;
+      font-size: var(--fs-text-size-2);
+      font-weight: var(--fs-text-weight-semibold);
+      line-height: 1.5;
+      color: var(--fs-color-text-inverse);
+    }
+  }
+
+  .newsletterText {
+    margin: 0;
+    font-size: var(--fs-text-size-1);
+    line-height: 1.4;
+    color: var(--fs-color-text-light);
+  }
+
+  .newsletterField {
+    display: grid;
+    grid-template-columns: 2.57fr 1fr;
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 11.5px 5px 11.5px 13px;
+      border: none;
+      border-radius: var(--fs-border-radius-medium) 0 0 var(--fs-border-radius-medium);
+      font-family: var(--fs-text-face-body);
+      font-size: var(--fs-text-size-1);
+      line-height: 1.3;
+      color: var(--fs-color-text);
+      outline: none;
+
+      &::placeholder {
+        color: var(--fs-color-text-light);
+      }
+    }
+
+    button {
+      padding: 9px 17px;
+      border: none;
+      border-radius: 0 var(--fs-border-radius-medium) var(--fs-border-radius-medium) 0;
+      background-color: var(--fs-color-primary-bkg);
+      font-family: var(--fs-text-face-body);
+      font-size: var(--fs-text-size-1);
+      font-weight: var(--fs-text-weight-semibold);
+      color: var(--fs-color-primary-text, #fff);
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+    }
+  }
+
+  .newsletterError {
+    margin: 0;
+    font-size: var(--fs-text-size-0);
+    color: var(--fs-color-danger-text, #ff8a8a);
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+
+    img {
+      display: block;
+      max-height: 24px;
+    }
+  }
+
+  .bottomBar {
+    background-color: #0b233f;
+  }
+
+  .bottomBarWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--fs-grid-max-width);
+    margin: 0 auto;
+    padding: 16px 0;
+
+    @media screen and (max-width: 1023px) {
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px var(--fs-grid-padding);
+    }
+  }
+
+  .logoContact {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    img {
+      display: block;
+      max-height: 40px;
+    }
+
+    @media screen and (max-width: 1023px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .contact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    p {
+      margin: 0;
+      font-size: var(--fs-text-size-1);
+      line-height: 1.4;
+      color: var(--fs-color-text-inverse);
+    }
+  }
+
+  .copyright {
+    margin: 0;
+    font-size: var(--fs-text-size-0);
+    line-height: 1.5;
+    color: var(--fs-color-text-light);
+  }
+}

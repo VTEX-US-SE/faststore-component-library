@@ -1,0 +1,78 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeCustomShelfProduct",
+  "$componentTitle": "SE Custom Product Shelf",
+  "title": "Custom Product Shelf B2B",
+  "description": "Product carousel shelf",
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "Shelf Title",
+      "type": "string"
+    },
+    "numberOfItems": {
+      "title": "Number of Items",
+      "type": "integer",
+      "default": 10
+    },
+    "sort": {
+      "title": "Sort By",
+      "type": "string",
+      "default": "score_desc",
+      "enumNames": [
+        "Relevance",
+        "Price: High to Low",
+        "Price: Low to High",
+        "Best Sellers",
+        "Name: A-Z",
+        "Name: Z-A",
+        "Release Date",
+        "Best Discount"
+      ],
+      "enum": [
+        "score_desc",
+        "price_desc",
+        "price_asc",
+        "orders_desc",
+        "name_asc",
+        "name_desc",
+        "release_desc",
+        "discount_desc"
+      ]
+    },
+    "term": {
+      "title": "Search Term",
+      "type": "string",
+      "description": "Filter products by a specific term (e.g. 'Pasta')"
+    },
+    "selectedFacets": {
+      "title": "Filters (Collection/Category)",
+      "type": "array",
+      "items": {
+        "title": "Filter",
+        "type": "object",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string",
+            "default": "productClusterIds",
+            "description": "e.g. productClusterIds (Collection) or category-1 (Department)"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "description": "Collection or category ID"
+          }
+        }
+      }
+    },
+    "loginUrl": {
+      "type": "string",
+      "title": "Login URL",
+      "description": "Where 'Login for price' sends anonymous shoppers",
+      "default": "/login"
+    }
+  }
+}

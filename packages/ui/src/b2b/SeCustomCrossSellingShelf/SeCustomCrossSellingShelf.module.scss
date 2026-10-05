@@ -1,0 +1,6 @@
+@layer components {
+  // Hook for consumers' own overrides; the native section brings its own layout.
+  .crossSellingShelf {
+    width: 100%;
+  }
+}

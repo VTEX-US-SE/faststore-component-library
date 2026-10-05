@@ -14,8 +14,26 @@ declare module '@faststore/core/experimental' {
     b2b?: B2bInfo | null
     channel?: string
     locale?: string
+    currency?: { code: string; symbol?: string }
+    /** Set once the shopper is signed in; `null`/absent for anonymous sessions. */
+    person?: { id?: string; email?: string; [key: string]: unknown } | null
     [key: string]: unknown
   }
+
+  export function useNewsletter_unstable(): {
+    subscribeUser: (variables: { data: { name: string; email: string } }) => Promise<unknown>
+    data: unknown
+    error: unknown
+    loading: boolean
+  }
+
+  export function useProductLink_unstable(options: {
+    index: number
+    product: unknown
+    selectedOffer: number
+  }): { href: string; onClick: () => void; 'data-testid': string }
+
+  export function useFormattedPrice_unstable(price: number): string
 
   export function useLazyQuery_unstable<TData = unknown, TVariables = unknown>(
     query: unknown,
@@ -41,3 +59,4 @@ declare module '@faststore/core/experimental' {
 declare module '@faststore/core/api' {
   export function gql(query: string): unknown
 }
+

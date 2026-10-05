@@ -1,0 +1,58 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeCategoryBanners",
+  "$componentTitle": "SE Category Banners",
+  "title": "Category Banners",
+  "description": "Category Banners configuration",
+  "type": "object",
+  "properties": {
+    "bannerList": {
+      "type": "array",
+      "title": "Banner List",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "title": "Banner",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "linkText": {
+            "type": "string",
+            "title": "Link Text",
+            "default": "Shop Now"
+          },
+          "url": {
+            "type": "string",
+            "title": "URL"
+          },
+          "banner": {
+            "type": "string",
+            "title": "Banner Image",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": {
+                "video": true,
+                "image": [
+                  "png",
+                  "jpg",
+                  "jpeg",
+                  "gif",
+                  "svg",
+                  "webp"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

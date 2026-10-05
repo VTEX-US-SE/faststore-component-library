@@ -34,10 +34,17 @@ const config: StorybookConfig = {
         new URL('./mocks/faststore-core-experimental.ts', import.meta.url),
       ),
       '@faststore/core/api': fileURLToPath(new URL('./mocks/faststore-core-api.ts', import.meta.url)),
+      // Must come AFTER the subpath aliases above: alias entries match in order, and a bare
+      // '@faststore/core' entry also matches any '@faststore/core/...' import.
+      '@faststore/core': fileURLToPath(new URL('./mocks/faststore-core.tsx', import.meta.url)),
       '@vtex-us-se/ui/b2c': fileURLToPath(new URL('../../ui/src/b2c/index.ts', import.meta.url)),
+      '@vtex-us-se/ui/b2b': fileURLToPath(new URL('../../ui/src/b2b/index.ts', import.meta.url)),
       '@vtex-us-se/ui': fileURLToPath(new URL('../../ui/src/index.ts', import.meta.url)),
       '@vtex-us-se/components/b2c': fileURLToPath(
         new URL('../../components/src/b2c/index.ts', import.meta.url),
+      ),
+      '@vtex-us-se/components/b2b': fileURLToPath(
+        new URL('../../components/src/b2b/index.ts', import.meta.url),
       ),
       '@vtex-us-se/components': fileURLToPath(
         new URL('../../components/src/index.ts', import.meta.url),

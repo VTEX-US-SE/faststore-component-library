@@ -1,0 +1,98 @@
+@layer components {
+  .card {
+    font-family: var(--fs-text-face-body, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    height: 100%;
+    padding-bottom: 10px;
+    border: 1px solid var(--fs-border-color);
+    border-radius: var(--fs-border-radius-medium);
+    background-color: var(--background-color-white, #fff);
+    overflow: hidden;
+  }
+
+  .productLink {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .image {
+    aspect-ratio: 1;
+    background-color: var(--background-color-light, #f7f7f7);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .name {
+    display: -webkit-box;
+    margin: 0;
+    padding: 0 10px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-family: var(--fs-text-face-body);
+    font-size: var(--fs-text-size-2);
+    font-weight: var(--fs-text-weight-medium);
+    line-height: 1.4;
+    color: var(--fs-color-text);
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 10px;
+  }
+
+  .price {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .perUnit {
+    margin: 0;
+    font-size: var(--fs-text-size-1);
+    line-height: 1.4;
+    color: var(--fs-color-text-light);
+  }
+
+  .priceRange {
+    font-family: var(--fs-text-face-body);
+    font-size: var(--fs-text-size-3);
+    font-weight: var(--fs-text-weight-semibold);
+    line-height: 1.4;
+    color: var(--fs-color-text);
+  }
+
+  .cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: var(--fs-border-radius-medium);
+    background-color: var(--fs-color-primary-bkg);
+    font-size: var(--fs-text-size-2);
+    font-weight: var(--fs-text-weight-semibold);
+    line-height: 1.5;
+    color: var(--fs-color-primary-text, #fff);
+    text-decoration: none;
+    transition: transform 0.2s ease-in-out;
+
+    @media (min-width: 1024px) {
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
