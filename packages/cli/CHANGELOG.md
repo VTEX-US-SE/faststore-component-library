@@ -1,5 +1,12 @@
 # @vtex-us-se/cli
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [0ec937c]
+  - @vtex-us-se/ui@0.4.0
+
 ## 3.0.2
 
 ### Patch Changes
