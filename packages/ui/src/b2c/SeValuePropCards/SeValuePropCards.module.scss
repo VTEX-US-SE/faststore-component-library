@@ -1,0 +1,106 @@
+@layer components {
+  .valuePropCards {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--fs-grid-max-width, 100%);
+    margin: 0 auto;
+    padding: var(--fs-spacing-3, 1rem) var(--fs-grid-padding, 1rem);
+    background-color: var(--fs-color-neutral-2, #dddddd);
+    overflow: hidden;
+  }
+
+  // Auto-fitting grid: 1 column on phones, 2 on tablets, up to 4 on desktop. Each column is
+  // capped at 22rem and the track is centered, so a lone card never stretches absurdly.
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 22rem));
+    justify-content: center;
+    gap: var(--fs-spacing-3, 1rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--fs-spacing-1, 0.5rem);
+    min-width: 0;
+    padding: var(--fs-spacing-3, 1rem);
+    background-color: var(--fs-color-body-bkg, #ffffff);
+    color: var(--fs-color-text, #222222);
+
+    &[data-has-cta='true'] {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: var(--fs-spacing-2, 0.75rem);
+    }
+  }
+
+  .icon {
+    flex: 0 0 auto;
+    box-sizing: content-box;
+    width: 2rem;
+    height: 2rem;
+    padding: var(--fs-spacing-1, 0.5rem);
+    object-fit: contain;
+    border-radius: 999px;
+    background-color: var(--fs-color-neutral-2, #f0f0f0);
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: var(--fs-spacing-1, 0.5rem);
+    margin: 0;
+    font-size: var(--fs-text-size-2, 1rem);
+    font-weight: var(--fs-text-weight-semibold, 600);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1rem;
+    height: 1rem;
+    border-radius: 4px;
+    background-color: var(--fs-color-neutral-2, #dddddd);
+    font-size: 0.75rem;
+    font-weight: var(--fs-text-weight-regular, 400);
+  }
+
+  .description {
+    margin: 0;
+    font-size: var(--fs-text-size-1, 0.875rem);
+    overflow-wrap: anywhere;
+  }
+
+  .cta {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    a {
+      color: inherit;
+      font-size: var(--fs-text-size-1, 0.875rem);
+      font-weight: var(--fs-text-weight-semibold, 600);
+      line-height: 1;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+}

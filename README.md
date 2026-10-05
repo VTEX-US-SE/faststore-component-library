@@ -119,6 +119,13 @@ plain npm import can never work for those.
   (`faststore-usb2b9`), `SeCardsCarousel` (`faststore-demoanalyst`), `SeGridContent`,
   `SeHeroSection`, `SeLearnMoreSection` (all three from `faststore-usb2b5c`), `SeImageTiles`
   (`faststore-hughtestenv`), and `SeProductCardWithButton` (`demo-poc-grill-house`).
+- **B2C**: two more presentational components, `SeHeader` (static site header: topbar, logo,
+  search form, account area — from `faststore-usb2b5c`) and `SeValuePropCards` (value-proposition
+  cards — from `faststore-usb2b6`, whose per-card cluster filter is now a `customerClass` prop
+  instead of a custom GraphQL query). Four more candidates from that same pass were **not**
+  ported because they need their own GraphQL: `SkuAccordion` (B2B order guides), `ClusterMenu`
+  (customer-cluster lookup), `DoctorsHeader` (custom `doctors` query), and `ProductSpecifications`
+  (needs a `ServerProduct` fragment extension for `specificationGroups`).
 - All B2C components except `SeAssemblySet` and `SeWelcomeBackMessage` are installable today via
   `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages (`SeAssemblySet` needs
   `se-components add`, not a plain import — see above).

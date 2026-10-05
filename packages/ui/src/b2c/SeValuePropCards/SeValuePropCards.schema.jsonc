@@ -1,0 +1,60 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeValuePropCards",
+  "$componentTitle": "SE Value Prop Cards",
+  "description": "A responsive row of value-proposition cards (icon, title, description and optional link).",
+  "type": "object",
+  "required": ["cards"],
+  "properties": {
+    "ariaLabel": {
+      "title": "Accessible label",
+      "description": "Label announced by screen readers for this section.",
+      "type": "string"
+    },
+    "showIndexBadge": {
+      "title": "Show card number badge",
+      "description": "Displays the card position next to each title.",
+      "type": "boolean",
+      "default": false
+    },
+    "cards": {
+      "title": "Cards",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "title": "Card",
+        "properties": {
+          "icon": {
+            "title": "Icon",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "title": { "title": "Title", "type": "string" },
+          "description": { "title": "Description", "type": "string", "widget": { "ui:widget": "textarea" } },
+          "cta": {
+            "title": "Call to action",
+            "type": "object",
+            "properties": {
+              "buttonText": { "title": "Link text", "type": "string" },
+              "link": { "title": "Link URL", "type": "string" }
+            }
+          },
+          "languagesToShow": {
+            "title": "Languages to show",
+            "description": "Optional comma-separated locales (e.g. en-US,es-MX). Leave empty to show for every language.",
+            "type": "string"
+          },
+          "clustersToShow": {
+            "title": "Customer clusters to show",
+            "description": "Optional comma-separated customer clusters. Leave empty to show for everyone.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
