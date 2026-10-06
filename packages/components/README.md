@@ -62,3 +62,10 @@ See [`@vtex-us-se/ui`](../ui/README.md#components) for each component's rendered
   `CrossSellingShelf` section with only its product card replaced, memoized.
 
 None of the B2B hooks above call a custom GraphQL operation, so they all ship as plain npm imports.
+
+- **`SeRequestToBuy`** — `useRequestToBuyForm()`: form values, `setField`, `submit` and a
+  `status` (`idle` / `submitting` / `success` / `invalid` / `error`) for the
+  `seSubmitOrganizationRequest` mutation (`@vtex-us-se/resolvers`' `organizationRequest`). Reads
+  the outcome from the awaited lazy-query call rather than a `useEffect` on its `data` (the kit's
+  approach, which never re-fired for a second identical result). **Calls its own GraphQL** — it
+  reaches a project only through `se-components add SeRequestToBuy`'s source copy.

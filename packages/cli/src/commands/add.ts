@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
+import { findOperationDefinitions, gqlOperationNames } from '../lib/operations'
 import { copyComponentSource, needsSourceCopy } from '../lib/sourceCopy'
 
 interface AddOptions {
@@ -161,6 +162,23 @@ function addComponent(componentName: string, options: AddOptions): void {
 
     for (const file of copiedFiles) summary.push(`✔ Copied ${file}`)
     for (const file of skipped) summary.push(`ℹ ${file} already exists — left untouched.`)
+
+    // The copy carries its own inlined operation text; any OTHER definition of the same
+    // operation in src/ (e.g. an older `add-resolver` client wrapper) breaks codegen the moment
+    // the two texts differ.
+    const copiedOperations = new Set(
+      [...copiedFiles, ...skipped].flatMap((file) => gqlOperationNames(readFileSync(file, 'utf-8'))),
+    )
+    for (const operation of copiedOperations) {
+      const elsewhere = findOperationDefinitions('src', operation, [sourceDir])
+      if (elsewhere.length > 0) {
+        summary.push(
+          `⚠ ${operation} is also defined in ${elsewhere.join(', ')}. FastStore's codegen fails ("Not all operations ` +
+            `have an unique name") as soon as the copies differ — delete ${elsewhere.length > 1 ? 'those files' : 'that file'} ` +
+            `if nothing but ${componentName} uses ${elsewhere.length > 1 ? 'them' : 'it'}.`,
+        )
+      }
+    }
 
     summary.push(
       `ℹ ${componentName} touches @vtex-us-se/resolvers, so its full source (not just the schema) was copied into ` +

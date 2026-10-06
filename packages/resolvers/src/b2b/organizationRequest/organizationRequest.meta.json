@@ -1,0 +1,11 @@
+{
+  "operationType": "Mutation",
+  "resolverShape": "field",
+  "namespace": "thirdParty",
+  "fieldName": "seSubmitOrganizationRequest",
+  "factoryExport": "createOrganizationRequestResolver",
+  "configParams": ["storeId", "environment?", "dataEntity?", "schema?"],
+  "clientQueryExport": "SE_SUBMIT_ORGANIZATION_REQUEST_MUTATION",
+  "clientFileName": "organizationRequest.ts",
+  "clientConstantName": "SUBMIT_ORGANIZATION_REQUEST_MUTATION"
+}

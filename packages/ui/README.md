@@ -160,3 +160,14 @@ values when they're missing, instead of rendering transparent backgrounds.
 - **`SeCustomCrossSellingShelf`** — **PDP only**: FastStore's native `CrossSellingShelf` section
   ("who bought / saw this also...") with its card swapped for `SeCustomProductCard` (via
   `getOverriddenSection`). Uses the default `loginUrl`.
+
+- **`SeRequestToBuy`** — "request buyer access" form for prospective organizations, stored in
+  Master Data through `@vtex-us-se/resolvers`' `organizationRequest` operation. The first B2B
+  component with **its own GraphQL**, so — like `SeAssemblySet` — it must be added with
+  `se-components add SeRequestToBuy` (source copy, mutation text inlined) plus
+  `se-components add-resolver organizationRequest`, never imported from the package: with no
+  codegen entry for its mutation, FastStore's lazy-query hook fails at render. Needs the Master
+  Data entity + app key/token described in the
+  [resolvers README](../resolvers/README.md#organizationrequest-b2b). Labels and messages are CMS
+  props; unlike the kit, the submit button stays enabled (except while sending) so a missing
+  field actually shows its validation message.
