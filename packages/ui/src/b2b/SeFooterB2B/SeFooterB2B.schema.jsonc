@@ -1,0 +1,197 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeFooterB2B",
+  "$componentTitle": "SE Footer B2B",
+  "title": "Footer B2B",
+  "description": "B2B Footer displayed on all pages",
+  "type": "object",
+  "properties": {
+    "columns": {
+      "type": "array",
+      "title": "Link Columns",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "title": "Column",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Column Title"
+          },
+          "links": {
+            "type": "array",
+            "title": "Link List",
+            "items": {
+              "type": "object",
+              "title": "Link",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "title": "Text"
+                },
+                "url": {
+                  "type": "string",
+                  "title": "URL"
+                },
+                "newTab": {
+                  "type": "boolean",
+                  "title": "Open link in new window?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "newsletter": {
+      "type": "object",
+      "title": "Newsletter",
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "default": "Subscribe to Newsletter"
+        },
+        "text": {
+          "type": "string",
+          "title": "Text",
+          "default": "Sign up for exclusive updates, new arrivals & insider only discounts"
+        },
+        "placeholder": {
+          "type": "string",
+          "title": "Input placeholder",
+          "default": "Your Email ID"
+        },
+        "submitLabel": {
+          "type": "string",
+          "title": "Button label",
+          "default": "Submit"
+        },
+        "successMessage": {
+          "type": "string",
+          "title": "Success message",
+          "default": "Thank you! You’ve successfully subscribed to our newsletter."
+        },
+        "errorMessage": {
+          "type": "string",
+          "title": "Error message",
+          "default": "Error while submitting newsletter"
+        }
+      }
+    },
+    "socialLinks": {
+      "title": "Social Media",
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "title": "Link",
+        "type": "object",
+        "required": [
+          "alt",
+          "url",
+          "icon"
+        ],
+        "properties": {
+          "icon": {
+            "title": "Icon",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": {
+                "video": true,
+                "image": [
+                  "png",
+                  "jpg",
+                  "jpeg",
+                  "gif",
+                  "svg",
+                  "webp"
+                ]
+              }
+            }
+          },
+          "alt": {
+            "title": "Alt",
+            "type": "string"
+          },
+          "url": {
+            "title": "URL",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "footerBottomBar": {
+      "title": "Bottom Bar",
+      "type": "object",
+      "properties": {
+        "logo": {
+          "title": "Logo",
+          "type": "object",
+          "required": [
+            "src",
+            "alt"
+          ],
+          "properties": {
+            "src": {
+              "title": "Image",
+              "type": "string",
+              "widget": {
+                "ui:widget": "media-gallery",
+                "restrictMediaTypes": {
+                  "video": true,
+                  "image": [
+                    "png",
+                    "jpg",
+                    "jpeg",
+                    "gif",
+                    "svg",
+                    "webp"
+                  ]
+                }
+              }
+            },
+            "alt": {
+              "title": "Alternative Label",
+              "type": "string"
+            },
+            "link": {
+              "title": "Logo Link",
+              "type": "object",
+              "required": [
+                "url",
+                "title"
+              ],
+              "properties": {
+                "url": {
+                  "title": "Link URL",
+                  "type": "string"
+                },
+                "title": {
+                  "title": "Link Title",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "contactCopyright": {
+          "type": "object",
+          "title": "Contact and Copyright",
+          "properties": {
+            "contact": {
+              "type": "string",
+              "title": "Contact"
+            },
+            "copyright": {
+              "type": "string",
+              "title": "Copyright Info"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeActionHubBulletinBoard",
+  "$componentTitle": "SE Action Hub & Bulletin Board",
+  "title": "Action Hub & Bulletin Board",
+  "description": "Action Hub and Bulletin Board configuration",
+  "type": "object",
+  "properties": {
+    "actionHub": {
+      "type": "object",
+      "title": "Action Hub",
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "default": "Action Hub"
+        },
+        "actionList": {
+          "type": "array",
+          "title": "Items",
+          "items": {
+            "type": "object",
+            "title": "Item",
+            "properties": {
+              "icon": {
+                "type": "string",
+                "title": "Icon",
+                "widget": {
+                  "ui:widget": "media-gallery",
+                  "restrictMediaTypes": {
+                    "video": true,
+                    "image": [
+                      "png",
+                      "jpg",
+                      "jpeg",
+                      "gif",
+                      "svg",
+                      "webp"
+                    ]
+                  }
+                }
+              },
+              "text": {
+                "type": "string",
+                "title": "Text"
+              },
+              "url": {
+                "type": "string",
+                "title": "URL"
+              },
+              "newTab": {
+                "type": "boolean",
+                "title": "Open link in new window?"
+              }
+            }
+          }
+        }
+      }
+    },
+    "bulletinBoard": {
+      "type": "object",
+      "title": "Bulletin Board",
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "default": "Bulletin Board"
+        },
+        "items": {
+          "type": "array",
+          "title": "Items",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "title": "Item",
+            "properties": {
+              "title": {
+                "type": "string",
+                "title": "Title"
+              },
+              "text": {
+                "type": "string",
+                "title": "Text"
+              },
+              "date": {
+                "type": "string",
+                "title": "Date",
+                "description": "e.g. '2025-09-15'"
+              },
+              "label": {
+                "type": "string",
+                "enumNames": [
+                  "Platform",
+                  "Supplier",
+                  "Compliance",
+                  "Product"
+                ],
+                "enum": [
+                  "platform",
+                  "supplier",
+                  "compliance",
+                  "product"
+                ],
+                "title": "Label"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

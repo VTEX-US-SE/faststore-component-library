@@ -59,7 +59,7 @@ assuming a new component's styles are fine just because Storybook renders them.
 ## B2C vs. B2B entry points
 
 - `@vtex-us-se/ui` (root) — B2C only. `import { SeBanner } from '@vtex-us-se/ui'`.
-- `@vtex-us-se/ui/b2b` — B2B only. `import { SeWelcomeBackMessage } from '@vtex-us-se/ui/b2b'`.
+- `@vtex-us-se/ui/b2b` — B2B only. `import { SeWelcomeBackMessage, SeFooterB2B } from '@vtex-us-se/ui/b2b'`.
 
 The root entry point deliberately does **not** re-export B2B components, so a B2C-only project
 never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by importing
@@ -127,3 +127,36 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   `@vtex-us-se/ui/b2b`) and a real FastStore project with the Buyer Portal plugin enabled and a
   B2B session; renders nothing (returns `null`) outside of one. See
   [`SeWelcomeBackMessage.tsx`](src/b2b/SeWelcomeBackMessage/SeWelcomeBackMessage.tsx).
+
+The components below are the rest of that kit's "wave 1": everything in it that needs no custom
+GraphQL operation, so all are plain npm imports from `@vtex-us-se/ui/b2b` (same optional
+`@faststore/core` peer). Ported with the kit's `swiper` carousels and JS screen-size hooks
+replaced by CSS (scroll-snap strips, media queries), so there's no extra dependency and no
+desktop-then-mobile re-render on first load. The kit expects every store's theme to define a set of
+custom `--background-color-*` tokens; these components fall back to the kit's documented neutral
+values when they're missing, instead of rendering transparent backgrounds.
+
+- **`SeActionHubBulletinBoard`** — signed-in B2B home widgets: quick-action links (hidden below
+  1024px, as in the kit) beside a short labelled announcements list. Renders nothing outside a B2B
+  session. No GraphQL.
+
+- **`SeCategoryBanners`** — up to three promo banners: a row on desktop, a swipeable strip on
+  mobile. No GraphQL.
+
+- **`SeFooterB2B`** — footer with up to four link columns (accordion on mobile), newsletter signup
+  through FastStore's native `subscribeToNewsletter` mutation, social icons and a logo/contact/
+  copyright bottom bar. Newsletter labels and success/error messages are CMS props. Unlike the
+  kit, a failed subscription actually shows its error message.
+
+- **`SeCustomProductCard`** — login-gated product card: signed-in shoppers see the price (or price
+  range across offers, formatted in the session's own currency) and a "View item" link;
+  anonymous ones see "Login for price", linking to a `loginUrl` prop (default `/login`, FastStore's
+  own login page — the kit read it from `discovery.config`, which a published package can't
+  import). Not a CMS section on its own; used by the two shelves below.
+
+- **`SeCustomShelfProduct`** — product shelf by term / sort / collection or category facets,
+  through FastStore's native `useProductsQuery`, rendered with `SeCustomProductCard`.
+
+- **`SeCustomCrossSellingShelf`** — **PDP only**: FastStore's native `CrossSellingShelf` section
+  ("who bought / saw this also...") with its card swapped for `SeCustomProductCard` (via
+  `getOverriddenSection`). Uses the default `loginUrl`.

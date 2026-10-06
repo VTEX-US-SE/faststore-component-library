@@ -105,8 +105,17 @@ plain npm import can never work for those.
   split. Needs `@faststore/core` (peer, optional) and only renders inside a real B2B session —
   no Storybook story, since it can't render meaningfully (or even bundle cleanly in Vite —
   `@faststore/core` is Next.js-server-coupled) outside an actual FastStore + Buyer Portal
-  project. The rest of that kit's components (most need custom GraphQL resolvers our CLI
-  doesn't copy yet) are out of scope for now.
+  project.
+- **B2B**: wave 1 of the rest of that kit — every component in it with no custom GraphQL:
+  `SeActionHubBulletinBoard`, `SeCategoryBanners`, `SeFooterB2B`, `SeCustomProductCard`,
+  `SeCustomShelfProduct` and `SeCustomCrossSellingShelf` (the last two over FastStore's native
+  `useProductsQuery` / `CrossSellingShelf`). These do have Storybook stories: `docs` now mocks the
+  `@faststore/core` root as well as `/experimental`, with a signed-in/signed-out session toggle.
+  Still to come from the kit: GraphQL components with their own operations (`RequestToBuy`,
+  `RecentOrdersSpendOverview`, `Dashboards`), `ProductGalleryB2B` (needs a `StoreProduct`
+  extension plus fragments, which the CLI doesn't copy yet), and the tightly coupled
+  `NavbarB2B` / `AddressSelector` / `CheckStockAndPricing` / `PurchaseLists` / `ProductDetailsB2B`
+  group.
 - **B2C**: `SeAssemblySet`, a customisable set builder ported from `poc-arbonne-clone`'s
   `AssemblySet`. First component needing its own `packages/resolvers` operation
   (`assemblySet`) — which is also why `se-components add` grew a second distribution mode: a
@@ -126,9 +135,9 @@ plain npm import can never work for those.
   ported because they need their own GraphQL: `SkuAccordion` (B2B order guides), `ClusterMenu`
   (customer-cluster lookup), `DoctorsHeader` (custom `doctors` query), and `ProductSpecifications`
   (needs a `ServerProduct` fragment extension for `specificationGroups`).
-- All B2C components except `SeAssemblySet` and `SeWelcomeBackMessage` are installable today via
-  `@vtex-us-se/ui`/`@vtex-us-se/ui/b2b` on GitHub Packages (`SeAssemblySet` needs
-  `se-components add`, not a plain import — see above).
+- Every component except `SeAssemblySet` is installable today as a plain import from
+  `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub Packages (`SeAssemblySet` needs
+  `se-components add`'s source copy, not a plain import — see above).
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.

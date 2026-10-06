@@ -12,8 +12,44 @@ export type B2bInfo = {
   [key: string]: unknown
 }
 
-export function useSession_unstable(): { b2b?: B2bInfo | null; channel?: string; locale?: string } {
-  return { b2b: { userName: 'Storybook User' }, channel: '{"salesChannel":"1"}', locale: 'en-US' }
+// Stories flip this to render the anonymous (logged-out) state of login-gated B2B components.
+let mockSignedIn = true
+
+export function setMockSignedIn(signedIn: boolean) {
+  mockSignedIn = signedIn
+}
+
+export function useSession_unstable(): {
+  b2b?: B2bInfo | null
+  channel?: string
+  locale?: string
+  currency?: { code: string; symbol: string }
+  person?: { id: string; email: string } | null
+} {
+  return {
+    b2b: mockSignedIn ? { userName: 'Storybook User' } : null,
+    channel: '{"salesChannel":"1"}',
+    locale: 'en-US',
+    currency: { code: 'USD', symbol: '$' },
+    person: mockSignedIn ? { id: 'storybook-person', email: 'buyer@example.com' } : null,
+  }
+}
+
+export function useFormattedPrice_unstable(price: number): string {
+  return Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
+}
+
+export function useProductLink_unstable({ product }: { product: { slug: string }; index: number; selectedOffer: number }) {
+  return { href: `/${product.slug}/p`, onClick: () => {}, 'data-testid': 'product-link' }
+}
+
+export function useNewsletter_unstable() {
+  const [data, setData] = useState<unknown>(undefined)
+  const subscribeUser = useCallback(async (variables: unknown) => {
+    console.log('[Storybook mock] useNewsletter_unstable subscribeUser called with', variables)
+    setData({ subscribeToNewsletter: { id: 'storybook-subscription' } })
+  }, [])
+  return { subscribeUser, data, error: undefined, loading: false }
 }
 
 export function useCart_unstable(): { id?: string } {
