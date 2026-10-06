@@ -58,10 +58,21 @@ either re-applying your own edits by hand afterward, or deleting the component's
 se-components add-resolver assemblySet
 ```
 
-Copies `<operationName>`'s `.graphql` typeDef into `src/graphql/<namespace>/typeDefs/`
-(`--namespace`, default `b2c` — this only affects where the *typeDef* lands; see below for
-resolver placement), and scaffolds (or safely merges into) the server resolver and its
-aggregator `resolvers/index.ts`.
+Copies `<operationName>`'s `.graphql` typeDef into `src/graphql/<namespace>/typeDefs/`, and
+scaffolds (or safely merges into) the server resolver and its aggregator `resolvers/index.ts`
+in the same namespace folder.
+
+**Namespace:** `--namespace`, else the operation's own `meta.json` `namespace`, else
+`thirdParty`. FastStore's GraphQL server only loads `src/graphql/vtex/` and
+`src/graphql/thirdParty/` — anything else is warned about, since it would be silently ignored.
+(Before CLI 6.0 the default was `b2c`, a folder FastStore never reads: a non-split operation
+added without `--namespace` was never part of the schema.)
+
+**Aggregator (`resolvers/index.ts`):** combines every resolver map **per GraphQL type**, not with
+a `{ ...a, ...b }` spread. Older CLIs wrote the spread, which silently dropped fields whenever
+two operations extend the same type — e.g. `assemblySet` and `organizationRequest` both add to
+`Mutation`, and the spread kept only the last one's. Adding an operation to a project with an
+older spread-shaped `index.ts` rewrites it into the per-type shape automatically.
 
 **Operations whose `meta.json` declares `typeExtensionKeys`** (see
 [`packages/resolvers/README.md`](../resolvers/README.md#the-two-server-side-extension-namespaces))
@@ -80,13 +91,17 @@ operation's query/mutation **text literally** — not an import of the constant 
 codegen-visibility reason `add`'s source-copy mode exists. Re-run this command (it won't
 overwrite an existing copy) after a `@vtex-us-se/resolvers` upgrade that changes the operation.
 
-None of this is needed if you only use the operation through a component `add` already copied
-in source form — that component's own copied hook already has its query/mutation text inlined.
-This wrapper exists for writing your **own** component against a `@vtex-us-se/resolvers`
-operation directly.
+The wrapper is **skipped** when your `src/` already defines the operation — typically a
+component `add` copied in source form, whose hook carries its own inlined copy. FastStore's
+codegen tolerates two definitions of one operation only while their text is byte-identical;
+once one copy changes (an upgrade re-copies one file but not the other), the whole codegen run
+fails with `Not all operations have an unique name` and generates nothing. For the same reason
+`add` warns when a component it copies defines an operation that already exists elsewhere in
+`src/` (e.g. a wrapper from running `add-resolver` first). The wrapper is only for writing your
+**own** component against a `@vtex-us-se/resolvers` operation directly.
 
 ```bash
-se-components add-resolver assemblySet --namespace b2c        # default, typeDef placement only
+se-components add-resolver organizationRequest --namespace thirdParty  # meta.json's own default
 se-components add-resolver assemblySet --target-dir src/graphql
 se-components add-resolver assemblySet --client-dir src/utils
 se-components add-resolver assemblySet --force   # overwrite an existing typeDef file

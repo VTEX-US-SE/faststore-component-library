@@ -10,6 +10,7 @@ src/<segment>/<operationName>/
 ├── <operationName>.resolver.ts      # the resolver factory
 ├── <operationName>.query.ts         # plain GraphQL strings (queries/mutations), for the client
 └── <operationName>.meta.json        # describes the operation for `se-components add-resolver`
+                                     # (incl. `namespace`: "vtex" | "thirdParty", for non-split ops)
 ```
 
 ## Read this first: two ways a component reaches this package
@@ -94,3 +95,30 @@ consumes this.
 - **Client:** `ASSEMBLY_SET_QUERY` (reads the parent product + its assembly option) and
   `SE_ADD_COMPOSED_SET_MUTATION` — both plain strings; see the note at the top of this file
   about why these can only ever work when inlined into your project's own `src/`.
+
+### `organizationRequest` (b2b)
+
+"Request buyer access" form submissions from prospective B2B organizations, stored as Master
+Data v2 documents. Ported from `faststore-b2b-buyer-portal-kit`'s `submitOrganizationRequest`.
+See [`@vtex-us-se/ui`'s `SeRequestToBuy`](../ui/README.md#b2b) for the component.
+
+- **Server:** `createOrganizationRequestResolver(config)` returns the single
+  `Mutation.seSubmitOrganizationRequest` field resolver (`resolverShape: "field"`,
+  `namespace: "thirdParty"`). Config: `storeId`, `environment?`, `dataEntity?` (default
+  `OrganizationRequest`), `schema?` (default `v1`), `appKey?`/`appToken?` (default to the
+  `FS_DISCOVERY_APP_KEY`/`FS_DISCOVERY_APP_TOKEN` env vars, read per request — prefer the env vars
+  so credentials are never committed).
+- **Client:** `SE_SUBMIT_ORGANIZATION_REQUEST_MUTATION`.
+- **It's a public write endpoint** (the requester has no account yet), so the resolver trims and
+  length-caps every field, requires company/contact/email, checks the email shape, and only then
+  writes. Master Data's own error text is logged server-side, never returned — the client only
+  ever sees `success: true | false`. There's no rate limiting or CAPTCHA; add one in front if the
+  store expects abuse.
+- **Prerequisites:**
+  1. A Master Data v2 entity (default `OrganizationRequest`) with a JSON schema (default `v1`)
+     accepting `companyName`, `contactName`, `email` (required) and `phone`, `message`
+     (optional), all strings. For example, `PUT /api/dataentities/OrganizationRequest/schemas/v1`
+     with
+     `{"properties":{"companyName":{"type":"string"},"contactName":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"message":{"type":"string"}},"required":["companyName","contactName","email"],"v-indexed":["email","companyName"]}`.
+  2. An app key/token whose role can create documents in that entity — scope it to just that.
+     Without them every request is rejected and the server logs why.

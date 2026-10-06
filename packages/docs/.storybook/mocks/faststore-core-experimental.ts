@@ -56,23 +56,45 @@ export function useCart_unstable(): { id?: string } {
   return { id: 'storybook-order-form-id' }
 }
 
+/**
+ * Answers by operation (the mocked `gql` hands back the raw query text) and, like the real hook,
+ * resolves `execute` to the response. `seSubmitOrganizationRequest` fails when the company name
+ * is "fail", so stories can exercise the error path.
+ */
+function mockLazyResponse(query: unknown, variables: unknown): unknown {
+  const text = String(query)
+
+  if (text.includes('seSubmitOrganizationRequest')) {
+    const companyName = (variables as { data?: { companyName?: string } })?.data?.companyName
+    return { seSubmitOrganizationRequest: { success: companyName?.toLowerCase() !== 'fail' } }
+  }
+
+  return {
+    seAddComposedSet: {
+      orderFormId: 'storybook-order-form-id',
+      value: 12550,
+      messages: [],
+    },
+  }
+}
+
 /* eslint-disable @typescript-eslint/no-unused-vars -- signature must match the real hook's */
 export function useLazyQuery_unstable<TData = unknown, TVariables = unknown>(query: unknown, variables: TVariables) {
   /* eslint-enable @typescript-eslint/no-unused-vars */
   const [data, setData] = useState<TData | undefined>(undefined)
 
-  const submit = useCallback(async (submittedVariables: TVariables) => {
-    console.log('[Storybook mock] useLazyQuery_unstable called with', submittedVariables)
-    setData({
-      seAddComposedSet: {
-        orderFormId: 'storybook-order-form-id',
-        value: 12550,
-        messages: [],
-      },
-    } as TData)
-  }, [])
+  const submit = useCallback(
+    async (submittedVariables: TVariables) => {
+      console.log('[Storybook mock] useLazyQuery_unstable called with', submittedVariables)
+      await new Promise((resolve) => setTimeout(resolve, 400))
+      const response = mockLazyResponse(query, submittedVariables) as TData
+      setData(response)
+      return response
+    },
+    [query],
+  )
 
-  return [submit, { data }] as [(submittedVariables: TVariables) => Promise<void>, { data: TData | undefined }]
+  return [submit, { data }] as [(submittedVariables: TVariables) => Promise<TData>, { data: TData | undefined }]
 }
 
 const IN_STOCK = 'https://schema.org/InStock'

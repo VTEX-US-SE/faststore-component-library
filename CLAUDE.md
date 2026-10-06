@@ -138,6 +138,14 @@ the printed summary line:**
 - [ ] If the operation is `resolverShape: "map"` with `typeExtensionKeys`: confirm the split
       landed in the right folders (`vtex/` got the declared keys, `thirdParty/` got the rest) —
       open both generated files and read the keys, don't infer from the console summary.
+- [ ] **Add the new operation next to an existing one that extends the same type** (e.g. two
+      `Mutation` operations — `assemblySet` + yours) and open `thirdParty/resolvers/index.ts`:
+      it must merge per type. Then actually execute it (transpile + `require`) and list the
+      merged `Mutation` fields — a top-level spread dropped `seAddComposedSet` silently, with no
+      build or boot error.
+- [ ] **No operation is defined twice under `src/`** — `grep -rn "mutation <OpName>\|query <OpName>" src`
+      should hit exactly one file (the copied hook). FastStore's codegen accepts identical
+      duplicates and fails the whole build once they diverge.
 - [ ] **The typeDef landed in the same namespace folder its resolver actually loads from.**
       A split resolver only fixes half the problem if the typeDef still goes wherever
       `--namespace` points (`b2c` by default) — a folder FastStore's GraphQL server never scans.

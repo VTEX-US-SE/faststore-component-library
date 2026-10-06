@@ -38,7 +38,7 @@ declare module '@faststore/core/experimental' {
   export function useLazyQuery_unstable<TData = unknown, TVariables = unknown>(
     query: unknown,
     variables: TVariables,
-  ): [(variables: TVariables) => Promise<void>, { data: TData | undefined }]
+  ): [(variables: TVariables) => Promise<TData | null | undefined>, { data: TData | undefined }]
 
   export function useQuery_unstable<TData = unknown, TVariables = unknown>(
     query: unknown,

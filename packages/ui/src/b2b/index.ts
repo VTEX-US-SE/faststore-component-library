@@ -12,3 +12,5 @@ export { SeCustomShelfProduct } from './SeCustomShelfProduct/SeCustomShelfProduc
 export type { SeCustomShelfProductProps } from './SeCustomShelfProduct/SeCustomShelfProduct'
 export { SeCustomCrossSellingShelf } from './SeCustomCrossSellingShelf/SeCustomCrossSellingShelf'
 export type { SeCustomCrossSellingShelfProps } from './SeCustomCrossSellingShelf/SeCustomCrossSellingShelf'
+export { SeRequestToBuy } from './SeRequestToBuy/SeRequestToBuy'
+export type { SeRequestToBuyProps } from './SeRequestToBuy/SeRequestToBuy'

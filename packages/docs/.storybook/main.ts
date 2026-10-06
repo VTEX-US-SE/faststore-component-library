@@ -52,6 +52,9 @@ const config: StorybookConfig = {
       '@vtex-us-se/resolvers/b2c': fileURLToPath(
         new URL('../../resolvers/src/b2c/index.ts', import.meta.url),
       ),
+      '@vtex-us-se/resolvers/b2b': fileURLToPath(
+        new URL('../../resolvers/src/b2b/index.ts', import.meta.url),
+      ),
       '@vtex-us-se/resolvers': fileURLToPath(new URL('../../resolvers/src/index.ts', import.meta.url)),
     }
 
