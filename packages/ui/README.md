@@ -120,6 +120,17 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   `columns.mobile` (default 6 / 4) and an empty-state message. Items are typed in the CMS today;
   a catalog-driven mode is planned. Built by the store-clone pipeline. No GraphQL.
 
+- **`SeProductReviews`** — PDP reviews block: star row, average line, "log in to review" link,
+  sort and filter toggles, and the review list or an empty state. Presentation only: reviews come
+  from the `reviews` prop (empty by default); a VTEX Reviews and Ratings data source would be a
+  separate source-copy component. Built by the store-clone pipeline. No GraphQL.
+
+- **`SeFooter`** — B2C store footer: up to 4 link columns (a column whose items have no URL
+  becomes a text column), logo, social links (sprite icon name or custom image), copyright, and
+  optional incentives and payment-method rows. Columns collapse into accordions below
+  `accordionBreakpoint` (`notebook` 1024px, or `tablet` 768px). Its field names follow the native
+  `Footer` schema where they overlap. Built by the store-clone pipeline. No GraphQL.
+
 - **`SeProductCardWithButton`** — product card with an image, price, and a CTA button. Ported
   from `demo-poc-grill-house`, rebuilt self-contained (the original wrapped a `DefaultProductCard`
   that doesn't exist in this library). No GraphQL.
