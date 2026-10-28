@@ -1,0 +1,52 @@
+@layer components {
+  .productImageGrid {
+    width: 100%;
+    background-color: var(--fs-color-neutral-bkg);
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(var(--se-product-image-grid-columns-mobile, 4), minmax(0, 1fr));
+    gap: var(--fs-spacing-2);
+    margin: 0;
+    padding: var(--fs-spacing-2) var(--fs-spacing-1);
+    list-style: none;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(var(--se-product-image-grid-columns-desktop, 6), minmax(0, 1fr));
+      gap: var(--fs-spacing-4);
+      padding: var(--fs-spacing-4) var(--fs-spacing-3);
+    }
+  }
+
+  .item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .link {
+    display: block;
+
+    &:focus-visible {
+      outline: 2px solid var(--fs-color-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+  }
+
+  .empty {
+    margin: 0;
+    padding: var(--fs-spacing-6) var(--fs-spacing-3);
+    color: var(--fs-color-text-light);
+    font-size: var(--fs-text-size-1);
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

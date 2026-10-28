@@ -4,6 +4,20 @@
   "$componentTitle": "SE Grid Content",
   "type": "object",
   "properties": {
+    "variant": {
+      "title": "Card layout",
+      "type": "string",
+      "enum": ["overlay", "caption-below"],
+      "enumNames": ["Content over the image", "Content below the image"],
+      "default": "overlay"
+    },
+    "columns": {
+      "title": "Columns on desktop",
+      "description": "Tablets show up to 2 columns, phones 1.",
+      "type": "integer",
+      "enum": [1, 2, 3, 4],
+      "default": 4
+    },
     "bannerImage": {
       "title": "Banner image",
       "description": "Optional full-width image displayed below the grid.",

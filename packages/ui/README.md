@@ -100,11 +100,25 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
 
 - **`SeGridContent`**, **`SeHeroSection`**, **`SeLearnMoreSection`** — presentational content
   sections ported from `faststore-usb2b5c`, with hardcoded client content replaced by CMS props
-  and `--fs-*` design tokens. No GraphQL.
+  and `--fs-*` design tokens. No GraphQL. `SeGridContent` takes `columns` (1–4, default 4) and
+  `variant` (`overlay`, the default, or `caption-below`), and reads only standard FastStore theme
+  tokens (`--fs-color-action-bkg`, `--fs-color-action-text`, `--fs-color-neutral-bkg`,
+  `--fs-color-text`), so it follows the store's theme instead of a built-in blue.
 
 - **`SeImageTiles`** — grid of 2–4 image tiles. Ported from `faststore-hughtestenv` (merges what
   were two near-identical components, `imagetiles`/`imagetiles3`, differing only in tile count).
-  No GraphQL.
+  Optional `captionPosition: "below"` (each tile's `title` and `linkLabel` under the image),
+  `columns` (2–4, keeps up to 2 on mobile), `aspectRatio` and `maxWidth`; without them it renders
+  exactly as before. No GraphQL.
+
+- **`SeEditorialSplit`** — full-bleed editorial images side by side (stacked on mobile), each
+  with an optional caption and arrow link. `columns` (1–3), `aspectRatio` (`3:4`, `4:5`, `1:1`)
+  and `captionPosition` (`below` or `overlay`). Built by the store-clone pipeline. No GraphQL.
+
+- **`SeProductImageGrid`** — dense grid of product cut-out images on a light background, each
+  linking to its product page, no names or prices ("shop the look" walls). `columns.desktop` /
+  `columns.mobile` (default 6 / 4) and an empty-state message. Items are typed in the CMS today;
+  a catalog-driven mode is planned. Built by the store-clone pipeline. No GraphQL.
 
 - **`SeProductCardWithButton`** — product card with an image, price, and a CTA button. Ported
   from `demo-poc-grill-house`, rebuilt self-contained (the original wrapped a `DefaultProductCard`

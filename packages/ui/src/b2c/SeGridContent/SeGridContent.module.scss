@@ -1,10 +1,10 @@
 @layer components {
   .gridContent {
-    padding: var(--fs-spacing-layout, 4.5rem) var(--fs-grid-padding, 1.5rem);
+    padding: var(--fs-spacing-8) var(--fs-grid-padding);
   }
 
   .container {
-    width: min(var(--fs-grid-max-width, 1250px), 100%);
+    width: min(var(--fs-grid-max-width), 100%);
     margin: 0 auto;
   }
 
@@ -20,8 +20,8 @@
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--fs-spacing-layout, 2rem);
+    grid-template-columns: repeat(var(--se-grid-content-columns, 4), minmax(0, 1fr));
+    gap: var(--fs-spacing-6);
     align-items: stretch;
   }
 
@@ -29,7 +29,7 @@
     position: relative;
     overflow: hidden;
     min-height: 660px;
-    background: var(--fs-color-surface-secondary, #dbeafe);
+    background: var(--fs-color-neutral-bkg);
     box-shadow: 0 18px 30px rgba(0, 0, 0, 0.12);
   }
 
@@ -59,12 +59,12 @@
     left: 1rem;
     right: 1rem;
     bottom: 1rem;
-    background: var(--fs-color-primary, #15a9e0);
+    background: var(--fs-color-action-bkg);
     box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16);
   }
 
   .content {
-    color: var(--fs-color-text-inverse, #ffffff);
+    color: var(--fs-color-action-text);
     padding: 1.5rem 1.5rem 1.75rem;
     display: flex;
     flex-direction: column;
@@ -78,8 +78,8 @@
   }
 
   .eyebrow {
-    font-size: var(--fs-text-size-0, 0.875rem);
-    font-weight: var(--fs-text-weight-bold, 700);
+    font-size: var(--fs-text-size-0);
+    font-weight: var(--fs-text-weight-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     opacity: 0.9;
@@ -102,7 +102,8 @@
   .divider {
     width: 100%;
     height: 1px;
-    background: rgba(255, 255, 255, 0.82);
+    background: currentColor;
+    opacity: 0.8;
   }
 
   .cta {
@@ -110,11 +111,12 @@
     align-items: center;
     gap: 0.5rem;
     width: fit-content;
-    background: var(--fs-color-action-main, #0b4cc9);
-    color: var(--fs-color-text-inverse, #ffffff);
+    // Inverse of the overlay card it sits on, so it stays visible with any theme.
+    background: var(--fs-color-action-text);
+    color: var(--fs-color-action-bkg);
     padding: 0.9rem 1.5rem;
     text-decoration: none;
-    font-weight: var(--fs-text-weight-bold, 700);
+    font-weight: var(--fs-text-weight-bold);
     line-height: 1;
     transition:
       transform 0.2s ease,
@@ -127,7 +129,7 @@
   }
 
   .cta:hover {
-    background: var(--fs-color-action-main-hover, #083b9b);
+    opacity: 0.9;
     transform: translateY(-1px);
   }
 
@@ -136,9 +138,9 @@
     align-items: center;
     gap: 0.35rem;
     width: fit-content;
-    color: var(--fs-color-text-inverse, #ffffff);
+    color: inherit;
     text-decoration: none;
-    font-weight: var(--fs-text-weight-bold, 700);
+    font-weight: var(--fs-text-weight-bold);
     line-height: 1.1;
   }
 
@@ -153,11 +155,7 @@
     }
 
     .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card {
-      min-height: 660px;
+      grid-template-columns: repeat(var(--se-grid-content-columns-tablet, 2), minmax(0, 1fr));
     }
   }
 
@@ -170,14 +168,60 @@
       grid-template-columns: 1fr;
     }
 
-    .card {
-      min-height: 660px;
-    }
-
     .overlayCard {
       left: 0.75rem;
       right: 0.75rem;
       bottom: 0.75rem;
+    }
+  }
+
+  // caption-below: the image keeps a fixed aspect ratio and the content sits under it,
+  // on the page background. No fixed height, no shadow.
+  .gridContent[data-variant='caption-below'] {
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: visible;
+      background: none;
+      box-shadow: none;
+    }
+
+    .mediaLink {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: var(--fs-color-neutral-bkg);
+    }
+
+    .overlayCard {
+      position: static;
+      background: none;
+      box-shadow: none;
+    }
+
+    .content {
+      min-height: 0;
+      padding: var(--fs-spacing-2) 0 0;
+      gap: var(--fs-spacing-1);
+      color: var(--fs-color-text);
+    }
+
+    .title {
+      font-size: var(--fs-text-size-3);
+      line-height: 1.2;
+      letter-spacing: normal;
+      max-width: none;
+    }
+
+    .cta {
+      background: var(--fs-color-action-bkg);
+      color: var(--fs-color-action-text);
+    }
+
+    .cta:hover {
+      background: var(--fs-color-action-bkg-hover);
+      opacity: 1;
     }
   }
 }

@@ -34,6 +34,9 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
 - **`SeCardsCarousel`**, **`SeGridContent`**, **`SeHeroSection`**, **`SeLearnMoreSection`**,
   **`SeImageTiles`** — presentational, no dedicated hooks beyond shared types.
 
+- **`SeEditorialSplit`**, **`SeProductImageGrid`** — types only, plus the shared
+  `filterItemsWithImage` helper (drops CMS rows that have no image yet). No GraphQL.
+
 - **`useFormattedPrice`** — price formatting for `SeProductCardWithButton`. No GraphQL.
 
 - **`SeHeader`** — types only (`SeHeaderTopbar`, `SeHeaderLogo`, `SeHeaderSearch`, ...). No GraphQL.

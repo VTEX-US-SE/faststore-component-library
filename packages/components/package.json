@@ -39,7 +39,7 @@
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "sanitize-html": "^2.13.0",
+    "sanitize-html": ">=2.13.0 <2.17.2",
     "@vtex-us-se/resolvers": "workspace:*"
   },
   "peerDependencies": {
