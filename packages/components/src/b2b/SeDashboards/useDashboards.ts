@@ -38,6 +38,8 @@ type SummaryResponse = {
   seBudgets?: DashboardBudget[] | null
 }
 
+type LowStockResponse = { seLowStockItems?: LowStockItems | null }
+
 type SessionWithB2b = {
   b2b?: { userEmail?: string; unitId?: string; customerId?: string } | null
 }
@@ -124,7 +126,7 @@ export function useDashboardSummary(userEmail: string | undefined, unitId: strin
 
     fetchSummaryRef
       .current({ unitId })
-      .then((result) => {
+      .then((result: SummaryResponse | null | undefined) => {
         if (cancelled) return
         const next: DashboardSummary = {
           openOrders: result?.seOpenOrdersCount ?? null,
@@ -154,7 +156,7 @@ export function useLowStockItems(userEmail: string | undefined) {
   const [items, setItems] = useState<LowStockItems | undefined>()
   const [state, setState] = useState<DashboardLoadState>('loading')
   const retries = useRef(0)
-  const [fetchLowStock] = useLazyQuery_unstable<{ seLowStockItems?: LowStockItems | null }, Record<string, never>>(
+  const [fetchLowStock] = useLazyQuery_unstable<LowStockResponse, Record<string, never>>(
     LOW_STOCK_ITEMS_QUERY,
     {},
   )
@@ -175,7 +177,7 @@ export function useLowStockItems(userEmail: string | undefined) {
     const load = () => {
       fetchLowStockRef
         .current({})
-        .then((result) => {
+        .then((result: LowStockResponse | null | undefined) => {
           if (cancelled) return
           const lowStock = result?.seLowStockItems
           if (!lowStock) {

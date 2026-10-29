@@ -22,6 +22,9 @@ const SPEND_CACHE_MAX_AGE = 24 * 60 * 60 * 1000
 const SPEND_MAX_RETRIES = 5
 const SPEND_RETRY_DELAY = 1500
 
+type RecentOrdersResponse = { seRecentOrders?: RecentOrder[] | null }
+type SpendOverviewResponse = { seSpendOverview?: { monthlyOrderValues?: MonthlySpend[] | null } | null }
+
 type SessionWithB2b = {
   b2b?: { userEmail?: string } | null
   locale?: string
@@ -55,7 +58,7 @@ function useLatest<T>(value: T) {
 export function useRecentOrders(userEmail: string | undefined, limit = 5) {
   const [orders, setOrders] = useState<RecentOrder[]>([])
   const [state, setState] = useState<LoadState>('loading')
-  const [fetchOrders] = useLazyQuery_unstable<{ seRecentOrders?: RecentOrder[] | null }, { limit: number }>(
+  const [fetchOrders] = useLazyQuery_unstable<RecentOrdersResponse, { limit: number }>(
     RECENT_ORDERS_QUERY,
     { limit },
   )
@@ -73,7 +76,7 @@ export function useRecentOrders(userEmail: string | undefined, limit = 5) {
     }
 
     fetchOrdersRef.current({ limit })
-      .then((result) => {
+      .then((result: RecentOrdersResponse | null | undefined) => {
         if (cancelled) return
         const list = result?.seRecentOrders ?? []
         writeShopperCache(ORDERS_CACHE_KEY, userEmail, list)
@@ -100,10 +103,7 @@ export function useSpendOverview(userEmail: string | undefined) {
   const [months, setMonths] = useState<MonthlySpend[]>([])
   const [state, setState] = useState<LoadState>('loading')
   const retries = useRef(0)
-  const [fetchSpend] = useLazyQuery_unstable<
-    { seSpendOverview?: { monthlyOrderValues?: MonthlySpend[] | null } | null },
-    Record<string, never>
-  >(SPEND_OVERVIEW_QUERY, {})
+  const [fetchSpend] = useLazyQuery_unstable<SpendOverviewResponse, Record<string, never>>(SPEND_OVERVIEW_QUERY, {})
   const fetchSpendRef = useLatest(fetchSpend)
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export function useSpendOverview(userEmail: string | undefined) {
 
     const load = () => {
       fetchSpendRef.current({})
-        .then((result) => {
+        .then((result: SpendOverviewResponse | null | undefined) => {
           if (cancelled) return
           const overview = result?.seSpendOverview
           // No overview at all: the service isn't installed on this account, or failed. Don't retry.
