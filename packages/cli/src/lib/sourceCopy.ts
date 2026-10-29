@@ -169,19 +169,21 @@ function rewriteImports(content: string): string {
 export interface CopyComponentSourceResult {
   copiedFiles: string[]
   usedSegments: { ui?: string; components?: string }
+  /** Sibling components it imports (`../<Name>/...`), copied next to it -- see copyComponentSource. */
+  companions: Array<{ name: string; dir: string }>
 }
 
 /**
- * Copies a component's full source (from both @vtex-us-se/ui and, if present, the matching
- * folder in @vtex-us-se/components) into `destDir`, flattened into one directory, with
- * cross-package imports rewritten to work standing alone. Never overwrites a file that already
- * exists at the destination (returns it in `skipped` instead) -- this can run again safely
- * after a manual edit.
+ * Names of the sibling @vtex-us-se/ui components a file imports by relative path
+ * (`from '../SeAddToPurchaseList/SeAddToPurchaseListButton'`) -- how one component reuses
+ * another's UI, e.g. SeCheckStockAndPricing's "add all to a purchase list" button.
  */
-export function copyComponentSource(
-  componentName: string,
-  destDir: string,
-): CopyComponentSourceResult & { skipped: string[] } {
+function siblingComponentImports(content: string): string[] {
+  return [...content.matchAll(/from\s+(['"])\.\.\/([A-Za-z0-9_-]+)\/[^'"]+\1/g)].map((match) => match[2] as string)
+}
+
+/** Copies ONE component's own files (ui + components folders, flattened) into `destDir`. */
+function copyOwnFiles(componentName: string, destDir: string) {
   const uiSrcRoot = resolvePackageSrcRoot('@vtex-us-se/ui')
   const uiFound = findComponentDir(uiSrcRoot, componentName)
   if (!uiFound) {
@@ -220,11 +222,48 @@ export function copyComponentSource(
     copiedFiles.push(destPath)
   }
 
-  return {
-    copiedFiles,
-    skipped,
-    usedSegments: { ui: uiFound.segment, components: componentsSegment },
+  const siblings = [...new Set(uiFiles.flatMap((file) => siblingComponentImports(file.content)))]
+  return { copiedFiles, skipped, siblings, usedSegments: { ui: uiFound.segment, components: componentsSegment } }
+}
+
+/**
+ * Copies a component's full source (from both @vtex-us-se/ui and, if present, the matching
+ * folder in @vtex-us-se/components) into `destDir`, flattened into one directory, with
+ * cross-package imports rewritten to work standing alone. Never overwrites a file that already
+ * exists at the destination (returns it in `skipped` instead) -- this can run again safely
+ * after a manual edit.
+ *
+ * A sibling component it imports by relative path (`../<Name>/...`) is copied the same way into
+ * `<destDir>/../<Name>` -- exactly where that import points -- and so on for ITS siblings. One
+ * shared copy, not a duplicate inside each folder: both would define the same GraphQL operations
+ * under src/, and FastStore's codegen fails once two definitions of one name differ. The sibling
+ * is not registered as a section; `add <Name>` does that, and finds its files already there.
+ */
+export function copyComponentSource(
+  componentName: string,
+  destDir: string,
+): CopyComponentSourceResult & { skipped: string[] } {
+  const own = copyOwnFiles(componentName, destDir)
+  const copiedFiles = [...own.copiedFiles]
+  const skipped = [...own.skipped]
+  const companions: Array<{ name: string; dir: string }> = []
+
+  const pending = [...own.siblings]
+  const seen = new Set([componentName])
+  while (pending.length > 0) {
+    const name = pending.shift() as string
+    if (seen.has(name)) continue
+    seen.add(name)
+
+    const dir = join(dirname(destDir), name)
+    const sibling = copyOwnFiles(name, dir)
+    copiedFiles.push(...sibling.copiedFiles)
+    skipped.push(...sibling.skipped)
+    companions.push({ name, dir })
+    pending.push(...sibling.siblings)
   }
+
+  return { copiedFiles, skipped, companions, usedSegments: own.usedSegments }
 }
 
 export type SourceCopyReason = 'resolvers' | 'core-runtime'

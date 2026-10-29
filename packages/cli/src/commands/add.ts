@@ -159,10 +159,16 @@ function addComponent(componentName: string, options: AddOptions): void {
   const copyReason = sourceCopyReason(componentName)
   if (copyReason) {
     const sourceDir = options.sourceDir ?? join('src', 'components', 'sections', componentName)
-    const { copiedFiles, skipped } = copyComponentSource(componentName, sourceDir)
+    const { copiedFiles, skipped, companions } = copyComponentSource(componentName, sourceDir)
 
     for (const file of copiedFiles) summary.push(`✔ Copied ${file}`)
     for (const file of skipped) summary.push(`ℹ ${file} already exists — left untouched.`)
+    for (const companion of companions) {
+      summary.push(
+        `ℹ ${componentName} reuses ${companion.name}'s UI, so ${companion.name}'s source is in ${companion.dir} too ` +
+          `(not registered as a section — run \`add ${companion.name}\` for that). Install the resolvers it needs as well.`,
+      )
+    }
 
     // The copy carries its own inlined operation text; any OTHER definition of the same
     // operation in src/ (e.g. an older `add-resolver` client wrapper) breaks codegen the moment
@@ -171,7 +177,7 @@ function addComponent(componentName: string, options: AddOptions): void {
       [...copiedFiles, ...skipped].flatMap((file) => gqlOperationNames(readFileSync(file, 'utf-8'))),
     )
     for (const operation of copiedOperations) {
-      const elsewhere = findOperationDefinitions('src', operation, [sourceDir])
+      const elsewhere = findOperationDefinitions('src', operation, [sourceDir, ...companions.map((companion) => companion.dir)])
       if (elsewhere.length > 0) {
         summary.push(
           `⚠ ${operation} is also defined in ${elsewhere.join(', ')}. FastStore's codegen fails ("Not all operations ` +

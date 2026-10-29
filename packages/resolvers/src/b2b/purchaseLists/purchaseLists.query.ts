@@ -70,6 +70,34 @@ export const SE_PURCHASE_LIST_DELETE_MUTATION = `
   }
 `
 
+/**
+ * The "add to a purchase list" picker's own copies of the list query and the two mutations it
+ * sends (SeAddToPurchaseList, and SeCheckStockAndPricing through it). Named apart from
+ * SePurchaseLists' operations: every copied component inlines its operation text into the
+ * store's src/, and FastStore's codegen fails the whole build once two definitions of one
+ * operation name differ (e.g. after only one of the components is re-copied on an upgrade).
+ */
+export const SE_ADD_TO_PURCHASE_LIST_LISTS_QUERY = `
+  query SeAddToPurchaseListLists {
+    sePurchaseLists {${LIST_FIELDS}
+    }
+  }
+`
+
+export const SE_ADD_TO_PURCHASE_LIST_ADD_ITEMS_MUTATION = `
+  mutation SeAddToPurchaseListAddItems($documentId: String!, $items: [SePurchaseListItemInput!]!) {
+    sePurchaseListAddItems(documentId: $documentId, items: $items) {${RESULT_FIELDS}
+    }
+  }
+`
+
+export const SE_ADD_TO_PURCHASE_LIST_CREATE_MUTATION = `
+  mutation SeAddToPurchaseListCreate($name: String!, $visibility: SePurchaseListVisibility!, $items: [SePurchaseListItemInput!]) {
+    sePurchaseListCreate(name: $name, visibility: $visibility, items: $items) {${RESULT_FIELDS}
+    }
+  }
+`
+
 const PRODUCT_FIELDS = `
       slug
       brand {

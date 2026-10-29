@@ -29,6 +29,13 @@
     },
     "clearLabel": { "type": "string", "title": "Clear button label", "default": "Clear List" },
     "addToCartLabel": { "type": "string", "title": "Add to cart button label", "default": "Add all to cart" },
+    "addToListLabel": { "type": "string", "title": "Add to purchase list button label", "default": "Add all to a purchase list" },
+    "purchaseListsUrl": {
+      "type": "string",
+      "title": "Purchase lists page URL",
+      "description": "The page with the SePurchaseLists section; when set, saving to a list links to it there",
+      "default": ""
+    },
     "totalLabel": { "type": "string", "title": "Total label", "default": "Total Estimated:" },
     "signedOutMessage": {
       "type": "string",

@@ -144,7 +144,7 @@ const FIXTURE_STOCK_PRODUCTS = [
   stockProduct('2', 'Steel Toe Boots', 'BOOT', ['9', '10'], 89),
 ]
 
-// SePurchaseLists: an in-memory Master Data, reset on reload. Its products are the
+// SePurchaseLists and SeAddToPurchaseList: an in-memory Master Data, reset on reload. Its products are the
 // SeCheckStockAndPricing fixtures (Ref IDs GLV-… and BOOT-…).
 type MockList = { documentId: string; name: string; visibility: string; ownerEmail: string; isOwner: boolean; items: Array<{ skuId: string; quantity: number }> }
 let mockLists: MockList[] = [
@@ -169,7 +169,8 @@ function mockPurchaseListResponse(text: string, variables: unknown): unknown {
   const result = (field: string, list: MockList | undefined, error = 'NOT_FOUND') =>
     ({ [field]: list ? { ok: true, error: null, list: { ...list, items: [...list.items] } } : { ok: false, error, list: null } })
 
-  if (text.includes('query SePurchaseLists')) return { sePurchaseLists: mockLists.map((list) => ({ ...list, items: [...list.items] })) }
+  // SeAddToPurchaseList sends its own copy of the list query (see purchaseLists.query.ts).
+  if (text.includes('query SePurchaseLists') || text.includes('query SeAddToPurchaseListLists')) return { sePurchaseLists: mockLists.map((list) => ({ ...list, items: [...list.items] })) }
   if (text.includes('query SePurchaseListProduct')) {
     const skuId = v.locator?.[0]?.value
     return { product: FIXTURE_STOCK_PRODUCTS.find((product) => product.seSkus.some((sku) => sku.itemId === skuId)) ?? null }

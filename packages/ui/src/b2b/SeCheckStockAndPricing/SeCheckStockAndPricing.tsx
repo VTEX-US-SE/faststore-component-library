@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { formatStockMoney, skuHref, useCheckStockAndPricing, useStockSkuSearch } from '@vtex-us-se/components/b2b'
+import { SeAddToPurchaseListButton } from '../SeAddToPurchaseList/SeAddToPurchaseListButton'
 import { SeStockImportModal } from './SeStockImportModal'
 import styles from './SeCheckStockAndPricing.module.scss'
 
@@ -13,6 +14,10 @@ export type SeCheckStockAndPricingProps = {
   emptyMessage?: string
   clearLabel?: string
   addToCartLabel?: string
+  /** Saves every row with a quantity to one of the buyer's purchase lists (SeAddToPurchaseList's picker). */
+  addToListLabel?: string
+  /** SePurchaseLists' page, linked to after saving to a list. */
+  purchaseListsUrl?: string
   totalLabel?: string
   /** Shown to anonymous shoppers instead of the worksheet. */
   signedOutMessage?: string
@@ -53,7 +58,9 @@ function RemoveIcon() {
  * Needs GraphQL of its own, so it must be added with `se-components add SeCheckStockAndPricing`
  * plus `se-components add-resolver skuAvailability` and `se-components add-resolver
  * b2bProductFields` (its search reads the `seSkus` product field). Pair it with the
- * `SeAddressSelector` section: stock is simulated at the session's postal code.
+ * `SeAddressSelector` section: stock is simulated at the session's postal code. Its "add all to a
+ * purchase list" button is SeAddToPurchaseList's, which `add` copies alongside (a sibling folder),
+ * so `se-components add-resolver purchaseLists` is needed too.
  */
 export function SeCheckStockAndPricing({
   title = 'Check Stock and Pricing',
@@ -65,6 +72,8 @@ export function SeCheckStockAndPricing({
   emptyMessage = 'Search for products above by Ref ID, or import a CSV file to check stock availability and pricing in bulk.',
   clearLabel = 'Clear List',
   addToCartLabel = 'Add all to cart',
+  addToListLabel = 'Add all to a purchase list',
+  purchaseListsUrl = '',
   totalLabel = 'Total Estimated:',
   signedOutMessage = 'Sign in to check stock and pricing.',
   loginUrl = '/login',
@@ -78,6 +87,10 @@ export function SeCheckStockAndPricing({
   const search = useStockSkuSearch(sheet.searchProducts, term)
   const searchRef = useRef<HTMLDivElement>(null)
   const listboxId = useId()
+  const listProducts = useMemo(
+    () => sheet.rows.map((row) => ({ skuId: row.sku.itemId, quantity: row.quantity })),
+    [sheet.rows],
+  )
 
   useEffect(() => {
     if (!dropdownOpen) return
@@ -262,6 +275,14 @@ export function SeCheckStockAndPricing({
           <button type="button" className={styles.secondary} disabled={sheet.rows.length === 0} onClick={sheet.clear}>
             {clearLabel}
           </button>
+          <SeAddToPurchaseListButton
+            products={listProducts}
+            className={styles.secondary}
+            buttonLabel={addToListLabel}
+            drawerTitle={addToListLabel}
+            listsUrl={purchaseListsUrl}
+            loginUrl={loginUrl}
+          />
           <button type="button" className={styles.primary} disabled={sheet.totalItems === 0} onClick={sheet.addAllToCart}>
             {addToCartLabel}
           </button>

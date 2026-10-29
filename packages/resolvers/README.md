@@ -192,7 +192,13 @@ plus `seSkus`). `createSkuAvailabilityResolver({ storeId, environment?, salesCha
 `CONFLICT`, `FAILED`). Stored in the Master Data `PL` entity **exactly as the kit stored it**
 (`items` as a JSON string), so existing lists keep working. Also exports
 `SE_PURCHASE_LIST_PRODUCT_QUERY` / `SE_PURCHASE_LIST_SEARCH_QUERY` (FastStore's `product`/`search`
-plus `seSkus`, named apart from `SeSkuSearch` so both components can coexist).
+plus `seSkus`, named apart from `SeSkuSearch` so both components can coexist), and the "add to a
+purchase list" picker's own copies of the list query and the add-items / create mutations —
+`SE_ADD_TO_PURCHASE_LIST_LISTS_QUERY`, `…_ADD_ITEMS_MUTATION`, `…_CREATE_MUTATION` (operations
+`SeAddToPurchaseListLists`, `SeAddToPurchaseListAddItems`, `SeAddToPurchaseListCreate`), sent by
+`SeAddToPurchaseList` and by `SeCheckStockAndPricing` through it. Same fields as `SePurchaseLists`'
+operations under different names, so a store with both components never defines one operation
+name twice.
 `createPurchaseListsResolver({ storeId, environment?, dataEntity?, appKey?, appToken? })`,
 `resolverShape: "map"`, `thirdParty`; app key/token default to `FS_DISCOVERY_APP_KEY`/`TOKEN`.
 
