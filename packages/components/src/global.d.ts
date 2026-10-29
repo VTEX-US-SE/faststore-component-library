@@ -50,6 +50,18 @@ declare module '@faststore/core/experimental' {
     id?: string
     [key: string]: unknown
   }
+
+  /** Add-to-cart click handler (plus data attributes) for one or several cart items. */
+  export function useBuyButton_unstable(
+    item: unknown,
+    shouldOpenCart?: boolean,
+  ): { onClick: (event: { preventDefault(): void }) => void; [key: string]: unknown }
+
+  /** FastStore's session store; `set` replaces the session and revalidates it with VTEX. */
+  export const sessionStore_unstable: {
+    set: (session: Record<string, unknown>) => void
+    read: () => Record<string, unknown>
+  }
 }
 
 // Same rationale as above, for @faststore/core/api: `gql` there reexports from the consuming

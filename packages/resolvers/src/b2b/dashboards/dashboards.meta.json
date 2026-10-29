@@ -1,0 +1,11 @@
+{
+  "operationType": "Query",
+  "resolverShape": "map",
+  "namespace": "thirdParty",
+  "fieldName": "seOpenOrdersCount",
+  "factoryExport": "createDashboardsResolver",
+  "configParams": ["storeId", "environment?", "lowStockUrl?"],
+  "clientQueryExport": "SE_DASHBOARD_SUMMARY_QUERY",
+  "clientFileName": "dashboards.ts",
+  "clientConstantName": "DASHBOARD_SUMMARY_QUERY"
+}

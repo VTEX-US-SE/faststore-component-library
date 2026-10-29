@@ -1,0 +1,58 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeDashboards",
+  "$componentTitle": "SE Dashboards",
+  "title": "Dashboards",
+  "description": "Buyer Portal home tiles: open orders, low-stock alerts, remaining budget, orders pending approval (B2B sessions only)",
+  "type": "object",
+  "properties": {
+    "openOrdersTitle": {
+      "type": "string",
+      "title": "Open orders title",
+      "default": "Open Orders"
+    },
+    "openOrdersUrl": {
+      "type": "string",
+      "title": "Open orders link",
+      "default": "/pvt/account/orders?status=order+placed&status=payment+pending&status=pending+approval&status=payment+denied&status=payment+approved&status=ready+for+delivery"
+    },
+    "lowStockTitle": {
+      "type": "string",
+      "title": "Low stock title",
+      "default": "Low Stock Alerts"
+    },
+    "unitsLeftLabel": {
+      "type": "string",
+      "title": "Units left label (low stock drawer)",
+      "default": "Units left:"
+    },
+    "spendTitle": {
+      "type": "string",
+      "title": "Budget tile title",
+      "default": "Spend Overview"
+    },
+    "remainingLabel": {
+      "type": "string",
+      "title": "Text after the remaining budget percentage",
+      "default": "remaining"
+    },
+    "budgetsUrl": {
+      "type": "string",
+      "title": "Budgets page link",
+      "description": "{unitId} and {customerId} are replaced from the buyer's session",
+      "default": "/pvt/organization-account/budgets/{unitId}/{customerId}"
+    },
+    "pendingApprovalTitle": {
+      "type": "string",
+      "title": "Pending approval title",
+      "default": "Orders Pending Approval"
+    },
+    "pendingApprovalUrl": {
+      "type": "string",
+      "title": "Pending approval link",
+      "default": "/pvt/account/orders?status=pending+approval"
+    }
+  }
+}

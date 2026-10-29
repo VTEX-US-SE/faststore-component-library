@@ -122,3 +122,87 @@ See [`@vtex-us-se/ui`'s `SeRequestToBuy`](../ui/README.md#b2b) for the component
      `{"properties":{"companyName":{"type":"string"},"contactName":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"message":{"type":"string"}},"required":["companyName","contactName","email"],"v-indexed":["email","companyName"]}`.
   2. An app key/token whose role can create documents in that entity — scope it to just that.
      Without them every request is rejected and the server logs why.
+
+### Buyer Portal kit, wave 2 (b2b)
+
+The rest of [`faststore-b2b-buyer-portal-kit`](https://github.com/VTEX-US-SE/faststore-b2b-buyer-portal-kit)'s
+GraphQL, one operation per component (see [`@vtex-us-se/ui`](../ui/README.md#b2b)). Every field is
+`se`-prefixed so a store that already installed the kit's own unprefixed resolvers doesn't get
+conflicting definitions. Shared changes from the kit:
+
+- **Shopper-scoped calls forward only the VTEX ID cookies** (plus `vtex_session`/`vtex_segment`
+  where the API needs them), not the browser's whole cookie header
+  (`src/b2b/shared/shopperRequest.ts`).
+- **Failures resolve to `null`/`[]`**, logged server-side. The kit returned `{ error }` objects
+  in `Int!`/list fields, which turned one failing widget into a GraphQL error for the whole
+  response.
+- **Ids are validated before they reach a URL path or a Master Data `_where`.**
+
+#### `recentOrdersSpendOverview`
+
+`Query.seRecentOrders(limit)` (OMS user orders, newest first, 1–15) and `Query.seSpendOverview`
+(monthly totals). `createRecentOrdersSpendOverviewResolver({ storeId, environment?, spendOverviewUrl? })`,
+`resolverShape: "map"`, `thirdParty`. **`seSpendOverview` reads a custom IO app** the demo accounts
+have (`https://{storeId}.myvtex.com/_v/spend-overview`, overridable with `spendOverviewUrl`), not a
+standard VTEX API — without it the field is `null` and the component hides the chart. Amounts are in
+cents, typed `Float` (the kit's `Int` overflows above ~$21M).
+
+#### `dashboards`
+
+`Query.seOpenOrdersCount`, `seOrdersPendingApprovalCount` (OMS), `seBudgets(unitId)` (Buyer Portal
+budgets API, with the shopper's VTEX ID token) and `seLowStockItems` (**custom IO app**,
+`https://{storeId}.myvtex.com/_v/low-stock`, overridable with `lowStockUrl`).
+`createDashboardsResolver({ storeId, environment?, lowStockUrl? })`, `resolverShape: "map"`,
+`thirdParty`.
+
+#### `shopperAddresses`
+
+`Query.seShopperAddresses`: the buyer's saved addresses plus their default shipping address id.
+Reads the VTEX session server-side and fetches every Master Data `AD` document in parallel (at most
+50) — the kit did this from the browser, one round trip per address, inside its navbar.
+`createShopperAddressesResolver({ storeId })`, `resolverShape: "field"`, `thirdParty`.
+
+#### `b2bProductFields`
+
+`StoreProduct.seDescription`, `seProperties` and `seSkus` (every SKU with its default seller's
+price and stock), from data already on the resolver root — a **`vtex`** extension, no external
+call. `createB2bProductFieldsResolver()`, `resolverShape: "map"`, `namespace: "vtex"`. Has **no
+client query**: its `meta.json` declares `"fragments": { "ClientManyProducts": … }`, so
+`add-resolver` writes `src/fragments/ClientManyProducts.ts` and FastStore's own product gallery
+query fetches the fields (see the [CLI README](../cli/README.md#add-resolver)). Also required by
+`skuAvailability` and `purchaseLists`, whose queries select `seSkus`.
+
+#### `skuAvailability`
+
+`Query.seSkuAvailability(items, country, postalCode)`: stock per SKU from a **cart simulation**
+(quantity 1 each, batches of 50, at most 500). Defaults to VTEX Checkout's public
+`/api/checkout/pub/orderForms/simulation`, forwarding the session/segment cookies so a B2B trade
+policy applies; `availabilityUrl` switches to the kit's custom `/_v/availability` app, which answers
+in the same shape. `availableQuantity` comes from `purchaseConditions.itemPurchaseConditions[].stockBalance`
+when present (it isn't in Checkout's published schema) and is `null` otherwise, with `availability`
+(`available`, `withoutStock`, …) still set. Also exports `SE_SKU_SEARCH_QUERY` (FastStore's `search`
+plus `seSkus`). `createSkuAvailabilityResolver({ storeId, environment?, salesChannel?, availabilityUrl? })`,
+`resolverShape: "field"`, `thirdParty`.
+
+#### `purchaseLists`
+
+`Query.sePurchaseLists` and six mutations (`sePurchaseListCreate`, `…AddItems`,
+`…SetItemQuantity` — 0 removes, `…Rename`, `…SetVisibility`, `…Delete`), all returning
+`{ ok, error, list }` with an error code (`UNAUTHENTICATED`, `INVALID`, `NOT_FOUND`, `FORBIDDEN`,
+`CONFLICT`, `FAILED`). Stored in the Master Data `PL` entity **exactly as the kit stored it**
+(`items` as a JSON string), so existing lists keep working. Also exports
+`SE_PURCHASE_LIST_PRODUCT_QUERY` / `SE_PURCHASE_LIST_SEARCH_QUERY` (FastStore's `product`/`search`
+plus `seSkus`, named apart from `SeSkuSearch` so both components can coexist).
+`createPurchaseListsResolver({ storeId, environment?, dataEntity?, appKey?, appToken? })`,
+`resolverShape: "map"`, `thirdParty`; app key/token default to `FS_DISCOVERY_APP_KEY`/`TOKEN`.
+
+- **Security fix over the kit:** the kit's item mutations edited any `documentId` with the app
+  token, whoever owned it. Here the buyer comes from their own VTEX session on every call, and
+  each mutation loads the document first: owners can do anything; buyers of the same organization
+  can edit the items of a list shared with it; rename / share / delete are owner-only; anyone
+  else's private list answers `NOT_FOUND`. Names are trimmed, capped at 100 characters and may
+  not contain quotes, so they can't break out of the `_where` clause.
+- **Search results aren't capped at 15** (Master Data's default page): `REST-Range` asks for 100.
+- **Prerequisite:** the `PL` entity (fields `name`, `visibility`, `items`, `ownerEmail`,
+  `organizationEmail`, `lastModifiedBy`, with `ownerEmail`/`organizationEmail`/`name`/`visibility`
+  searchable) and an app key/token whose role can read/write it.

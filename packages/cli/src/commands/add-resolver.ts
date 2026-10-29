@@ -6,6 +6,7 @@ import { findOperationDefinitions, operationNames } from '../lib/operations'
 interface AddResolverOptions {
   targetDir: string
   clientDir: string
+  fragmentsDir: string
   namespace?: string
   force: boolean
 }
@@ -21,9 +22,22 @@ interface OperationMeta {
   fieldName: string
   factoryExport: string
   configParams: string[]
-  clientQueryExport: string
-  clientFileName: string
-  clientConstantName: string
+  /**
+   * The string export holding the operation a component sends, scaffolded into `clientDir` as
+   * a `gql(...)` wrapper. Absent for operations no component sends itself -- e.g. a
+   * `StoreProduct` extension that only reaches the client through `fragments`.
+   */
+  clientQueryExport?: string
+  clientFileName?: string
+  clientConstantName?: string
+  /**
+   * FastStore query fragments this operation needs, as { fragmentName: stringExport } --
+   * e.g. { "ClientManyProducts": "SE_..._FRAGMENT" } to add fields to the product gallery's
+   * own query. Each is written to `<fragmentsDir>/<fragmentName>.ts`, the file FastStore
+   * merges into its built-in query of that name. A project has one such file per fragment
+   * name, so an existing one is never overwritten (see writeFragment).
+   */
+  fragments?: Record<string, string>
   /**
    * "field" (default): the factory returns a single resolver function for one
    * `operationType.fieldName`, and this CLI wraps it in `{ [operationType]: { [fieldName]:
@@ -60,6 +74,7 @@ export const addResolverCommand = new Command('add-resolver')
   .argument('<operationName>', 'Name of the GraphQL operation to add (must exist in @vtex-us-se/resolvers)')
   .option('-t, --target-dir <path>', "Consuming project's src/graphql/ folder", 'src/graphql')
   .option('-c, --client-dir <path>', "Consuming project's client query folder", 'src/utils')
+  .option('--fragments-dir <path>', "Consuming project's FastStore fragments folder", 'src/fragments')
   .option(
     '-n, --namespace <name>',
     'FastStore GraphQL namespace folder for a non-split operation ("vtex" or "thirdParty"). Defaults to the ' +
@@ -228,6 +243,12 @@ function buildConfigLines(meta: OperationMeta, vtexConfig: { storeId?: string; e
   return lines.join(`\n${indent}`)
 }
 
+/** `{ ...config lines... }`, or a bare `{}` for a factory that declares no config params. */
+function buildConfigObject(meta: OperationMeta, vtexConfig: { storeId?: string; environment?: string }, indent: string): string {
+  const lines = buildConfigLines(meta, vtexConfig, `${indent}  `)
+  return lines ? `{\n${indent}  ${lines}\n${indent}}` : '{}'
+}
+
 function buildResolverSnippet(
   meta: OperationMeta,
   packageSubpath: string,
@@ -236,9 +257,7 @@ function buildResolverSnippet(
   if (meta.resolverShape === 'map') {
     return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
 
-export default ${meta.factoryExport}({
-  ${buildConfigLines(meta, vtexConfig, '  ')}
-})
+export default ${meta.factoryExport}(${buildConfigObject(meta, vtexConfig, '')})
 `
   }
 
@@ -248,9 +267,7 @@ export default ${meta.factoryExport}({
 
 const ${resolverVarName} = {
   ${meta.operationType}: {
-    ${meta.fieldName}: ${meta.factoryExport}({
-      ${buildConfigLines(meta, vtexConfig, '      ')}
-    }),
+    ${meta.fieldName}: ${meta.factoryExport}(${buildConfigObject(meta, vtexConfig, '    ')}),
   },
 }
 
@@ -271,9 +288,7 @@ function buildSplitResolverSnippet(
 
   return `import { ${meta.factoryExport} } from '@vtex-us-se/resolvers/${packageSubpath}'
 
-const ${operationName} = ${meta.factoryExport}({
-  ${buildConfigLines(meta, vtexConfig, '  ')}
-})
+const ${operationName} = ${meta.factoryExport}(${buildConfigObject(meta, vtexConfig, '')})
 
 export default {
 ${keyLines}
@@ -281,7 +296,11 @@ ${keyLines}
 `
 }
 
-function buildClientWrapperSnippet(meta: OperationMeta, packageSubpath: string, operationName: string): string {
+function buildClientWrapperSnippet(
+  meta: OperationMeta & { clientQueryExport: string },
+  packageSubpath: string,
+  operationName: string,
+): string {
   const queryText = escapeForTemplateLiteral(resolveStringExport(packageSubpath, meta.clientQueryExport))
 
   return `import { gql } from '@faststore/core/api'
@@ -293,6 +312,47 @@ function buildClientWrapperSnippet(meta: OperationMeta, packageSubpath: string, 
 // upgrade that changes this operation -- it never overwrites an existing copy of this file.
 export const ${meta.clientConstantName} = gql(\`${queryText}\`)
 `
+}
+
+/** Whitespace-insensitive, so a reformatted copy of the same fragment still counts as present. */
+function normalizeGraphql(text: string): string {
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * Writes `<fragmentsDir>/<fragmentName>.ts` with the fragment's text embedded literally (same
+ * codegen-visibility reason as buildClientWrapperSnippet). FastStore allows exactly one file per
+ * fragment name, and another component or the project itself may already extend it -- so an
+ * existing file is never touched: if it doesn't already contain this exact fragment, the text is
+ * printed to merge in by hand (GraphQL merges duplicate selections of the same field).
+ */
+function writeFragment(fragmentsDir: string, fragmentName: string, fragmentText: string, operationName: string): string {
+  const fragmentPath = join(fragmentsDir, `${fragmentName}.ts`)
+
+  if (existsSync(fragmentPath)) {
+    const content = readFileSync(fragmentPath, 'utf-8')
+    if (normalizeGraphql(content).includes(normalizeGraphql(fragmentText))) {
+      return `ℹ ${fragmentPath} already contains ${operationName}'s fragment — left untouched.`
+    }
+    return (
+      `⚠ ${fragmentPath} already exists — not touched. Merge these selections into its ${fragmentName} fragment by ` +
+      `hand (keep a single \`fragment ${fragmentName}\`; GraphQL merges repeated fields):\n${fragmentText}`
+    )
+  }
+
+  mkdirSync(fragmentsDir, { recursive: true })
+  writeFileSync(
+    fragmentPath,
+    `import { gql } from '@faststore/core/api'
+
+// Generated by se-components add-resolver ${operationName}. FastStore merges this file into its
+// built-in ${fragmentName} query, so every page using that query also fetches these fields.
+// Embedded literally (not imported) so this project's GraphQL codegen can see it. If another
+// component needs more fields from ${fragmentName}, add them here -- there can only be one.
+export const fragment = gql(\`${escapeForTemplateLiteral(fragmentText)}\`)
+`,
+  )
+  return `✔ Created ${fragmentPath} (extends FastStore's ${fragmentName} query)`
 }
 
 /**
@@ -391,7 +451,7 @@ function writeOrMergeAggregator(aggregatorPath: string, resolverModuleName: stri
 }
 
 function addResolver(operationName: string, options: AddResolverOptions): void {
-  const { targetDir, clientDir, force } = options
+  const { targetDir, clientDir, fragmentsDir, force } = options
   const { graphqlPath, metaPath, packageSubpath } = resolveOperationAssets(operationName)
   const meta: OperationMeta = JSON.parse(readFileSync(metaPath, 'utf-8'))
 
@@ -488,11 +548,17 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
     } else {
       mkdirSync(dirname(resolverPath), { recursive: true })
       writeFileSync(resolverPath, resolverSnippet)
-      const storeIdNote = vtexConfig.storeId ? ` (storeId auto-detected: ${vtexConfig.storeId})` : ' (storeId left as a TODO placeholder)'
+      const storeIdNote = !meta.configParams.includes('storeId')
+        ? ''
+        : vtexConfig.storeId
+          ? ` (storeId auto-detected: ${vtexConfig.storeId})`
+          : ' (storeId left as a TODO placeholder)'
       summary.push(`✔ Created ${resolverPath}${storeIdNote}`)
     }
 
-    if (meta.resolverShape === 'map') {
+    // An explicit meta.json namespace means the operation's author already placed every key on
+    // purpose (e.g. a Query-only map in thirdParty/, a type-extension-only map in vtex/).
+    if (meta.resolverShape === 'map' && !meta.namespace) {
       summary.push(
         `ℹ ${resolverFileName} exports a full resolver map (it may cover more than "${meta.operationType}.${meta.fieldName}" — ` +
           'declare typeExtensionKeys in this operation\'s meta.json to have this command split it across vtex/ and thirdParty/ automatically).',
@@ -507,11 +573,16 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
   // this project's src/ already defines the operation (typically a component copied by
   // `se-components add`, which carries its own inlined copy): a second copy only works while
   // both stay byte-identical, then breaks codegen for the whole project (see operations.ts).
-  const clientPath = join(clientDir, meta.clientFileName)
-  const clientOperation = operationNames(resolveStringExport(packageSubpath, meta.clientQueryExport))[0]
-  const existingDefinitions = clientOperation ? findOperationDefinitions('src', clientOperation, [clientPath]) : []
+  const clientPath = meta.clientQueryExport && meta.clientFileName ? join(clientDir, meta.clientFileName) : undefined
+  const clientOperation = meta.clientQueryExport
+    ? operationNames(resolveStringExport(packageSubpath, meta.clientQueryExport))[0]
+    : undefined
+  const existingDefinitions =
+    clientPath && clientOperation ? findOperationDefinitions('src', clientOperation, [clientPath]) : []
 
-  if (existsSync(clientPath)) {
+  if (!clientPath) {
+    // Nothing a component sends itself (see OperationMeta.clientQueryExport).
+  } else if (existsSync(clientPath)) {
     summary.push(`⚠ ${clientPath} already exists — not touched.`)
   } else if (existingDefinitions.length > 0) {
     summary.push(
@@ -521,18 +592,32 @@ function addResolver(operationName: string, options: AddResolverOptions): void {
     )
   } else {
     mkdirSync(dirname(clientPath), { recursive: true })
-    writeFileSync(clientPath, buildClientWrapperSnippet(meta, packageSubpath, operationName))
+    writeFileSync(
+      clientPath,
+      buildClientWrapperSnippet(meta as OperationMeta & { clientQueryExport: string }, packageSubpath, operationName),
+    )
     summary.push(`✔ Created ${clientPath}`)
   }
+
+  // 4. FastStore query fragments
+  for (const [fragmentName, exportName] of Object.entries(meta.fragments ?? {})) {
+    summary.push(writeFragment(fragmentsDir, fragmentName, resolveStringExport(packageSubpath, exportName), operationName))
+  }
+
+  const fragmentNames = Object.keys(meta.fragments ?? {})
+  const importStep = !clientPath
+    ? `2. Nothing to import: this operation reaches the client through FastStore's own ${fragmentNames.join(' / ')} ` +
+      'quer' + (fragmentNames.length === 1 ? 'y' : 'ies') + ' (the fragment file' + (fragmentNames.length === 1 ? '' : 's') + ' above).\n'
+    : existingDefinitions.length > 0
+      ? `2. Nothing to import: ${existingDefinitions.join(', ')} already calls this operation.\n`
+      : `2. Import ${meta.clientConstantName} from ${clientPath} in whatever component calls this operation.\n`
 
   console.log(summary.join('\n'))
   console.log(
     '\nNext steps (not automated by this CLI):\n' +
       '1. Set FS_DISCOVERY_APP_KEY / FS_DISCOVERY_APP_TOKEN in WebOps Settings (production) or vtex.env ' +
       '(local — never commit real values), if this operation needs them.\n' +
-      (existingDefinitions.length > 0
-        ? `2. Nothing to import: ${existingDefinitions.join(', ')} already calls this operation.\n`
-        : `2. Import ${meta.clientConstantName} from ${clientPath} in whatever component calls this operation.\n`) +
+      importStep +
       '3. Run `faststore dev` / `faststore build` once so FastStore\'s own codegen generates the TS types for this operation.',
   )
 }

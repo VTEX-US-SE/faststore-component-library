@@ -1,0 +1,48 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeCheckStockAndPricing",
+  "$componentTitle": "SE Check Stock and Pricing",
+  "title": "Check Stock and Pricing",
+  "description": "B2B worksheet: add SKUs by Ref ID search or CSV, see session price and live stock, add all to cart",
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "title": "Title", "default": "Check Stock and Pricing" },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "default": "Search for items or import a CSV to check real-time availability and pricing."
+    },
+    "searchPlaceholder": { "type": "string", "title": "Search placeholder", "default": "Search product by Ref ID" },
+    "noResultsMessage": {
+      "type": "string",
+      "title": "No search results message",
+      "default": "No results found. Please try a different Ref ID."
+    },
+    "importLabel": { "type": "string", "title": "Import button label", "default": "Import CSV" },
+    "emptyTitle": { "type": "string", "title": "Empty list title", "default": "No items added yet" },
+    "emptyMessage": {
+      "type": "string",
+      "title": "Empty list message",
+      "default": "Search for products above by Ref ID, or import a CSV file to check stock availability and pricing in bulk."
+    },
+    "clearLabel": { "type": "string", "title": "Clear button label", "default": "Clear List" },
+    "addToCartLabel": { "type": "string", "title": "Add to cart button label", "default": "Add all to cart" },
+    "totalLabel": { "type": "string", "title": "Total label", "default": "Total Estimated:" },
+    "signedOutMessage": {
+      "type": "string",
+      "title": "Message for anonymous shoppers",
+      "default": "Sign in to check stock and pricing."
+    },
+    "loginUrl": { "type": "string", "title": "Login page URL", "default": "/login" },
+    "loginLabel": { "type": "string", "title": "Login link label", "default": "Sign in" },
+    "lowStockThreshold": {
+      "type": "integer",
+      "title": "Low stock threshold",
+      "description": "Units at or above which a SKU shows \"In Stock\" instead of \"Low Stock\"",
+      "minimum": 1,
+      "default": 50
+    }
+  }
+}

@@ -1,0 +1,36 @@
+extend type Query {
+  """
+  The signed-in shopper's most recent orders (OMS user orders, newest first). Empty when
+  there's no VTEX ID session or OMS can't be reached.
+  """
+  seRecentOrders(limit: Int): [SeRecentOrder!]!
+  """
+  Month-by-month order totals for the signed-in shopper, from the account's spend-overview
+  service. `monthlyOrderValues` is null while that service is still computing them.
+  """
+  seSpendOverview: SeSpendOverview
+}
+
+type SeRecentOrder {
+  orderId: String!
+  creationDate: String!
+  status: String!
+  """
+  In cents, like every OMS amount.
+  """
+  totalValue: Float!
+  isAllDelivered: Boolean!
+}
+
+type SeSpendOverview {
+  monthlyOrderValues: [SeMonthlySpend!]
+}
+
+type SeMonthlySpend {
+  month: String!
+  """
+  In cents.
+  """
+  totalValue: Float!
+  totalOrders: Int!
+}

@@ -86,3 +86,31 @@ None of the B2B hooks above call a custom GraphQL operation, so they all ship as
   the outcome from the awaited lazy-query call rather than a `useEffect` on its `data` (the kit's
   approach, which never re-fired for a second identical result). **Calls its own GraphQL** — it
   reaches a project only through `se-components add SeRequestToBuy`'s source copy.
+
+**Wave 2** (each **calls its own GraphQL**, so it reaches a project only through
+`se-components add`'s source copy):
+
+- **`SeRecentOrdersSpendOverview`** — `useB2bShopper()` (email + session money format),
+  `useRecentOrders()`, `useSpendOverview()` (retries while the spend service is still computing),
+  plus pure `orderBadge()`, `buildSpendChart()`, `formatCents()`. Per-shopper localStorage cache
+  (3 h orders, 24 h spend), wrapped so disabled storage only means a refetch.
+- **`SeDashboards`** — `useDashboardsSession()`, `useDashboardSummary()` (one query for the three
+  cheap tiles), `useLowStockItems()`, `budgetRemainingPercent()`, `lowStockProductHref()`.
+- **`SeAddressSelector`** — `useAddressSelector()`: addresses, current one, `select()` (writes
+  FastStore's session through `sessionStore_unstable`), default-address bootstrap.
+- **`SeProductGalleryB2B`** — exported from the **`@vtex-us-se/components/product-gallery-b2b`**
+  subpath only (`core-runtime` source copy, like `product-listing`): `productGalleryWithCard()`,
+  `useB2bListingCard()`, `useSkuMatrix()`.
+- **`SeCheckStockAndPricing`** — `useCheckStockAndPricing()` (rows, `addSkus`, `importCsv` /
+  `confirmImport`, totals, `addAllToCart`), `useStockSkuSearch()`, and the dependency-free
+  `parseStockCsv()`. Imports look up a few Ref IDs at a time and simulate every new SKU in one
+  request — the kit chained one search and one simulation per row through effects.
+- **`SePurchaseLists`** — `usePurchaseLists()` (lists + every action, applying the list the
+  server returns), `usePurchaseListLines()` (product data per SKU via FastStore's `product`
+  query, totals, add to cart), `usePurchaseListSearch()`.
+
+**Authoring note — FastStore's lazy `execute` is a new function on every render.**
+`useLazyQuery_unstable` (unlike Storybook's mock of it) builds `execute` inline, so listing it in
+a `useEffect`'s dependencies re-runs the effect after every state update it causes: an endless
+request loop in a real store that no story shows. Every wave-2 hook reads it through a `useLatest`
+ref instead — keep doing that.

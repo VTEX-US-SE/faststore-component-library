@@ -1,0 +1,11 @@
+{
+  "operationType": "Query",
+  "resolverShape": "map",
+  "namespace": "thirdParty",
+  "fieldName": "sePurchaseLists",
+  "factoryExport": "createPurchaseListsResolver",
+  "configParams": ["storeId", "environment?", "dataEntity?"],
+  "clientQueryExport": "SE_PURCHASE_LISTS_QUERY",
+  "clientFileName": "purchaseLists.ts",
+  "clientConstantName": "PURCHASE_LISTS_QUERY"
+}

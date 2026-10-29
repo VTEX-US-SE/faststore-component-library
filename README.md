@@ -118,10 +118,16 @@ plain npm import can never work for those.
   the resolvers aggregator dropped fields when two operations extend the same type (`Mutation`),
   and the client wrapper duplicated the copied component's operation (fatal to codegen once the
   copies diverge).
-  Still to come from the kit: `RecentOrdersSpendOverview`, `Dashboards`, `ProductGalleryB2B` (needs a `StoreProduct`
-  extension plus fragments, which the CLI doesn't copy yet), and the tightly coupled
-  `NavbarB2B` / `AddressSelector` / `CheckStockAndPricing` / `PurchaseLists` / `ProductDetailsB2B`
-  group.
+- **B2B**: wave 2, the rest of the kit's 13 components — `SeRecentOrdersSpendOverview`,
+  `SeDashboards`, `SeAddressSelector`, `SeProductGalleryB2B`, `SeCheckStockAndPricing` and
+  `SePurchaseLists` — with six new `@vtex-us-se/resolvers` operations (`recentOrdersSpendOverview`,
+  `dashboards`, `shopperAddresses`, `b2bProductFields`, `skuAvailability`, `purchaseLists`).
+  All source-copy. `add-resolver` now writes FastStore query fragments (`src/fragments/`), which is
+  what lets `b2bProductFields` reach the native product gallery. Fixed along the way: the kit's
+  purchase-list mutations let any signed-in buyer edit any list by id, and its `AddressSelector`
+  only worked after its navbar had run. **All 13 kit components are now in the library.** Still
+  outside it: the kit's `NavbarB2B` and `ProductDetailsB2B` (not among the 13), and the
+  `usb2b*` clones' extras (`RequestOrganization`, `PriceGate`, `TireSelector`, …).
 - **B2C**: `SeAssemblySet`, a customisable set builder ported from `poc-arbonne-clone`'s
   `AssemblySet`. First component needing its own `packages/resolvers` operation
   (`assemblySet`) — which is also why `se-components add` grew a second distribution mode: a
@@ -147,10 +153,10 @@ plain npm import can never work for those.
   `columns` / `variant: "caption-below"`, now themed only through standard `--fs-*` tokens.
   `@vtex-us-se/components` pins `sanitize-html` below 2.17.2 so `next build` works (see
   Troubleshooting in [`IMPLEMENTATION.md`](IMPLEMENTATION.md)).
-- Every component except `SeAssemblySet`, `SeRequestToBuy` and `SeProductListing` is installable
-  today as a plain import from `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub
-  Packages (`SeAssemblySet` and `SeRequestToBuy` need `se-components add`'s source copy plus
-  `add-resolver`; `SeProductListing` needs the source copy only — see above).
+- Every component except `SeAssemblySet`, `SeProductListing`, `SeRequestToBuy` and the six
+  wave-2 B2B components is installable today as a plain import from `@vtex-us-se/ui` (B2C) or
+  `@vtex-us-se/ui/b2b` (B2B) on GitHub Packages. Those need `se-components add`'s source copy, plus
+  `add-resolver` for the ones with their own GraphQL — see above and each package README.
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.

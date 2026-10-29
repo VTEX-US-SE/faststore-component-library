@@ -1,0 +1,27 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SePurchaseLists",
+  "$componentTitle": "SE Purchase Lists",
+  "title": "Purchase Lists",
+  "description": "Buyer Portal purchase lists page: create, share, edit and add lists to the cart (B2B sessions only)",
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "title": "Title", "default": "Purchase Lists" },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "default": "Save the items you order regularly and add them to the cart in one click."
+    },
+    "newListLabel": { "type": "string", "title": "New list button label", "default": "New list" },
+    "emptyMessage": { "type": "string", "title": "Message when there are no lists", "default": "You have no purchase lists yet." },
+    "signedOutMessage": {
+      "type": "string",
+      "title": "Message for anonymous shoppers",
+      "default": "Sign in to see your purchase lists."
+    },
+    "loginUrl": { "type": "string", "title": "Login page URL", "default": "/login" },
+    "loginLabel": { "type": "string", "title": "Login link label", "default": "Sign in" }
+  }
+}

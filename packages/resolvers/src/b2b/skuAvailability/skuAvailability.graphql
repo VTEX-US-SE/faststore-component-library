@@ -1,0 +1,24 @@
+extend type Query {
+  """
+  Stock for each SKU at the shopper's location, from a VTEX cart simulation (no items are
+  added to any cart). Null when the simulation can't be run.
+  """
+  seSkuAvailability(items: [SeSkuAvailabilityInput!]!, country: String!, postalCode: String): [SeSkuAvailability!]
+}
+
+input SeSkuAvailabilityInput {
+  id: String!
+  seller: String!
+}
+
+type SeSkuAvailability {
+  id: String!
+  """
+  "available", "withoutStock", "cannotBeDelivered", ... as reported by VTEX Checkout.
+  """
+  availability: String
+  """
+  Units in stock, when the simulation reports them (`stockBalance`); null otherwise.
+  """
+  availableQuantity: Int
+}

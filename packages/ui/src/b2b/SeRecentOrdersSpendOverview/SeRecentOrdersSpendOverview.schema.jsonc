@@ -1,0 +1,45 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeRecentOrdersSpendOverview",
+  "$componentTitle": "SE Recent Orders & Spend Overview",
+  "title": "Recent Orders & Spend Overview",
+  "description": "The signed-in buyer's latest orders next to a monthly spend chart (B2B sessions only)",
+  "type": "object",
+  "properties": {
+    "recentOrdersTitle": {
+      "type": "string",
+      "title": "Recent orders title",
+      "default": "Recent Orders"
+    },
+    "viewAllLabel": {
+      "type": "string",
+      "title": "View all link label",
+      "default": "View All"
+    },
+    "ordersUrl": {
+      "type": "string",
+      "title": "Orders page URL",
+      "description": "Each order links to this URL followed by /{orderId}",
+      "default": "/pvt/account/orders"
+    },
+    "ordersLimit": {
+      "type": "integer",
+      "title": "Orders to show",
+      "minimum": 1,
+      "maximum": 15,
+      "default": 5
+    },
+    "emptyOrdersMessage": {
+      "type": "string",
+      "title": "Message when there are no orders",
+      "default": "No orders yet."
+    },
+    "spendOverviewTitle": {
+      "type": "string",
+      "title": "Spend overview title",
+      "default": "Spend Overview (MTD)"
+    }
+  }
+}

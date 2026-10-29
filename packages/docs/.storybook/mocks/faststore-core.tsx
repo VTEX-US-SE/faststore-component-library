@@ -11,7 +11,27 @@ const product = (id: number, name: string, prices: number[]) => ({
   brand: { name: 'Storybook' },
   isVariantOf: { productGroupID: `${id}`, name },
   image: [{ url: `https://placehold.co/300x300?text=${encodeURIComponent(name)}`, alternateName: name }],
-  offers: { offers: prices.map((price) => ({ price, listPrice: price })) },
+  offers: { offers: prices.map((price) => ({ price, listPrice: price, availability: 'https://schema.org/InStock' })) },
+  // The `se*` fields the resolvers package's `b2bProductFields` operation adds (SeProductGalleryB2B).
+  seDescription: `<p>${name} for industrial and commercial use. <b>Bulk pricing</b> available.</p>`,
+  seProperties: [
+    { name: 'Material', values: ['Nitrile'] },
+    { name: 'Pack size', values: ['12', '24'] },
+  ],
+  seSkus: prices.map((price, index) => ({
+    itemId: `${id}${index}`,
+    name: `${name} — ${['S', 'M', 'L', 'XL'][index] ?? index}`,
+    ean: null,
+    referenceCode: `REF-${id}${index}`,
+    unitMultiplier: 1,
+    imageUrl: `https://placehold.co/80x80?text=${id}`,
+    imageAlt: name,
+    variations: [{ name: 'Size', values: [['S', 'M', 'L', 'XL'][index] ?? `${index}`] }],
+    sellerId: '1',
+    price,
+    listPrice: price,
+    availableQuantity: index === 1 ? 0 : 25,
+  })),
 })
 
 // Module scope: stable identity across renders, like the real SWR-backed hook.
@@ -47,18 +67,33 @@ export const CrossSellingShelfSection: ComponentType<ShelfProps> = () => null
  * which is the only part of the real section the B2B override changes.
  */
 export function getOverriddenSection(override: {
+  Section?: unknown
   className?: string
   components?: { __experimentalProductCard?: { Component?: ComponentType<{ product: unknown; index: number }> } }
 }) {
   const Card = override.components?.__experimentalProductCard?.Component
+  // The PLP gallery (SeProductGalleryB2B) lays its cards out itself through the native
+  // `data-fs-product-grid` markup; shelves get a fixed five-column row.
+  const isGallery = override.Section === ProductGallerySection
 
   return function OverriddenSection({ title, numberOfItems }: ShelfProps) {
+    const cards = Card && FIXTURE_PRODUCTS.slice(0, numberOfItems).map((p, i) => <Card key={p.id} product={p} index={i} />)
     return (
       <section className={override.className}>
         <h2 style={{ fontFamily: 'sans-serif' }}>{title}</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 24 }}>
-          {Card && FIXTURE_PRODUCTS.slice(0, numberOfItems).map((p, i) => <Card key={p.id} product={p} index={i} />)}
-        </div>
+        {isGallery ? (
+          <div data-fs-product-listing-results>
+            <ul data-fs-product-grid style={{ display: 'grid', margin: 0, padding: 0, listStyle: 'none' }}>
+              {cards?.map((card) => (
+                <li key={card.key} data-fs-product-grid-item>
+                  {card}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 24 }}>{cards}</div>
+        )}
       </section>
     )
   }
