@@ -14,3 +14,7 @@ export { SeCustomCrossSellingShelf } from './SeCustomCrossSellingShelf/SeCustomC
 export type { SeCustomCrossSellingShelfProps } from './SeCustomCrossSellingShelf/SeCustomCrossSellingShelf'
 export { SeRequestToBuy } from './SeRequestToBuy/SeRequestToBuy'
 export type { SeRequestToBuyProps } from './SeRequestToBuy/SeRequestToBuy'
+export { SeRecentOrdersSpendOverview } from './SeRecentOrdersSpendOverview/SeRecentOrdersSpendOverview'
+export type { SeRecentOrdersSpendOverviewProps } from './SeRecentOrdersSpendOverview/SeRecentOrdersSpendOverview'
+export { SeDashboards } from './SeDashboards/SeDashboards'
+export type { SeDashboardsProps } from './SeDashboards/SeDashboards'

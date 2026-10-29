@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react'
 
 export type B2bInfo = {
   userName?: string
+  userEmail?: string
   [key: string]: unknown
 }
 
@@ -27,7 +28,14 @@ export function useSession_unstable(): {
   person?: { id: string; email: string } | null
 } {
   return {
-    b2b: mockSignedIn ? { userName: 'Storybook User' } : null,
+    b2b: mockSignedIn
+      ? {
+          userName: 'Storybook User',
+          userEmail: 'buyer@example.com',
+          unitId: 'storybook-unit-id',
+          customerId: 'storybook-customer-id',
+        }
+      : null,
     channel: '{"salesChannel":"1"}',
     locale: 'en-US',
     currency: { code: 'USD', symbol: '$' },
@@ -56,6 +64,47 @@ export function useCart_unstable(): { id?: string } {
   return { id: 'storybook-order-form-id' }
 }
 
+const FIXTURE_RECENT_ORDERS = [
+  ['1475130512345-01', '2026-10-27T14:03:00Z', 'ready-for-handling', 1284550, false],
+  ['1474920500431-01', '2026-10-21T09:41:00Z', 'invoiced', 492000, false],
+  ['1474700498112-01', '2026-10-14T16:20:00Z', 'invoiced', 2310075, true],
+  ['1474410487705-01', '2026-10-02T11:05:00Z', 'canceled', 87500, false],
+  ['1474100476230-01', '2026-09-24T08:30:00Z', 'something-new', 150000, false],
+].map(([orderId, creationDate, status, totalValue, isAllDelivered]) => ({
+  orderId,
+  creationDate,
+  status,
+  totalValue,
+  isAllDelivered,
+}))
+
+const FIXTURE_LOW_STOCK = {
+  lowStockCount: 3,
+  minimumStock: 10,
+  stockBySku: [
+    ['101', 'Nitrile Gloves, Box of 100', 4],
+    ['205', 'Safety Glasses, Clear', 2],
+    ['318', 'Hi-Vis Vest, Size L', 6],
+  ].map(([id, name, total]) => ({
+    total,
+    sku: {
+      id,
+      name,
+      imageUrl: `https://placehold.co/110x110?text=${encodeURIComponent(String(name).split(',')[0])}`,
+      detailUrl: `/${String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-')}/p`,
+    },
+  })),
+}
+
+const FIXTURE_MONTHLY_SPEND = [
+  ['May', 1820000, 9],
+  ['Jun', 2465000, 12],
+  ['Jul', 1390000, 7],
+  ['Aug', 3105000, 15],
+  ['Sep', 2780000, 11],
+  ['Oct', 4174125, 18],
+].map(([month, totalValue, totalOrders]) => ({ month, totalValue, totalOrders }))
+
 /**
  * Answers by operation (the mocked `gql` hands back the raw query text) and, like the real hook,
  * resolves `execute` to the response. `seSubmitOrganizationRequest` fails when the company name
@@ -63,6 +112,20 @@ export function useCart_unstable(): { id?: string } {
  */
 function mockLazyResponse(query: unknown, variables: unknown): unknown {
   const text = String(query)
+
+  if (text.includes('seOpenOrdersCount')) {
+    return {
+      seOpenOrdersCount: 7,
+      seOrdersPendingApprovalCount: 2,
+      seBudgets: [
+        { id: 'budget-1', balance: { amount: 50000, remaining: 18625 } },
+        { id: 'budget-2', balance: { amount: 25000, remaining: 12500 } },
+      ],
+    }
+  }
+  if (text.includes('seLowStockItems')) return { seLowStockItems: FIXTURE_LOW_STOCK }
+  if (text.includes('seRecentOrders')) return { seRecentOrders: FIXTURE_RECENT_ORDERS }
+  if (text.includes('seSpendOverview')) return { seSpendOverview: { monthlyOrderValues: FIXTURE_MONTHLY_SPEND } }
 
   if (text.includes('seSubmitOrganizationRequest')) {
     const companyName = (variables as { data?: { companyName?: string } })?.data?.companyName

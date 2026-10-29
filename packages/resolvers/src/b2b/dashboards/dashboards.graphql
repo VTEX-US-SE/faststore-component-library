@@ -1,0 +1,55 @@
+extend type Query {
+  """
+  How many of the signed-in shopper's orders are still open (placed, pending payment or
+  approval, approved, or ready for handling). Null when OMS can't be reached.
+  """
+  seOpenOrdersCount: Int
+  """
+  How many of the signed-in shopper's orders are waiting for authorization (Buyer Portal
+  order approval). Null when OMS can't be reached.
+  """
+  seOrdersPendingApprovalCount: Int
+  """
+  Active Buyer Portal budgets of the organizational unit `unitId`. Null when the budgets API
+  can't be reached (or the shopper has no access to that unit).
+  """
+  seBudgets(unitId: String!): [SeBudget!]
+  """
+  SKUs under the account's minimum-stock threshold, from its low-stock service. Null while
+  that service is still computing, or when it isn't installed on the account.
+  """
+  seLowStockItems: SeLowStockItems
+}
+
+type SeBudget {
+  id: String!
+  name: String!
+  startDate: String
+  endDate: String
+  status: String
+  balance: SeBudgetBalance!
+}
+
+type SeBudgetBalance {
+  amount: Float!
+  balanceAdjustment: Float
+  remaining: Float!
+}
+
+type SeLowStockItems {
+  lowStockCount: Int!
+  minimumStock: Int!
+  stockBySku: [SeLowStockSku!]!
+}
+
+type SeLowStockSku {
+  total: Int!
+  sku: SeLowStockSkuInfo!
+}
+
+type SeLowStockSkuInfo {
+  id: String!
+  name: String!
+  imageUrl: String
+  detailUrl: String
+}

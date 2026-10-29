@@ -1,0 +1,11 @@
+{
+  "operationType": "Query",
+  "resolverShape": "map",
+  "namespace": "thirdParty",
+  "fieldName": "seRecentOrders",
+  "factoryExport": "createRecentOrdersSpendOverviewResolver",
+  "configParams": ["storeId", "environment?", "spendOverviewUrl?"],
+  "clientQueryExport": "SE_RECENT_ORDERS_QUERY",
+  "clientFileName": "recentOrdersSpendOverview.ts",
+  "clientConstantName": "RECENT_ORDERS_QUERY"
+}
