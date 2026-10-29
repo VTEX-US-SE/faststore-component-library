@@ -1,7 +1,7 @@
 import { Command } from 'commander'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
-import { copyComponentSource, needsSourceCopy } from '../lib/sourceCopy'
+import { copyComponentSource, sourceCopyReason } from '../lib/sourceCopy'
 
 interface AddOptions {
   targetDir: string
@@ -155,17 +155,24 @@ function addComponent(componentName: string, options: AddOptions): void {
   summary.push(`✔ Copied CMS schema → ${destPath}`)
 
   // 2. Component itself: full source copy (GraphQL-dependent) or a plain npm import.
-  if (needsSourceCopy(componentName)) {
+  const copyReason = sourceCopyReason(componentName)
+  if (copyReason) {
     const sourceDir = options.sourceDir ?? join('src', 'components', 'sections', componentName)
     const { copiedFiles, skipped } = copyComponentSource(componentName, sourceDir)
 
     for (const file of copiedFiles) summary.push(`✔ Copied ${file}`)
     for (const file of skipped) summary.push(`ℹ ${file} already exists — left untouched.`)
 
+    const why =
+      copyReason === 'resolvers'
+        ? `${componentName} touches @vtex-us-se/resolvers, so its full source (not just the schema) was copied into ` +
+          `${sourceDir} — this project's own GraphQL codegen can only see \`gql(...)\` calls with literal query text ` +
+          "inside this project's own src/, not inside node_modules."
+        : `${componentName} reads FastStore's page context or renders a native section, so its full source (not just ` +
+          `the schema) was copied into ${sourceDir} — only code in this project's own src/ gets the running app's ` +
+          '@faststore/core; inside node_modules it would get a separate copy whose contexts are never provided.'
     summary.push(
-      `ℹ ${componentName} touches @vtex-us-se/resolvers, so its full source (not just the schema) was copied into ` +
-        `${sourceDir} — this project's own GraphQL codegen can only see \`gql(...)\` calls with literal query text ` +
-        "inside this project's own src/, not inside node_modules. Re-run this command after upgrading " +
+      `ℹ ${why} Re-run this command after upgrading ` +
         '@vtex-us-se/ui/@vtex-us-se/components/@vtex-us-se/resolvers to pick up changes (it never overwrites ' +
         'existing files, so re-apply any local edits by hand, or delete the folder first to take the fresh copy).',
     )

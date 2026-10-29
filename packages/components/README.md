@@ -43,8 +43,10 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
 
 - **`SeProductListing`** — `useSeProductListingTitle` (category title from FastStore's page
   context via `usePage`/`isPLP`) and `SeProductListingGallery` (the native
-  `ProductGallerySection`). Public `@faststore/core` exports only, so it ships as a plain import;
-  recheck these exports on a core bump. No GraphQL of its own.
+  `ProductGallerySection`), from the `@vtex-us-se/components/product-listing` subpath only, not
+  the barrels. Public `@faststore/core` exports only, but they must be the store's own instance,
+  so the component ships by source copy (`// @se-components source-copy: core-runtime`). Recheck
+  these exports on a core bump. No GraphQL of its own.
 
 - **`SeFooter`** — types plus `getSeFooterColumnVariant`, `getSeFooterSocialIconName` and
   `isExternalUrl`. No GraphQL.

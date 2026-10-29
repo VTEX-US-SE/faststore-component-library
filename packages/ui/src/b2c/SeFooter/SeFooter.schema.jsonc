@@ -23,7 +23,7 @@
         "required": ["title"],
         "properties": {
           "title": { "title": "Title", "type": "string" },
-          "text": { "title": "Text", "type": "string" },
+          "firstLineText": { "title": "Text", "type": "string" },
           "icon": {
             "title": "Icon",
             "description": "Icon name in the store's icon sprite (e.g. Truck, ShieldCheck).",

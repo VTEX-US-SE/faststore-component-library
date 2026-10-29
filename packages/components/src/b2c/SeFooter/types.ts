@@ -34,7 +34,8 @@ export type SeFooterLogo = {
 
 export type SeFooterIncentive = {
   title: string
-  text?: string
+  /** Same field name as the native Footer's incentives. */
+  firstLineText?: string
   /** Icon name in the store's FastStore icon sprite. */
   icon?: string
 }

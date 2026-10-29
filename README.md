@@ -136,7 +136,7 @@ plain npm import can never work for those.
   (customer-cluster lookup), `DoctorsHeader` (custom `doctors` query), and `ProductSpecifications`
   (needs a `ServerProduct` fragment extension for `specificationGroups`).
 - **B2C**: `SeEditorialSplit`, `SeProductImageGrid`, `SeProductListing` (wraps the native product
-  gallery), `SeProductReviews` (presentation only) and `SeFooter`, presentational sections first built by the store-clone pipeline, plus new options on existing components: `SeImageTiles` captions
+  gallery; installed by `se-components add`'s source copy, see `packages/cli/README.md`), `SeProductReviews` (presentation only) and `SeFooter`, presentational sections first built by the store-clone pipeline, plus new options on existing components: `SeImageTiles` captions
   below the image (`captionPosition`, `columns`, `aspectRatio`, `maxWidth`) and `SeGridContent`
   `columns` / `variant: "caption-below"`, now themed only through standard `--fs-*` tokens.
   `@vtex-us-se/components` pins `sanitize-html` below 2.17.2 so `next build` works (see

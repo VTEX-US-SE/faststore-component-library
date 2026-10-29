@@ -17,6 +17,10 @@
       "types": "./dist/b2b/index.d.ts",
       "default": "./dist/b2b/index.js"
     },
+    "./product-listing": {
+      "types": "./dist/b2c/SeProductListing/index.d.ts",
+      "default": "./dist/b2c/SeProductListing/index.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -26,6 +30,9 @@
       ],
       "b2b": [
         "./dist/b2b/index.d.ts"
+      ],
+      "product-listing": [
+        "./dist/b2c/SeProductListing/index.d.ts"
       ]
     }
   },

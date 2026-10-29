@@ -130,9 +130,10 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   links and analytics keep working. `columns.mobile` / `columns.desktop` (default 2 / 4),
   `imageAspectRatio` (`2:3`, `3:4`, `1:1`), `edgeToEdge` and `uppercase`; every label and sort
   option is a prop. An error boundary shows `labels.errorMessage` if the gallery throws. Desktop
-  filters stay core's sidebar (a desktop drawer would need core support). Needs a FastStore
-  project (`@faststore/core`); its story mocks the page context and the gallery. Built by the
-  store-clone pipeline.
+  filters stay core's sidebar (a desktop drawer would need core support). **Install with
+  `se-components add SeProductListing`** (source copy): it must run against the store's own
+  `@faststore/core`, so it isn't exported from this package's barrels. Its story mocks the page
+  context and the gallery. Built by the store-clone pipeline.
 
 - **`SeFooter`** — B2C store footer: up to 4 link columns (a column whose items have no URL
   becomes a text column), logo, social links (sprite icon name or custom image), copyright, and

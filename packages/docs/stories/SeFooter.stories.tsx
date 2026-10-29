@@ -66,9 +66,9 @@ export const WithIncentivesAndPayments: Story = {
   args: {
     ...Default.args,
     incentives: [
-      { title: 'Free shipping', text: 'On orders over a minimum amount' },
-      { title: 'Easy returns', text: 'Within 30 days' },
-      { title: 'Secure payment', text: 'Encrypted checkout' },
+      { title: 'Free shipping', firstLineText: 'On orders over a minimum amount' },
+      { title: 'Easy returns', firstLineText: 'Within 30 days' },
+      { title: 'Secure payment', firstLineText: 'Encrypted checkout' },
     ],
     acceptedPaymentMethods: {
       title: 'We accept',

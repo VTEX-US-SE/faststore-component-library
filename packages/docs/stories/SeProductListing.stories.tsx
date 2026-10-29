@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SeProductListing } from '@vtex-us-se/ui'
+// Source-copy only, so not exported from @vtex-us-se/ui: imported from its source folder.
+import { SeProductListing } from '../../ui/src/b2c/SeProductListing/SeProductListing'
 
 // The page context and the native gallery are mocked (.storybook/mocks/faststore-core.tsx): the
 // story shows the title and the restyling, not real facets, sorting or pagination.

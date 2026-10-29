@@ -1,12 +1,12 @@
 import { Component, type CSSProperties, type ErrorInfo, type ReactNode } from 'react'
-import { SeProductListingGallery, useSeProductListingTitle } from '@vtex-us-se/components'
+import { SeProductListingGallery, useSeProductListingTitle } from '@vtex-us-se/components/product-listing'
 import type {
   SeProductListingColumns,
   SeProductListingEmptyState,
   SeProductListingImageAspectRatio,
   SeProductListingLabels,
   SeProductListingSortOptions,
-} from '@vtex-us-se/components'
+} from '@vtex-us-se/components/product-listing'
 import styles from './SeProductListing.module.scss'
 
 export interface SeProductListingProps {
@@ -78,6 +78,9 @@ class GalleryErrorBoundary extends Component<
 }
 
 /**
+ * Source-copy only (`se-components add SeProductListing`): not exported from this package's
+ * barrels. See `useSeProductListing` in @vtex-us-se/components for why.
+ *
  * PLP and search listing: a category title above FastStore's native product gallery (facets,
  * sorting, load more, SEO links and analytics keep working), restyled through props.
  */

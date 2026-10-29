@@ -111,7 +111,9 @@ export function SeFooter({
                 {incentive.icon && <Icon name={incentive.icon} width={24} height={24} aria-hidden />}
                 <span>
                   <strong>{incentive.title}</strong>
-                  {incentive.text && <span className={styles.incentiveText}>{incentive.text}</span>}
+                  {incentive.firstLineText && (
+                    <span className={styles.incentiveText}>{incentive.firstLineText}</span>
+                  )}
                 </span>
               </li>
             ))}
