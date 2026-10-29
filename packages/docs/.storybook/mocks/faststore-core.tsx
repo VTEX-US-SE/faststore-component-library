@@ -1,6 +1,6 @@
 // Storybook-only mock for the `@faststore/core` package root — same reason as
-// faststore-core-experimental.ts. Only the B2B product shelves reach it.
-import type { ComponentType } from 'react'
+// faststore-core-experimental.ts. Reached by the B2B product shelves and SeProductListing.
+import type { ComponentType, CSSProperties } from 'react'
 
 const product = (id: number, name: string, prices: number[]) => ({
   id: `storybook-product-${id}`,
@@ -62,4 +62,88 @@ export function getOverriddenSection(override: {
       </section>
     )
   }
+}
+
+// SeProductListing: a PLP page context and a stand-in for the native gallery section that renders
+// the same `data-fs-*` structure, so the listing's restyling shows. Only the gallery's own grid
+// layout is inlined here; Storybook loads FastStore's tokens, not its section styles.
+const PLP_CONTEXT = {
+  data: {
+    collection: {
+      seo: { title: 'Storybook Category' },
+      breadcrumbList: { itemListElement: [{ name: 'Home' }, { name: 'Storybook Category' }] },
+    },
+  },
+}
+
+export function usePage<T>(): T {
+  return PLP_CONTEXT as T
+}
+
+export const isPLP = (context: unknown): boolean =>
+  Boolean((context as typeof PLP_CONTEXT | undefined)?.data?.collection?.seo)
+
+type GalleryProps = {
+  totalCountLabel?: string
+  sortBySelector?: { label?: string; options?: Record<string, string> }
+  loadMorePageButton?: { label?: string }
+}
+
+const gridStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(var(--fs-product-grid-columns-desktop, 4), minmax(0, 1fr))',
+  columnGap: 'var(--fs-product-grid-gap-desktop, 1rem)',
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
+}
+
+export function ProductGallerySection({ totalCountLabel, sortBySelector, loadMorePageButton }: GalleryProps) {
+  return (
+    <section style={{ fontFamily: 'sans-serif' }}>
+      <div data-fs-product-listing>
+        <div data-fs-product-listing-content-grid>
+          <div data-fs-product-listing-results-count>
+            <h2>
+              {FIXTURE_PRODUCTS.length} {totalCountLabel}
+            </h2>
+          </div>
+          <div data-fs-product-listing-sort>
+            <div data-fs-select-field>
+              <label htmlFor="storybook-sort">{sortBySelector?.label}</label>
+              <select id="storybook-sort">
+                {Object.entries(sortBySelector?.options ?? {}).map(([key, label]) => (
+                  <option key={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div data-fs-product-listing-results>
+            <ul data-fs-product-grid style={gridStyle}>
+              {FIXTURE_PRODUCTS.map((p) => (
+                <li key={p.id}>
+                  <article data-fs-product-card>
+                    <div data-fs-product-card-image style={{ overflow: 'hidden' }}>
+                      <img src={p.image[0].url} alt={p.name} style={{ width: '100%', height: '100%', display: 'block' }} />
+                    </div>
+                    <div data-fs-product-card-content>
+                      <h3 data-fs-product-card-title>
+                        <a href={`#${p.slug}`}>{p.name}</a>
+                      </h3>
+                      <span data-fs-product-card-prices>${p.offers.offers[0].price}</span>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div data-fs-product-listing-pagination style={{ textAlign: 'center' }}>
+            <button type="button" data-fs-button>
+              {loadMorePageButton?.label}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

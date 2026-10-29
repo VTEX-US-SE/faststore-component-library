@@ -1,0 +1,60 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeEditorialSplit",
+  "$componentTitle": "SE Editorial Split",
+  "description": "Full-bleed editorial images side by side (stacked on mobile), each with an optional caption and arrow link.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "ariaLabel": {
+      "title": "Accessible label",
+      "description": "Label announced by screen readers for this section.",
+      "type": "string",
+      "default": "Featured"
+    },
+    "columns": {
+      "title": "Columns on desktop",
+      "description": "Items always stack on mobile.",
+      "type": "integer",
+      "enum": [1, 2, 3],
+      "default": 2
+    },
+    "aspectRatio": {
+      "title": "Image aspect ratio",
+      "type": "string",
+      "enum": ["3:4", "4:5", "1:1"],
+      "enumNames": ["Portrait 3:4", "Portrait 4:5", "Square 1:1"],
+      "default": "3:4"
+    },
+    "captionPosition": {
+      "title": "Caption position",
+      "type": "string",
+      "enum": ["below", "overlay"],
+      "enumNames": ["Below the image", "Over the image"],
+      "default": "below"
+    },
+    "items": {
+      "title": "Images",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "title": "Image",
+        "type": "object",
+        "required": ["image"],
+        "properties": {
+          "image": {
+            "title": "Image",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "alt": { "title": "Alternative text", "type": "string" },
+          "title": { "title": "Caption", "description": "Leave empty to hide the caption.", "type": "string" },
+          "link": { "title": "Link URL", "type": "string" }
+        }
+      }
+    }
+  }
+}

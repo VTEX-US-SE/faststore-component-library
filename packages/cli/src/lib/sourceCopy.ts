@@ -68,6 +68,21 @@ function referencesResolversPackage(files: SourceFile[]): boolean {
   return files.some((file) => file.content.includes('@vtex-us-se/resolvers'))
 }
 
+/**
+ * Opt-in marker for components whose logic needs FastStore's RUNTIME instance of
+ * `@faststore/core` (its React contexts such as `usePage`, or a native section that reads
+ * them). Inside a FastStore project, `@faststore/core` resolves to the app itself only for files
+ * in the project's own src/; a file inside node_modules gets the separate
+ * `node_modules/@faststore/core` copy, whose contexts are never provided, so `usePage()` throws
+ * `Cannot destructure property 'context' of ... as it is null`. Copying the source into src/ is
+ * the same fix as for codegen visibility.
+ */
+const CORE_RUNTIME_DIRECTIVE = '@se-components source-copy: core-runtime'
+
+function declaresCoreRuntimeCopy(files: SourceFile[]): boolean {
+  return files.some((file) => file.content.includes(CORE_RUNTIME_DIRECTIVE))
+}
+
 /** Escapes a GraphQL operation string for safe embedding inside a JS template literal. */
 function escapeForTemplateLiteral(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
@@ -212,17 +227,30 @@ export function copyComponentSource(
   }
 }
 
-/** Whether `componentName` needs full source-copy distribution (see referencesResolversPackage). */
-export function needsSourceCopy(componentName: string): boolean {
+export type SourceCopyReason = 'resolvers' | 'core-runtime'
+
+/**
+ * Why `componentName` needs full source-copy distribution, or `undefined` for a plain npm import
+ * (see referencesResolversPackage and CORE_RUNTIME_DIRECTIVE).
+ */
+export function sourceCopyReason(componentName: string): SourceCopyReason | undefined {
   let componentsSrcRoot: string
   try {
     componentsSrcRoot = resolvePackageSrcRoot('@vtex-us-se/components')
   } catch {
-    return false
+    return undefined
   }
 
   const found = findComponentDir(componentsSrcRoot, componentName)
-  if (!found) return false
+  if (!found) return undefined
 
-  return referencesResolversPackage(readDirFilesFlat(found.dir))
+  const files = readDirFilesFlat(found.dir)
+  if (referencesResolversPackage(files)) return 'resolvers'
+  if (declaresCoreRuntimeCopy(files)) return 'core-runtime'
+  return undefined
+}
+
+/** Whether `componentName` needs full source-copy distribution (see sourceCopyReason). */
+export function needsSourceCopy(componentName: string): boolean {
+  return sourceCopyReason(componentName) !== undefined
 }

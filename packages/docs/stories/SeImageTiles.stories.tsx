@@ -33,3 +33,18 @@ export const FourTiles: Story = {
     tiles: [TILE_A, TILE_B, TILE_C, TILE_D],
   },
 }
+
+export const CaptionBelow: Story = {
+  args: {
+    captionPosition: 'below',
+    columns: 2,
+    aspectRatio: '2:3',
+    maxWidth: '880px',
+    tiles: [
+      { ...TILE_A, title: 'Category A', linkLabel: 'See more' },
+      { ...TILE_B, title: 'Category B', linkLabel: 'See more' },
+      { ...TILE_C, title: 'Category C', linkLabel: 'See more' },
+      { ...TILE_D, title: 'Category D', linkLabel: 'See more' },
+    ],
+  },
+}

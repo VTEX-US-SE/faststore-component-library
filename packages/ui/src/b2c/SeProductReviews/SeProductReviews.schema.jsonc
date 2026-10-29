@@ -1,0 +1,75 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeProductReviews",
+  "$componentTitle": "SE Product Reviews",
+  "description": "PDP reviews block: star row, average rating, log-in link, sort and filter toggles, and the review list or an empty state. Reviews come from the `reviews` prop (no data source is wired yet).",
+  "type": "object",
+  "properties": {
+    "ariaLabel": { "title": "Accessible label", "type": "string", "default": "Reviews" },
+    "starsLabel": {
+      "title": "Star row accessible label",
+      "description": "{rating} is replaced by the average rating.",
+      "type": "string",
+      "default": "Rated {rating} out of 5"
+    },
+    "averageRatingLabel": {
+      "title": "Average rating label",
+      "description": "Rendered as \"<label>: <average> (<count> <reviews label>)\".",
+      "type": "string",
+      "default": "Average rating"
+    },
+    "reviewsCountLabel": { "title": "Reviews count label", "type": "string", "default": "reviews" },
+    "loginLabel": { "title": "Log-in link label", "description": "Leave empty to hide the link.", "type": "string", "default": "Log in to review" },
+    "loginLink": { "title": "Log-in link URL", "description": "Leave empty to hide the link.", "type": "string", "default": "/login" },
+    "sortLabel": { "title": "Sort toggle label", "type": "string", "default": "Sort by" },
+    "sortOptions": {
+      "title": "Sort options",
+      "description": "The first one is selected by default.",
+      "type": "array",
+      "items": {
+        "title": "Option",
+        "type": "object",
+        "required": ["key", "label"],
+        "properties": {
+          "key": {
+            "title": "Order",
+            "type": "string",
+            "enum": ["newest", "oldest", "lowest", "highest"],
+            "enumNames": ["Newest first", "Oldest first", "Lowest rated first", "Highest rated first"]
+          },
+          "label": { "title": "Label", "type": "string" }
+        }
+      },
+      "default": [
+        { "key": "newest", "label": "Newest" },
+        { "key": "oldest", "label": "Oldest" },
+        { "key": "lowest", "label": "Lowest rated" },
+        { "key": "highest", "label": "Highest rated" }
+      ]
+    },
+    "filterLabel": { "title": "Filter toggle label", "type": "string", "default": "Filter by" },
+    "filterOptions": {
+      "title": "Filter options",
+      "description": "The first one is selected by default. Rating 0 shows every review.",
+      "type": "array",
+      "items": {
+        "title": "Option",
+        "type": "object",
+        "required": ["rating", "label"],
+        "properties": {
+          "rating": { "title": "Rating", "type": "integer", "minimum": 0, "maximum": 5 },
+          "label": { "title": "Label", "type": "string" }
+        }
+      },
+      "default": [
+        { "rating": 0, "label": "All" },
+        { "rating": 1, "label": "1 star" },
+        { "rating": 2, "label": "2 stars" },
+        { "rating": 3, "label": "3 stars" },
+        { "rating": 4, "label": "4 stars" },
+        { "rating": 5, "label": "5 stars" }
+      ]
+    },
+    "emptyMessage": { "title": "Empty state message", "type": "string", "default": "No reviews yet" }
+  }
+}
