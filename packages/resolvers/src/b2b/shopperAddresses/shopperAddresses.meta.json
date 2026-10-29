@@ -1,0 +1,11 @@
+{
+  "operationType": "Query",
+  "resolverShape": "field",
+  "namespace": "thirdParty",
+  "fieldName": "seShopperAddresses",
+  "factoryExport": "createShopperAddressesResolver",
+  "configParams": ["storeId"],
+  "clientQueryExport": "SE_SHOPPER_ADDRESSES_QUERY",
+  "clientFileName": "shopperAddresses.ts",
+  "clientConstantName": "SHOPPER_ADDRESSES_QUERY"
+}

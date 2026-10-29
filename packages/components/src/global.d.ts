@@ -50,6 +50,12 @@ declare module '@faststore/core/experimental' {
     id?: string
     [key: string]: unknown
   }
+
+  /** FastStore's session store; `set` replaces the session and revalidates it with VTEX. */
+  export const sessionStore_unstable: {
+    set: (session: Record<string, unknown>) => void
+    read: () => Record<string, unknown>
+  }
 }
 
 // Same rationale as above, for @faststore/core/api: `gql` there reexports from the consuming

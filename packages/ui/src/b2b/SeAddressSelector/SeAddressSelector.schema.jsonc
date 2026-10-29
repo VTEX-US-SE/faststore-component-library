@@ -1,0 +1,39 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeAddressSelector",
+  "$componentTitle": "SE Address Selector",
+  "title": "Address Selector",
+  "description": "\"Ship to\" dropdown of the buyer's saved addresses; switches the session's regionalization (B2B sessions only)",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string",
+      "title": "Label",
+      "default": "Ship to"
+    },
+    "placeholder": {
+      "type": "string",
+      "title": "Text before an address is selected",
+      "default": "Select an address"
+    },
+    "addAddressLabel": {
+      "type": "string",
+      "title": "Add address link label",
+      "default": "Add new Address"
+    },
+    "addAddressUrl": {
+      "type": "string",
+      "title": "Address book link",
+      "description": "{unitId} and {customerId} are replaced from the buyer's session",
+      "default": "/pvt/organization-account/addresses/{unitId}/{customerId}"
+    },
+    "addressType": {
+      "type": "string",
+      "title": "Only list addresses of this type",
+      "description": "Master Data addressType to show; leave empty to list every address",
+      "default": "commercial"
+    }
+  }
+}

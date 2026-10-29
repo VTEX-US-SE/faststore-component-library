@@ -23,17 +23,20 @@ function cookieHeader(ctx: ShopperRequestContext): string {
   return Array.isArray(raw) ? raw.join('; ') : (raw ?? '')
 }
 
+const AUTH_COOKIE_PREFIXES = ['VtexIdclientAutCookie']
+
 /**
  * Only the shopper's VTEX ID cookies (`VtexIdclientAutCookie` and its account-scoped
- * `VtexIdclientAutCookie_<account>` variants), re-serialized as a `Cookie` header. The kit
- * forwarded the browser's whole cookie header; nothing else in it is needed to authenticate
- * against VTEX, so nothing else leaves the storefront.
+ * `VtexIdclientAutCookie_<account>` variants) plus any `extraPrefixes` (e.g. `vtex_session` for
+ * the Session API), re-serialized as a `Cookie` header. The kit forwarded the browser's whole
+ * cookie header; nothing else in it is needed by VTEX, so nothing else leaves the storefront.
  */
-export function vtexAuthCookieHeader(ctx: ShopperRequestContext): string {
+export function vtexAuthCookieHeader(ctx: ShopperRequestContext, extraPrefixes: string[] = []): string {
+  const prefixes = [...AUTH_COOKIE_PREFIXES, ...extraPrefixes]
   return cookieHeader(ctx)
     .split(';')
     .map((pair) => pair.trim())
-    .filter((pair) => pair.startsWith('VtexIdclientAutCookie'))
+    .filter((pair) => prefixes.some((prefix) => pair.startsWith(prefix)))
     .join('; ')
 }
 
@@ -57,8 +60,9 @@ export async function getAsShopper<T>(
   ctx: ShopperRequestContext,
   logPrefix: string,
   headers: Record<string, string> = {},
+  extraCookiePrefixes: string[] = [],
 ): Promise<T | undefined> {
-  const cookie = vtexAuthCookieHeader(ctx)
+  const cookie = vtexAuthCookieHeader(ctx, extraCookiePrefixes)
   if (!cookie && !headers.VtexIdclientAutCookie) {
     // Signed-out shopper: expected (the components only query inside a B2B session), not an error.
     return undefined

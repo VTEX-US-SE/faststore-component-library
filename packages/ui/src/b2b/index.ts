@@ -18,3 +18,5 @@ export { SeRecentOrdersSpendOverview } from './SeRecentOrdersSpendOverview/SeRec
 export type { SeRecentOrdersSpendOverviewProps } from './SeRecentOrdersSpendOverview/SeRecentOrdersSpendOverview'
 export { SeDashboards } from './SeDashboards/SeDashboards'
 export type { SeDashboardsProps } from './SeDashboards/SeDashboards'
+export { SeAddressSelector } from './SeAddressSelector/SeAddressSelector'
+export type { SeAddressSelectorProps } from './SeAddressSelector/SeAddressSelector'

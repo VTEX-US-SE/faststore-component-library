@@ -5,7 +5,7 @@
 // the moment any story imports the real module, taking down all of Storybook — not just the
 // story that needs it. This mock is aliased in main.ts ONLY for Storybook; the published
 // components/ui packages still import the real module at runtime in a real FastStore project.
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useSyncExternalStore } from 'react'
 
 export type B2bInfo = {
   userName?: string
@@ -20,14 +20,40 @@ export function setMockSignedIn(signedIn: boolean) {
   mockSignedIn = signedIn
 }
 
+// Fields `sessionStore_unstable.set` changed (e.g. the address selector's postal code), merged
+// into every `useSession_unstable` result; components re-render on change like the real store.
+let sessionOverrides: Record<string, unknown> = {}
+const sessionListeners = new Set<() => void>()
+
+export const sessionStore_unstable = {
+  set(session: Record<string, unknown>) {
+    console.log('[Storybook mock] sessionStore_unstable.set called with', session)
+    const { country, addressType, city, postalCode } = session
+    sessionOverrides = { country, addressType, city, postalCode }
+    sessionListeners.forEach((listener) => listener())
+  },
+  read() {
+    return sessionOverrides
+  },
+}
+
+function subscribeSession(listener: () => void) {
+  sessionListeners.add(listener)
+  return () => sessionListeners.delete(listener)
+}
+
 export function useSession_unstable(): {
   b2b?: B2bInfo | null
   channel?: string
   locale?: string
   currency?: { code: string; symbol: string }
   person?: { id: string; email: string } | null
+  postalCode?: string | null
+  [key: string]: unknown
 } {
+  const overrides = useSyncExternalStore(subscribeSession, () => sessionOverrides)
   return {
+    ...overrides,
     b2b: mockSignedIn
       ? {
           userName: 'Storybook User',
@@ -78,6 +104,26 @@ const FIXTURE_RECENT_ORDERS = [
   isAllDelivered,
 }))
 
+const FIXTURE_SHOPPER_ADDRESSES = {
+  defaultAddressId: 'address-hq',
+  addresses: [
+    ['address-hq', 'commercial', 'Downtown', 'Chicago', 'IL', '60601'],
+    ['address-wh', 'commercial', 'Elk Grove Village', 'Chicago', 'IL', '60007'],
+    ['address-tx', 'commercial', 'Northwest', 'Austin', 'TX', '78759'],
+    ['address-home', 'residential', 'Lincoln Park', 'Chicago', 'IL', '60614'],
+  ].map(([id, addressType, neighborhood, city, state, postalCode]) => ({
+    id,
+    addressType,
+    isActive: true,
+    country: 'USA',
+    state,
+    city,
+    neighborhood,
+    street: null,
+    postalCode,
+  })),
+}
+
 const FIXTURE_LOW_STOCK = {
   lowStockCount: 3,
   minimumStock: 10,
@@ -113,6 +159,7 @@ const FIXTURE_MONTHLY_SPEND = [
 function mockLazyResponse(query: unknown, variables: unknown): unknown {
   const text = String(query)
 
+  if (text.includes('seShopperAddresses')) return { seShopperAddresses: FIXTURE_SHOPPER_ADDRESSES }
   if (text.includes('seOpenOrdersCount')) {
     return {
       seOpenOrdersCount: 7,

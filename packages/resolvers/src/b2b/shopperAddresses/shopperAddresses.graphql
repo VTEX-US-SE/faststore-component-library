@@ -1,0 +1,25 @@
+extend type Query {
+  """
+  The signed-in shopper's saved addresses (the Master Data `AD` documents their VTEX session
+  points at) and which one is their default shipping address. Null when there's no session or
+  it can't be read.
+  """
+  seShopperAddresses: SeShopperAddresses
+}
+
+type SeShopperAddresses {
+  defaultAddressId: String
+  addresses: [SeShopperAddress!]!
+}
+
+type SeShopperAddress {
+  id: String!
+  addressType: String
+  isActive: Boolean
+  country: String
+  state: String
+  city: String
+  neighborhood: String
+  street: String
+  postalCode: String
+}
