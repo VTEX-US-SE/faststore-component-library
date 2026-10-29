@@ -107,6 +107,19 @@ fails with `Not all operations have an unique name` and generates nothing. For t
 `src/` (e.g. a wrapper from running `add-resolver` first). The wrapper is only for writing your
 **own** component against a `@vtex-us-se/resolvers` operation directly.
 
+**Fragments.** An operation whose `meta.json` declares `"fragments": { "<FragmentName>": "<export>" }`
+(e.g. `b2bProductFields` → `ClientManyProducts`) gets `src/fragments/<FragmentName>.ts` written
+with the fragment's text inlined — the file FastStore merges into its own built-in query of that
+name, which is how a `StoreProduct` extension reaches the native product gallery. A project has
+**one** such file per fragment name, so an existing one is never overwritten: if it already
+contains the fragment, nothing happens; otherwise the command prints the selections to merge into
+it by hand (keep a single `fragment <FragmentName>`; GraphQL merges repeated fields).
+`--fragments-dir` (default `src/fragments`) changes the folder.
+
+**Operations with no client query** (`clientQueryExport` omitted in `meta.json`, like
+`b2bProductFields`) get no `src/utils/` wrapper — nothing in the client sends them by name.
+Factories that take no config (`configParams: []`) are called with `{}`.
+
 ```bash
 se-components add-resolver organizationRequest --namespace thirdParty  # meta.json's own default
 se-components add-resolver assemblySet --target-dir src/graphql

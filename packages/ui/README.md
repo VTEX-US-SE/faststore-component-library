@@ -206,3 +206,44 @@ values when they're missing, instead of rendering transparent backgrounds.
   [resolvers README](../resolvers/README.md#organizationrequest-b2b). Labels and messages are CMS
   props; unlike the kit, the submit button stays enabled (except while sending) so a missing
   field actually shows its validation message.
+
+**Wave 2** — the rest of the kit, all with **their own GraphQL**: each must be added with
+`se-components add <Component>` (source copy) plus the `add-resolver` operations listed, never
+imported from the package (see the [resolvers README](../resolvers/README.md#buyer-portal-kit-wave-2-b2b)).
+All render nothing (or a sign-in prompt) outside a B2B session, format money in the session's
+own locale and currency (the kit hardcoded `en-US`/`USD`), and replace the kit's `swiper`,
+`papaparse`, `react-hot-toast` and `@faststore/ui` overlays with plain CSS and self-contained
+dialogs — so a store installs no extra dependency, and nothing needs FastStore's `UIProvider`.
+
+- **`SeRecentOrdersSpendOverview`** — the buyer's latest orders (status badges grouped from OMS's
+  ~30 workflow statuses) next to a monthly spend bar chart. `add-resolver recentOrdersSpendOverview`.
+  The chart needs the account's custom spend-overview IO app; without it the panel is hidden.
+  Fixes the kit's "Delivered" badge (`border-radius` where `background-color` was meant).
+- **`SeDashboards`** — four tiles: open orders, low-stock alerts (opens a drawer listing the
+  SKUs), remaining budget percentage, orders pending approval. `add-resolver dashboards`. Mobile
+  is a scroll-snap row: the kit's Swiper imported global CSS from inside the component, which
+  Next.js rejects outside `_app`.
+- **`SeAddressSelector`** — "Ship to" dropdown of the buyer's saved addresses (`addressType` prop,
+  default `commercial`); picking one points FastStore's session (regionalization) at it, and a
+  session with no postal code yet gets the default shipping address. `add-resolver
+  shopperAddresses`. Works on its own — the kit's only worked after its navbar had filled
+  localStorage.
+- **`SeProductGalleryB2B`** — PLP/search gallery: FastStore's native `ProductGallery` section
+  (facets, sorting, pagination) with a list-style B2B card — login-gated price range across the
+  product's SKUs and a "View options" SKU matrix that adds several SKUs to the cart at once
+  (through FastStore's own `useBuyButton`). `add-resolver b2bProductFields`, which writes the
+  `ClientManyProducts` fragment. **Source-copy only, like `SeProductListing`** (it overrides a
+  native section), so it isn't exported from `@vtex-us-se/ui/b2b`. Catalog descriptions are shown
+  as plain text, never injected as HTML.
+- **`SeCheckStockAndPricing`** — worksheet: add SKUs by Ref ID (search) or a `refId,quantity`
+  CSV (`,` or `;`, quoted fields; template generated in the browser instead of the kit's Google
+  Drive link), see session price and live stock, edit quantities, add all to cart. A SKU whose
+  stock turns out lower than its quantity is capped (out of stock drops to 0).
+  `add-resolver skuAvailability` **and** `add-resolver b2bProductFields`. Pair it with
+  `SeAddressSelector` (stock is simulated at the session's postal code); the kit embedded both
+  the address selector and an "add to purchase list" button, which a source-copied component
+  can't import from another folder.
+- **`SePurchaseLists`** — the buyer's and their organization's shared purchase lists: create,
+  open (`?list=<id>` deep link), add SKUs by Ref ID, edit quantities (debounced saves), add the
+  list to the cart; rename / share / delete for the owner only. `add-resolver purchaseLists`
+  **and** `add-resolver b2bProductFields`. Needs the `PL` Master Data entity and app key/token.
