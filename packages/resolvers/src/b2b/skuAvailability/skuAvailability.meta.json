@@ -1,0 +1,11 @@
+{
+  "operationType": "Query",
+  "resolverShape": "field",
+  "namespace": "thirdParty",
+  "fieldName": "seSkuAvailability",
+  "factoryExport": "createSkuAvailabilityResolver",
+  "configParams": ["storeId", "environment?", "salesChannel?", "availabilityUrl?"],
+  "clientQueryExport": "SE_SKU_AVAILABILITY_QUERY",
+  "clientFileName": "skuAvailability.ts",
+  "clientConstantName": "SKU_AVAILABILITY_QUERY"
+}

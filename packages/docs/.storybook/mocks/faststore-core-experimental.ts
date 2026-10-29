@@ -63,6 +63,7 @@ export function useSession_unstable(): {
         }
       : null,
     channel: '{"salesChannel":"1"}',
+    country: 'USA',
     locale: 'en-US',
     currency: { code: 'USD', symbol: '$' },
     person: mockSignedIn ? { id: 'storybook-person', email: 'buyer@example.com' } : null,
@@ -112,6 +113,36 @@ const FIXTURE_RECENT_ORDERS = [
   totalValue,
   isAllDelivered,
 }))
+
+// SeCheckStockAndPricing: Ref IDs GLV-100…GLV-103 and BOOT-200…BOOT-201. GLV-102 is out of stock,
+// GLV-101 and BOOT-201 are low; anything else has 120 units.
+const FIXTURE_STOCK: Record<string, number> = { glv101: 18, glv102: 0, boot201: 7 }
+
+const stockProduct = (id: string, name: string, prefix: string, sizes: string[], price: number) => ({
+  slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${id}`,
+  brand: { name: 'Storybook' },
+  isVariantOf: { name, productGroupID: id },
+  additionalProperty: [{ propertyID: 'size', name: 'Size' }],
+  seSkus: sizes.map((size, index) => ({
+    itemId: `${prefix.toLowerCase()}${100 * (prefix === 'GLV' ? 1 : 2) + index}`,
+    name: `${name} — ${size}`,
+    ean: null,
+    referenceCode: `${prefix}-${100 * (prefix === 'GLV' ? 1 : 2) + index}`,
+    unitMultiplier: 1,
+    imageUrl: null,
+    imageAlt: null,
+    variations: [{ name: 'Size', values: [size] }],
+    sellerId: '1',
+    price: price + index,
+    listPrice: price + index,
+    availableQuantity: 100,
+  })),
+})
+
+const FIXTURE_STOCK_PRODUCTS = [
+  stockProduct('1', 'Nitrile Gloves', 'GLV', ['S', 'M', 'L', 'XL'], 12.5),
+  stockProduct('2', 'Steel Toe Boots', 'BOOT', ['9', '10'], 89),
+]
 
 const FIXTURE_SHOPPER_ADDRESSES = {
   defaultAddressId: 'address-hq',
@@ -168,6 +199,22 @@ const FIXTURE_MONTHLY_SPEND = [
 function mockLazyResponse(query: unknown, variables: unknown): unknown {
   const text = String(query)
 
+  if (text.includes('seSkuAvailability')) {
+    const items = (variables as { items?: Array<{ id: string }> })?.items ?? []
+    return {
+      seSkuAvailability: items.map(({ id }) => {
+        const quantity = FIXTURE_STOCK[id] ?? 120
+        return { id, availability: quantity > 0 ? 'available' : 'withoutStock', availableQuantity: quantity }
+      }),
+    }
+  }
+  if (text.includes('query SeSkuSearch')) {
+    const term = String((variables as { term?: string })?.term ?? '').toLowerCase()
+    const matches = FIXTURE_STOCK_PRODUCTS.filter((product) =>
+      product.seSkus.some((sku) => sku.referenceCode.toLowerCase().includes(term)),
+    )
+    return { search: { products: { edges: matches.map((node) => ({ node })) } } }
+  }
   if (text.includes('seShopperAddresses')) return { seShopperAddresses: FIXTURE_SHOPPER_ADDRESSES }
   if (text.includes('seOpenOrdersCount')) {
     return {
