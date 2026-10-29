@@ -1,0 +1,24 @@
+extend type Mutation {
+  """
+  Stores a prospective buyer organization's "request buyer access" form as a Master
+  Data v2 document. Public by design (the requester has no account yet), so the
+  resolver validates and length-caps every field before writing anything.
+  """
+  seSubmitOrganizationRequest(data: SeOrganizationRequestInput!): SeOrganizationRequestResult!
+}
+
+input SeOrganizationRequestInput {
+  companyName: String!
+  contactName: String!
+  email: String!
+  phone: String
+  message: String
+}
+
+type SeOrganizationRequestResult {
+  """
+  False when the input was rejected or Master Data could not store the request.
+  Details are only logged server-side, never returned to the (anonymous) client.
+  """
+  success: Boolean!
+}

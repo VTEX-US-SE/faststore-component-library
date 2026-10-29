@@ -1,0 +1,47 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeRequestToBuy",
+  "$componentTitle": "SE Request to Buy",
+  "title": "Request to Buy",
+  "description": "Form for companies to request buyer access to the B2B portal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Section title",
+      "default": "Request buyer access"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "default": "Fill out the form below and we'll get back to you."
+    },
+    "ctaLabel": {
+      "type": "string",
+      "title": "Button label",
+      "default": "Request to Buy"
+    },
+    "submittingLabel": {
+      "type": "string",
+      "title": "Button label while sending",
+      "default": "Sending…"
+    },
+    "successMessage": {
+      "type": "string",
+      "title": "Success message",
+      "default": "Thank you. We’ll be in touch soon."
+    },
+    "validationMessage": {
+      "type": "string",
+      "title": "Missing required fields message",
+      "default": "Please fill in all required fields (Company name, Contact name, and Email)."
+    },
+    "errorMessage": {
+      "type": "string",
+      "title": "Error message",
+      "default": "Something went wrong. Please try again."
+    }
+  }
+}

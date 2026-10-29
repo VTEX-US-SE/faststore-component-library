@@ -13,12 +13,19 @@
       "types": "./dist/b2c/index.d.ts",
       "default": "./dist/b2c/index.js"
     },
+    "./b2b": {
+      "types": "./dist/b2b/index.d.ts",
+      "default": "./dist/b2b/index.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "b2c": [
         "./dist/b2c/index.d.ts"
+      ],
+      "b2b": [
+        "./dist/b2b/index.d.ts"
       ]
     }
   },

@@ -111,8 +111,14 @@ plain npm import can never work for those.
   `SeCustomShelfProduct` and `SeCustomCrossSellingShelf` (the last two over FastStore's native
   `useProductsQuery` / `CrossSellingShelf`). These do have Storybook stories: `docs` now mocks the
   `@faststore/core` root as well as `/experimental`, with a signed-in/signed-out session toggle.
-  Still to come from the kit: GraphQL components with their own operations (`RequestToBuy`,
-  `RecentOrdersSpendOverview`, `Dashboards`), `ProductGalleryB2B` (needs a `StoreProduct`
+- **B2B**: `SeRequestToBuy`, the first B2B component with its own GraphQL operation
+  (`organizationRequest` → `seSubmitOrganizationRequest`, a Master Data write) on the
+  source-copy mechanism. Wiring it alongside `SeAssemblySet` surfaced and fixed three
+  `add-resolver` bugs: non-split operations defaulted to a `b2c/` folder FastStore never loads,
+  the resolvers aggregator dropped fields when two operations extend the same type (`Mutation`),
+  and the client wrapper duplicated the copied component's operation (fatal to codegen once the
+  copies diverge).
+  Still to come from the kit: `RecentOrdersSpendOverview`, `Dashboards`, `ProductGalleryB2B` (needs a `StoreProduct`
   extension plus fragments, which the CLI doesn't copy yet), and the tightly coupled
   `NavbarB2B` / `AddressSelector` / `CheckStockAndPricing` / `PurchaseLists` / `ProductDetailsB2B`
   group.
@@ -141,9 +147,10 @@ plain npm import can never work for those.
   `columns` / `variant: "caption-below"`, now themed only through standard `--fs-*` tokens.
   `@vtex-us-se/components` pins `sanitize-html` below 2.17.2 so `next build` works (see
   Troubleshooting in [`IMPLEMENTATION.md`](IMPLEMENTATION.md)).
-- Every component except `SeAssemblySet` is installable today as a plain import from
-  `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub Packages (`SeAssemblySet` needs
-  `se-components add`'s source copy, not a plain import — see above).
+- Every component except `SeAssemblySet`, `SeRequestToBuy` and `SeProductListing` is installable
+  today as a plain import from `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub
+  Packages (`SeAssemblySet` and `SeRequestToBuy` need `se-components add`'s source copy plus
+  `add-resolver`; `SeProductListing` needs the source copy only — see above).
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.
