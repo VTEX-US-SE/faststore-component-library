@@ -21,6 +21,10 @@
       "types": "./dist/b2c/SeProductListing/index.d.ts",
       "default": "./dist/b2c/SeProductListing/index.js"
     },
+    "./product-gallery-b2b": {
+      "types": "./dist/b2b/SeProductGalleryB2B/index.d.ts",
+      "default": "./dist/b2b/SeProductGalleryB2B/index.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -33,6 +37,9 @@
       ],
       "product-listing": [
         "./dist/b2c/SeProductListing/index.d.ts"
+      ],
+      "product-gallery-b2b": [
+        "./dist/b2b/SeProductGalleryB2B/index.d.ts"
       ]
     }
   },

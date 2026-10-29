@@ -1,0 +1,11 @@
+{
+  "operationType": "StoreProduct",
+  "resolverShape": "map",
+  "namespace": "vtex",
+  "fieldName": "seSkus",
+  "factoryExport": "createB2bProductFieldsResolver",
+  "configParams": [],
+  "fragments": {
+    "ClientManyProducts": "SE_CLIENT_MANY_PRODUCTS_FRAGMENT"
+  }
+}

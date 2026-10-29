@@ -86,6 +86,15 @@ export function useNewsletter_unstable() {
   return { subscribeUser, data, error: undefined, loading: false }
 }
 
+export function useBuyButton_unstable(items: unknown) {
+  return {
+    onClick: (event: { preventDefault(): void }) => {
+      event.preventDefault()
+      console.log('[Storybook mock] useBuyButton_unstable onClick with', items)
+    },
+  }
+}
+
 export function useCart_unstable(): { id?: string } {
   return { id: 'storybook-order-form-id' }
 }

@@ -1,0 +1,43 @@
+extend type StoreProduct {
+  """
+  The product's long description (HTML, as entered in the catalog).
+  """
+  seDescription: String
+  """
+  Product-level specifications (name plus values), e.g. "Material: Nitrile".
+  """
+  seProperties: [SeProductProperty!]!
+  """
+  Every SKU of the product with its default seller's price and stock -- what the B2B listing
+  card needs for its price range and its SKU matrix.
+  """
+  seSkus: [SeProductSku!]!
+}
+
+type SeProductProperty {
+  name: String!
+  values: [String!]!
+}
+
+type SeProductSku {
+  itemId: String!
+  name: String!
+  ean: String
+  """
+  The SKU's first reference code (e.g. a manufacturer part number), if any.
+  """
+  referenceCode: String
+  unitMultiplier: Float
+  imageUrl: String
+  imageAlt: String
+  variations: [SeProductSkuVariation!]!
+  sellerId: String
+  price: Float
+  listPrice: Float
+  availableQuantity: Int!
+}
+
+type SeProductSkuVariation {
+  name: String!
+  values: [String!]!
+}
