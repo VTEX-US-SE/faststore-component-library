@@ -41,6 +41,11 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
   `selectSeProductReviews`: average and count, filter by rating, sort by date or rating. No
   GraphQL (reviews come in as a prop).
 
+- **`SeProductListing`** — `useSeProductListingTitle` (category title from FastStore's page
+  context via `usePage`/`isPLP`) and `SeProductListingGallery` (the native
+  `ProductGallerySection`). Public `@faststore/core` exports only, so it ships as a plain import;
+  recheck these exports on a core bump. No GraphQL of its own.
+
 - **`SeFooter`** — types plus `getSeFooterColumnVariant`, `getSeFooterSocialIconName` and
   `isExternalUrl`. No GraphQL.
 

@@ -125,6 +125,15 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   from the `reviews` prop (empty by default); a VTEX Reviews and Ratings data source would be a
   separate source-copy component. Built by the store-clone pipeline. No GraphQL.
 
+- **`SeProductListing`** — PLP/search listing: a category title (last breadcrumb item, or a
+  `title` override) above FastStore's native product gallery, so facets, sorting, load more, SEO
+  links and analytics keep working. `columns.mobile` / `columns.desktop` (default 2 / 4),
+  `imageAspectRatio` (`2:3`, `3:4`, `1:1`), `edgeToEdge` and `uppercase`; every label and sort
+  option is a prop. An error boundary shows `labels.errorMessage` if the gallery throws. Desktop
+  filters stay core's sidebar (a desktop drawer would need core support). Needs a FastStore
+  project (`@faststore/core`); its story mocks the page context and the gallery. Built by the
+  store-clone pipeline.
+
 - **`SeFooter`** — B2C store footer: up to 4 link columns (a column whose items have no URL
   becomes a text column), logo, social links (sprite icon name or custom image), copyright, and
   optional incentives and payment-method rows. Columns collapse into accordions below
