@@ -74,3 +74,11 @@ export const Empty: Story = {
     items: [],
   },
 }
+
+export const CaptionBelowTwoColumns: Story = {
+  args: {
+    variant: 'caption-below',
+    columns: 2,
+    items: items.slice(0, 2),
+  },
+}

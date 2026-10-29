@@ -26,6 +26,13 @@ Then, depending on whether the component's logic touches `@vtex-us-se/resolvers`
   can never be seen by this project's own GraphQL codegen, regardless of how it's imported —
   only source living in your own `src/`, with the operation text already inlined, works.
 
+- **Needs the store's own `@faststore/core` at runtime (e.g. `SeProductListing`):** same full
+  source copy. Inside a FastStore project, `@faststore/core` resolves to the running app only for
+  files in the project's own `src/`; a file in `node_modules` gets the separate
+  `node_modules/@faststore/core` copy, whose React contexts (`usePage`, the native sections that
+  read them) are never provided. A component opts in with a
+  `// @se-components source-copy: core-runtime` comment in its `@vtex-us-se/components` logic.
+
 During that copy, every cross-package import is rewritten so the copied files work standing
 alone:
 - `@vtex-us-se/components(/segment)` → `./index` (the copied components-package barrel now

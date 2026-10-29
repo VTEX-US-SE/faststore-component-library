@@ -1,0 +1,52 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeProductImageGrid",
+  "$componentTitle": "SE Product Image Grid",
+  "description": "Dense grid of product cut-out images on a light background, each linking to its product page. No names or prices.",
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "ariaLabel": {
+      "title": "Accessible label",
+      "description": "Label announced by screen readers for this section.",
+      "type": "string",
+      "default": "Collection"
+    },
+    "emptyMessage": {
+      "title": "Empty state message",
+      "description": "Shown when no item has an image.",
+      "type": "string",
+      "default": "No products to show yet."
+    },
+    "columns": {
+      "title": "Columns",
+      "type": "object",
+      "properties": {
+        "desktop": { "title": "Columns from 768px up", "type": "integer", "minimum": 2, "maximum": 8, "default": 6 },
+        "mobile": { "title": "Columns below 768px", "type": "integer", "minimum": 2, "maximum": 6, "default": 4 }
+      }
+    },
+    "items": {
+      "title": "Products",
+      "type": "array",
+      "items": {
+        "title": "Product",
+        "type": "object",
+        "required": ["image"],
+        "properties": {
+          "image": {
+            "title": "Image",
+            "description": "Catalog image URL or uploaded image.",
+            "type": "string",
+            "widget": {
+              "ui:widget": "media-gallery",
+              "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+            }
+          },
+          "alt": { "title": "Alternative text", "description": "Also used as the link label.", "type": "string" },
+          "link": { "title": "Product link", "description": "Product page path, e.g. /product-slug/p.", "type": "string" }
+        }
+      }
+    }
+  }
+}

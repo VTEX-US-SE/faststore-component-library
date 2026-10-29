@@ -1,0 +1,134 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeProductListing",
+  "$componentTitle": "SE Product Listing",
+  "description": "PLP and search listing: category title above FastStore's native product gallery (filters, sorting, load more), with configurable columns, image ratio and density.",
+  "type": "object",
+  "required": ["showTitle", "labels", "sortOptions", "emptyState"],
+  "properties": {
+    "title": {
+      "title": "Title override",
+      "description": "Leave empty to show the category name.",
+      "type": "string",
+      "default": ""
+    },
+    "showTitle": {
+      "title": "Show title?",
+      "type": "boolean",
+      "default": true
+    },
+    "columns": {
+      "title": "Product grid columns",
+      "type": "object",
+      "properties": {
+        "mobile": { "title": "Below 768px", "type": "integer", "minimum": 1, "maximum": 3, "default": 2 },
+        "desktop": { "title": "From 768px", "type": "integer", "minimum": 2, "maximum": 6, "default": 4 }
+      }
+    },
+    "imageAspectRatio": {
+      "title": "Product image aspect ratio",
+      "type": "string",
+      "enum": ["2:3", "3:4", "1:1"],
+      "enumNames": ["Portrait 2:3", "Portrait 3:4", "Square 1:1"],
+      "default": "2:3"
+    },
+    "edgeToEdge": {
+      "title": "Edge-to-edge grid",
+      "description": "No gaps between product cards.",
+      "type": "boolean",
+      "default": true
+    },
+    "uppercase": {
+      "title": "Uppercase text",
+      "description": "Title, controls and product names in uppercase.",
+      "type": "boolean",
+      "default": true
+    },
+    "labels": {
+      "title": "Labels",
+      "type": "object",
+      "required": [
+        "filterButton",
+        "filtersTitle",
+        "clearFilters",
+        "applyFilters",
+        "sortBy",
+        "resultsCount",
+        "loadMore",
+        "previousPage",
+        "sponsored",
+        "errorMessage"
+      ],
+      "properties": {
+        "filterButton": { "title": "Filter button", "type": "string", "default": "Filters" },
+        "filtersTitle": { "title": "Filters panel title", "type": "string", "default": "Filters" },
+        "clearFilters": { "title": "Clear filters button", "type": "string", "default": "Clear all" },
+        "applyFilters": { "title": "Apply filters button", "type": "string", "default": "Apply" },
+        "sortBy": { "title": "Sort label", "type": "string", "default": "Sort by" },
+        "resultsCount": { "title": "Results count label", "type": "string", "default": "Results" },
+        "loadMore": { "title": "Load more button", "type": "string", "default": "Load more products" },
+        "previousPage": { "title": "Previous page button", "type": "string", "default": "Previous page" },
+        "sponsored": { "title": "Sponsored product label", "type": "string", "default": "Sponsored" },
+        "errorMessage": {
+          "title": "Error message",
+          "type": "string",
+          "default": "Products could not be loaded. Please refresh the page."
+        }
+      }
+    },
+    "sortOptions": {
+      "title": "Sort options labels",
+      "type": "object",
+      "required": [
+        "score_desc",
+        "orders_desc",
+        "release_desc",
+        "price_asc",
+        "price_desc",
+        "discount_desc",
+        "name_asc",
+        "name_desc"
+      ],
+      "properties": {
+        "score_desc": { "title": "Relevance", "type": "string", "default": "Relevance" },
+        "orders_desc": { "title": "Top sales", "type": "string", "default": "Top sales" },
+        "release_desc": { "title": "Release date", "type": "string", "default": "Newest" },
+        "price_asc": { "title": "Price ascending", "type": "string", "default": "Price, low to high" },
+        "price_desc": { "title": "Price descending", "type": "string", "default": "Price, high to low" },
+        "discount_desc": { "title": "Discount", "type": "string", "default": "Discount" },
+        "name_asc": { "title": "Name A-Z", "type": "string", "default": "Name, A-Z" },
+        "name_desc": { "title": "Name Z-A", "type": "string", "default": "Name, Z-A" }
+      }
+    },
+    "emptyState": {
+      "title": "Empty state",
+      "type": "object",
+      "required": ["title", "firstLink", "secondLink"],
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "default": "No products match your selection"
+        },
+        "firstLink": {
+          "title": "First link",
+          "type": "object",
+          "required": ["label", "url"],
+          "properties": {
+            "label": { "title": "Label", "type": "string", "default": "Clear filters" },
+            "url": { "title": "URL", "type": "string", "default": "?" }
+          }
+        },
+        "secondLink": {
+          "title": "Second link",
+          "type": "object",
+          "required": ["label", "url"],
+          "properties": {
+            "label": { "title": "Label", "type": "string", "default": "Back to home" },
+            "url": { "title": "URL", "type": "string", "default": "/" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeFooter",
+  "$componentTitle": "SE Footer",
+  "description": "Store footer: up to 4 link or text columns (accordions on mobile), logo, social links, copyright, and optional incentives and payment-method rows.",
+  "type": "object",
+  "properties": {
+    "accordionBreakpoint": {
+      "title": "Accordion breakpoint",
+      "description": "Below this width the columns collapse into accordions.",
+      "type": "string",
+      "enum": ["notebook", "tablet"],
+      "enumNames": ["1024px", "768px"],
+      "default": "notebook"
+    },
+    "incentives": {
+      "title": "Incentives",
+      "description": "Optional row above the columns.",
+      "type": "array",
+      "items": {
+        "title": "Incentive",
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "title": "Title", "type": "string" },
+          "firstLineText": { "title": "Text", "type": "string" },
+          "icon": {
+            "title": "Icon",
+            "description": "Icon name in the store's icon sprite (e.g. Truck, ShieldCheck).",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "footerLinks": {
+      "title": "Columns",
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "title": "Column",
+        "type": "object",
+        "properties": {
+          "sectionTitle": { "title": "Title", "type": "string" },
+          "items": {
+            "title": "Items",
+            "description": "An item without a URL renders as a paragraph, and its column as a text column.",
+            "type": "array",
+            "items": {
+              "title": "Item",
+              "type": "object",
+              "required": ["text"],
+              "properties": {
+                "text": { "title": "Text", "type": "string", "widget": { "ui:widget": "textarea" } },
+                "url": { "title": "URL", "description": "Leave empty for a paragraph.", "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "logo": {
+      "title": "Logo",
+      "type": "object",
+      "properties": {
+        "src": { "title": "Image", "type": "string", "widget": { "ui:widget": "media-gallery" } },
+        "alt": { "title": "Alternative text", "type": "string" },
+        "link": {
+          "title": "Link",
+          "type": "object",
+          "properties": {
+            "url": { "title": "URL", "type": "string", "default": "/" },
+            "title": { "title": "Title", "type": "string" }
+          }
+        }
+      }
+    },
+    "footerSocial": {
+      "title": "Social links",
+      "type": "object",
+      "properties": {
+        "title": { "title": "Accessible label", "type": "string" },
+        "socialLinks": {
+          "title": "Links",
+          "type": "array",
+          "items": {
+            "title": "Link",
+            "type": "object",
+            "required": ["alt", "url"],
+            "properties": {
+              "icon": {
+                "title": "Icon",
+                "description": "Icon name in the store's icon sprite (e.g. Facebook, Instagram, Pinterest, Twitter).",
+                "type": "string"
+              },
+              "image": {
+                "title": "Custom icon",
+                "description": "Image for a network the sprite doesn't have. Wins over the icon name.",
+                "type": "string",
+                "widget": { "ui:widget": "media-gallery" }
+              },
+              "alt": { "title": "Network name", "type": "string" },
+              "url": { "title": "URL", "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "acceptedPaymentMethods": {
+      "title": "Payment methods",
+      "description": "Optional row next to the copyright.",
+      "type": "object",
+      "properties": {
+        "title": { "title": "Title", "type": "string" },
+        "methods": {
+          "title": "Methods",
+          "type": "array",
+          "items": {
+            "title": "Method",
+            "type": "object",
+            "required": ["image", "alt"],
+            "properties": {
+              "image": { "title": "Image", "type": "string", "widget": { "ui:widget": "media-gallery" } },
+              "alt": { "title": "Name", "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "copyrightInfo": { "title": "Copyright", "type": "string" }
+  }
+}

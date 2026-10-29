@@ -1,6 +1,6 @@
 {
   "name": "@vtex-us-se/components",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Logic and accessibility for React components for FastStore v4, no styles.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,6 +17,10 @@
       "types": "./dist/b2b/index.d.ts",
       "default": "./dist/b2b/index.js"
     },
+    "./product-listing": {
+      "types": "./dist/b2c/SeProductListing/index.d.ts",
+      "default": "./dist/b2c/SeProductListing/index.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -26,6 +30,9 @@
       ],
       "b2b": [
         "./dist/b2b/index.d.ts"
+      ],
+      "product-listing": [
+        "./dist/b2c/SeProductListing/index.d.ts"
       ]
     }
   },
@@ -39,7 +46,7 @@
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "sanitize-html": "^2.13.0",
+    "sanitize-html": ">=2.13.0 <2.17.2",
     "@vtex-us-se/resolvers": "workspace:*"
   },
   "peerDependencies": {

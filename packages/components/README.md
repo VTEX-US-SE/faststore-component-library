@@ -34,6 +34,23 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
 - **`SeCardsCarousel`**, **`SeGridContent`**, **`SeHeroSection`**, **`SeLearnMoreSection`**,
   **`SeImageTiles`** — presentational, no dedicated hooks beyond shared types.
 
+- **`SeEditorialSplit`**, **`SeProductImageGrid`** — types only, plus the shared
+  `filterItemsWithImage` helper (drops CMS rows that have no image yet). No GraphQL.
+
+- **`SeProductReviews`** — `useSeProductReviews` / `summarizeSeProductReviews` /
+  `selectSeProductReviews`: average and count, filter by rating, sort by date or rating. No
+  GraphQL (reviews come in as a prop).
+
+- **`SeProductListing`** — `useSeProductListingTitle` (category title from FastStore's page
+  context via `usePage`/`isPLP`) and `SeProductListingGallery` (the native
+  `ProductGallerySection`), from the `@vtex-us-se/components/product-listing` subpath only, not
+  the barrels. Public `@faststore/core` exports only, but they must be the store's own instance,
+  so the component ships by source copy (`// @se-components source-copy: core-runtime`). Recheck
+  these exports on a core bump. No GraphQL of its own.
+
+- **`SeFooter`** — types plus `getSeFooterColumnVariant`, `getSeFooterSocialIconName` and
+  `isExternalUrl`. No GraphQL.
+
 - **`useFormattedPrice`** — price formatting for `SeProductCardWithButton`. No GraphQL.
 
 - **`SeHeader`** — types only (`SeHeaderTopbar`, `SeHeaderLogo`, `SeHeaderSearch`, ...). No GraphQL.

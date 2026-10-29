@@ -40,6 +40,9 @@ const config: StorybookConfig = {
       '@vtex-us-se/ui/b2c': fileURLToPath(new URL('../../ui/src/b2c/index.ts', import.meta.url)),
       '@vtex-us-se/ui/b2b': fileURLToPath(new URL('../../ui/src/b2b/index.ts', import.meta.url)),
       '@vtex-us-se/ui': fileURLToPath(new URL('../../ui/src/index.ts', import.meta.url)),
+      '@vtex-us-se/components/product-listing': fileURLToPath(
+        new URL('../../components/src/b2c/SeProductListing/index.ts', import.meta.url),
+      ),
       '@vtex-us-se/components/b2c': fileURLToPath(
         new URL('../../components/src/b2c/index.ts', import.meta.url),
       ),

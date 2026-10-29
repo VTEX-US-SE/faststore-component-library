@@ -141,9 +141,16 @@ plain npm import can never work for those.
   ported because they need their own GraphQL: `SkuAccordion` (B2B order guides), `ClusterMenu`
   (customer-cluster lookup), `DoctorsHeader` (custom `doctors` query), and `ProductSpecifications`
   (needs a `ServerProduct` fragment extension for `specificationGroups`).
-- Every component except `SeAssemblySet` and `SeRequestToBuy` is installable today as a plain
-  import from `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub Packages (those two
-  need `se-components add`'s source copy plus `add-resolver`, not a plain import — see above).
+- **B2C**: `SeEditorialSplit`, `SeProductImageGrid`, `SeProductListing` (wraps the native product
+  gallery; installed by `se-components add`'s source copy, see `packages/cli/README.md`), `SeProductReviews` (presentation only) and `SeFooter`, presentational sections first built by the store-clone pipeline, plus new options on existing components: `SeImageTiles` captions
+  below the image (`captionPosition`, `columns`, `aspectRatio`, `maxWidth`) and `SeGridContent`
+  `columns` / `variant: "caption-below"`, now themed only through standard `--fs-*` tokens.
+  `@vtex-us-se/components` pins `sanitize-html` below 2.17.2 so `next build` works (see
+  Troubleshooting in [`IMPLEMENTATION.md`](IMPLEMENTATION.md)).
+- Every component except `SeAssemblySet`, `SeRequestToBuy` and `SeProductListing` is installable
+  today as a plain import from `@vtex-us-se/ui` (B2C) or `@vtex-us-se/ui/b2b` (B2B) on GitHub
+  Packages (`SeAssemblySet` and `SeRequestToBuy` need `se-components add`'s source copy plus
+  `add-resolver`; `SeProductListing` needs the source copy only — see above).
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
   segment folder deep under `dist/` so it doesn't need to know segment names.
 - Real rich-text/markdown support (`textMode`) isn't implemented yet.
