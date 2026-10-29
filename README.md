@@ -158,8 +158,8 @@ plain npm import can never work for those.
   `columns` / `variant: "caption-below"`, now themed only through standard `--fs-*` tokens.
   `@vtex-us-se/components` pins `sanitize-html` below 2.17.2 so `next build` works (see
   Troubleshooting in [`IMPLEMENTATION.md`](IMPLEMENTATION.md)).
-- Every component except `SeAssemblySet`, `SeProductListing`, `SeRequestToBuy` and the six
-  wave-2 B2B components is installable today as a plain import from `@vtex-us-se/ui` (B2C) or
+- Every component except `SeAssemblySet`, `SeProductListing`, `SeRequestToBuy`, the six
+  wave-2 B2B components and `SeAddToPurchaseList` is installable today as a plain import from `@vtex-us-se/ui` (B2C) or
   `@vtex-us-se/ui/b2b` (B2B) on GitHub Packages. Those need `se-components add`'s source copy, plus
   `add-resolver` for the ones with their own GraphQL — see above and each package README.
 - CLI copies real schemas end-to-end (`se-components add <ComponentName>`), searching one
