@@ -108,6 +108,11 @@ None of the B2B hooks above call a custom GraphQL operation, so they all ship as
 - **`SePurchaseLists`** — `usePurchaseLists()` (lists + every action, applying the list the
   server returns), `usePurchaseListLines()` (product data per SKU via FastStore's `product`
   query, totals, add to cart), `usePurchaseListSearch()`.
+- **`SeAddToPurchaseList`** — `useAddToPurchaseList(products)` (lists loaded on demand by
+  `load()` — not on mount, since the button sits on every PDP — plus `addTo(documentId)` and
+  `createWith(name, visibility)`), `usePdpPurchaseListProducts(quantity)` (the PDP's selected SKU),
+  and the pure `purchaseListItemsFrom()` (whole positive quantities, repeated SKUs summed — what
+  the resolvers accept).
 
 **Authoring note — FastStore's lazy `execute` is a new function on every render.**
 `useLazyQuery_unstable` (unlike Storybook's mock of it) builds `execute` inline, so listing it in

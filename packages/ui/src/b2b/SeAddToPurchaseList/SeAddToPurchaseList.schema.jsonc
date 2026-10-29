@@ -1,0 +1,37 @@
+{
+  "$extends": [
+    "#/$defs/base-component"
+  ],
+  "$componentKey": "SeAddToPurchaseList",
+  "$componentTitle": "SE Add to Purchase List",
+  "title": "Add to Purchase List",
+  "description": "B2B PDP button: saves the selected SKU to one of the buyer's purchase lists, or to a new one",
+  "type": "object",
+  "properties": {
+    "quantity": { "type": "integer", "title": "Units to save", "minimum": 1, "default": 1 },
+    "buttonLabel": { "type": "string", "title": "Button label", "default": "Add to a purchase list" },
+    "drawerTitle": { "type": "string", "title": "Drawer title", "default": "Add to a purchase list" },
+    "emptyMessage": { "type": "string", "title": "No lists message", "default": "You have no purchase lists yet." },
+    "newListLabel": { "type": "string", "title": "New list button label", "default": "Create a new list" },
+    "createLabel": { "type": "string", "title": "Create button label", "default": "Create and add" },
+    "successMessage": {
+      "type": "string",
+      "title": "Success message",
+      "description": "{list} is replaced with the list's name",
+      "default": "Added to {list}."
+    },
+    "listsUrl": {
+      "type": "string",
+      "title": "Purchase lists page URL",
+      "description": "The page with the SePurchaseLists section; when set, a success links to the list there",
+      "default": ""
+    },
+    "viewListLabel": { "type": "string", "title": "View list link label", "default": "View list" },
+    "signedOutLabel": {
+      "type": "string",
+      "title": "Link label for anonymous shoppers",
+      "default": "Sign in to save to a purchase list"
+    },
+    "loginUrl": { "type": "string", "title": "Login page URL", "default": "/login" }
+  }
+}

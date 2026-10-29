@@ -41,6 +41,16 @@ alone:
   constant) are inlined as a literal template string wherever they're passed to `gql(...)`, and
   dropped from the import entirely
 
+**Components that reuse another component's UI.** A copied `@vtex-us-se/ui` file may import a
+sibling component by relative path (`from '../SeAddToPurchaseList/SeAddToPurchaseListButton'`,
+as `SeCheckStockAndPricing` does). `add` then copies that sibling's full source too, into
+`<source-dir>/../<Sibling>/` — exactly where the import points — and so on for the sibling's own
+siblings. It is **not** registered as a section (run `add <Sibling>` for that; it finds its files
+already there and only registers it). One shared copy rather than a duplicate inside each
+folder, because both would define the same GraphQL operations under `src/`. With a custom
+`--source-dir`, give every component the same parent folder, or the sibling ends up copied twice
+(`add` warns about the duplicated operations if it is).
+
 Both the schema copy and the component/source copy refuse to clobber anything that already
 exists — the schema needs `--force` to overwrite; the source files and
 `src/components/index.tsx` are just left untouched (with a merge hint printed) if already

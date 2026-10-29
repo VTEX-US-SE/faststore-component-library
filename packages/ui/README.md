@@ -240,10 +240,19 @@ dialogs — so a store installs no extra dependency, and nothing needs FastStore
   Drive link), see session price and live stock, edit quantities, add all to cart. A SKU whose
   stock turns out lower than its quantity is capped (out of stock drops to 0).
   `add-resolver skuAvailability` **and** `add-resolver b2bProductFields`. Pair it with
-  `SeAddressSelector` (stock is simulated at the session's postal code); the kit embedded both
-  the address selector and an "add to purchase list" button, which a source-copied component
-  can't import from another folder.
+  `SeAddressSelector` (stock is simulated at the session's postal code). Its "Add all to a
+  purchase list" button is `SeAddToPurchaseList`'s picker (`addToListLabel`, `purchaseListsUrl`),
+  imported from the sibling folder — `add` copies that folder too, so `add-resolver purchaseLists`
+  is needed as well.
 - **`SePurchaseLists`** — the buyer's and their organization's shared purchase lists: create,
   open (`?list=<id>` deep link), add SKUs by Ref ID, edit quantities (debounced saves), add the
   list to the cart; rename / share / delete for the owner only. `add-resolver purchaseLists`
   **and** `add-resolver b2bProductFields`. Needs the `PL` Master Data entity and app key/token.
+- **`SeAddToPurchaseList`** — PDP section: an "Add to a purchase list" button for the product's
+  selected SKU (`quantity` units, from FastStore's `usePDP`), opening a drawer with the buyer's
+  own and organization-shared lists; picking one adds the SKU, or a new list can be created with
+  it. A success can link to the list on the `SePurchaseLists` page (`listsUrl`, `?list=<id>`);
+  anonymous shoppers get a sign-in link. The picker itself is exported as
+  **`SeAddToPurchaseListButton`** (`products: { skuId, quantity }[]`, same labels), which is what
+  `SeCheckStockAndPricing` reuses. `add-resolver purchaseLists`. Reads the PDP's page context, so
+  it only works as a PDP section (or with `products` passed in).

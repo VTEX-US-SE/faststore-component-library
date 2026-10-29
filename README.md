@@ -128,6 +128,11 @@ plain npm import can never work for those.
   only worked after its navbar had run. **All 13 kit components are now in the library.** Still
   outside it: the kit's `NavbarB2B` and `ProductDetailsB2B` (not among the 13), and the
   `usb2b*` clones' extras (`RequestOrganization`, `PriceGate`, `TireSelector`, …).
+- **B2B**: `SeAddToPurchaseList`, the kit's "Add to a purchase list" (left out of wave 2): a PDP
+  section saving the selected SKU to one of the buyer's purchase lists, or a new one. Its picker
+  also gives `SeCheckStockAndPricing` an "Add all to a purchase list" button — `se-components add`
+  now copies a sibling component a copied component imports (`../<Name>/`) next to it, so the two
+  share one copy of the picker and its operations (named apart from `SePurchaseLists`').
 - **B2C**: `SeAssemblySet`, a customisable set builder ported from `poc-arbonne-clone`'s
   `AssemblySet`. First component needing its own `packages/resolvers` operation
   (`assemblySet`) — which is also why `se-components add` grew a second distribution mode: a
