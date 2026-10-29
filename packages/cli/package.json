@@ -20,8 +20,8 @@
     "commander": "^12.1.0"
   },
   "peerDependencies": {
-    "@vtex-us-se/ui": "workspace:*",
-    "@vtex-us-se/resolvers": "workspace:*"
+    "@vtex-us-se/ui": "workspace:>=0.8.0",
+    "@vtex-us-se/resolvers": "workspace:>=0.4.0"
   },
   "peerDependenciesMeta": {
     "@vtex-us-se/ui": {

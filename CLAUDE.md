@@ -182,6 +182,13 @@ Pick the semver level per package honestly: a CLI behavior change that's backwar
 (new scaffolding capability) is `minor`, not `patch`; a pure bugfix is `patch`. Don't force
 everything to the same number just because they're landing together.
 
+`@vtex-us-se/cli` peer-depends on `ui`/`resolvers` with floor ranges (`workspace:>=x.y.z`), and
+`.changeset/config.json` sets `onlyUpdatePeerDependentsWhenOutOfRange`. Keep both: with
+`workspace:*` (published as an exact version) changesets bumped `cli` to a new **major** on every
+`ui`/`resolvers` release (5.0.0 → 8.0.0 in one day, none of them breaking). The CLI only resolves
+those packages from the consuming project at runtime, so raise a floor only when the CLI starts
+relying on something newer in them.
+
 Always a branch + PR, never a direct push to `main` (standing preference — see memory). Wait
 for `build-lint-test` to go green. Remember `build-lint-test` proves the **library** builds; it
 does not run Step 4's harness — that's still on you before opening the PR.
