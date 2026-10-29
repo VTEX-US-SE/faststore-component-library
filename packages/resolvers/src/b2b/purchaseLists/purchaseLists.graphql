@@ -1,0 +1,71 @@
+extend type Query {
+  """
+  Purchase lists the signed-in buyer can see: their own, plus their organization's lists shared
+  with "organization" visibility. Empty when signed out.
+  """
+  sePurchaseLists: [SePurchaseList!]!
+}
+
+extend type Mutation {
+  sePurchaseListCreate(name: String!, visibility: SePurchaseListVisibility!, items: [SePurchaseListItemInput!]): SePurchaseListResult!
+  """
+  Adds quantities to the list (an SKU already on it gets the quantities summed).
+  """
+  sePurchaseListAddItems(documentId: String!, items: [SePurchaseListItemInput!]!): SePurchaseListResult!
+  """
+  Sets one SKU's quantity; 0 removes it from the list.
+  """
+  sePurchaseListSetItemQuantity(documentId: String!, skuId: String!, quantity: Int!): SePurchaseListResult!
+  """
+  Owner only.
+  """
+  sePurchaseListRename(documentId: String!, name: String!): SePurchaseListResult!
+  """
+  Owner only.
+  """
+  sePurchaseListSetVisibility(documentId: String!, visibility: SePurchaseListVisibility!): SePurchaseListResult!
+  """
+  Owner only.
+  """
+  sePurchaseListDelete(documentId: String!): SePurchaseListResult!
+}
+
+enum SePurchaseListVisibility {
+  private
+  organization
+}
+
+input SePurchaseListItemInput {
+  skuId: String!
+  quantity: Int!
+}
+
+type SePurchaseList {
+  documentId: String!
+  name: String!
+  visibility: SePurchaseListVisibility!
+  items: [SePurchaseListItem!]!
+  ownerEmail: String!
+  """
+  Whether the signed-in buyer owns the list (and so may rename, share or delete it).
+  """
+  isOwner: Boolean!
+}
+
+type SePurchaseListItem {
+  skuId: String!
+  quantity: Int!
+}
+
+type SePurchaseListResult {
+  ok: Boolean!
+  """
+  UNAUTHENTICATED, INVALID, NOT_FOUND, FORBIDDEN, CONFLICT (a list with that name exists) or
+  FAILED. Null when ok.
+  """
+  error: String
+  """
+  The list after the change. Null on error and after a delete.
+  """
+  list: SePurchaseList
+}

@@ -144,6 +144,80 @@ const FIXTURE_STOCK_PRODUCTS = [
   stockProduct('2', 'Steel Toe Boots', 'BOOT', ['9', '10'], 89),
 ]
 
+// SePurchaseLists: an in-memory Master Data, reset on reload. Its products are the
+// SeCheckStockAndPricing fixtures (Ref IDs GLV-… and BOOT-…).
+type MockList = { documentId: string; name: string; visibility: string; ownerEmail: string; isOwner: boolean; items: Array<{ skuId: string; quantity: number }> }
+let mockLists: MockList[] = [
+  { documentId: 'list-1', name: 'Weekly PPE restock', visibility: 'private', ownerEmail: 'buyer@example.com', isOwner: true,
+    items: [{ skuId: 'glv100', quantity: 40 }, { skuId: 'glv101', quantity: 25 }, { skuId: 'boot200', quantity: 4 }] },
+  { documentId: 'list-2', name: 'Plant B essentials', visibility: 'organization', ownerEmail: 'ops@example.com', isOwner: false,
+    items: [{ skuId: 'glv103', quantity: 10 }] },
+]
+
+function mockPurchaseListResponse(text: string, variables: unknown): unknown {
+  const v = (variables ?? {}) as {
+    documentId?: string
+    name: string
+    visibility: string
+    skuId?: string
+    quantity?: number
+    term?: string
+    items?: Array<{ skuId: string; quantity: number }>
+    locator?: Array<{ value: string }>
+  }
+  const find = () => mockLists.find((list) => list.documentId === v.documentId)
+  const result = (field: string, list: MockList | undefined, error = 'NOT_FOUND') =>
+    ({ [field]: list ? { ok: true, error: null, list: { ...list, items: [...list.items] } } : { ok: false, error, list: null } })
+
+  if (text.includes('query SePurchaseLists')) return { sePurchaseLists: mockLists.map((list) => ({ ...list, items: [...list.items] })) }
+  if (text.includes('query SePurchaseListProduct')) {
+    const skuId = v.locator?.[0]?.value
+    return { product: FIXTURE_STOCK_PRODUCTS.find((product) => product.seSkus.some((sku) => sku.itemId === skuId)) ?? null }
+  }
+  if (text.includes('query SePurchaseListSearch')) {
+    const term = String(v.term ?? '').toLowerCase()
+    const matches = FIXTURE_STOCK_PRODUCTS.filter((product) => product.seSkus.some((sku) => sku.referenceCode.toLowerCase().includes(term)))
+    return { search: { products: { edges: matches.map((node) => ({ node })) } } }
+  }
+  if (text.includes('sePurchaseListCreate')) {
+    if (mockLists.some((list) => list.isOwner && list.name === v.name.trim())) return result('sePurchaseListCreate', undefined, 'CONFLICT')
+    const list = { documentId: `list-${Date.now()}`, name: v.name.trim(), visibility: v.visibility, ownerEmail: 'buyer@example.com', isOwner: true, items: v.items ?? [] }
+    mockLists = [...mockLists, list]
+    return result('sePurchaseListCreate', list)
+  }
+  if (text.includes('sePurchaseListAddItems')) {
+    const list = find()
+    for (const item of v.items ?? []) {
+      const existing = list?.items.find((entry) => entry.skuId === item.skuId)
+      if (existing) existing.quantity += item.quantity
+      else list?.items.push({ ...item })
+    }
+    return result('sePurchaseListAddItems', list)
+  }
+  if (text.includes('sePurchaseListSetItemQuantity')) {
+    const list = find()
+    if (list) list.items = v.quantity === 0 ? list.items.filter((item) => item.skuId !== v.skuId) : list.items.map((item) => (item.skuId === v.skuId ? { ...item, quantity: v.quantity } : item))
+    return result('sePurchaseListSetItemQuantity', list)
+  }
+  if (text.includes('sePurchaseListRename')) {
+    const list = find()
+    if (list && !list.isOwner) return result('sePurchaseListRename', undefined, 'FORBIDDEN')
+    if (list) list.name = v.name.trim()
+    return result('sePurchaseListRename', list)
+  }
+  if (text.includes('sePurchaseListSetVisibility')) {
+    const list = find()
+    if (list) list.visibility = v.visibility
+    return result('sePurchaseListSetVisibility', list)
+  }
+  if (text.includes('sePurchaseListDelete')) {
+    const list = find()
+    mockLists = mockLists.filter((entry) => entry !== list)
+    return { sePurchaseListDelete: list ? { ok: true, error: null } : { ok: false, error: 'NOT_FOUND' } }
+  }
+  return undefined
+}
+
 const FIXTURE_SHOPPER_ADDRESSES = {
   defaultAddressId: 'address-hq',
   addresses: [
@@ -199,6 +273,8 @@ const FIXTURE_MONTHLY_SPEND = [
 function mockLazyResponse(query: unknown, variables: unknown): unknown {
   const text = String(query)
 
+  const purchaseList = mockPurchaseListResponse(text, variables)
+  if (purchaseList) return purchaseList
   if (text.includes('seSkuAvailability')) {
     const items = (variables as { items?: Array<{ id: string }> })?.items ?? []
     return {
