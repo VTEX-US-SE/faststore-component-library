@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react'
 import { Icon } from '@faststore/ui'
-import { useSeVideoHeroPlayback } from '@vtex-us-se/components'
+import { seVideoHeroEmbedUrl, useSeVideoHeroPlayback } from '@vtex-us-se/components'
 import type {
   SeVideoHeroAspectRatio,
   SeVideoHeroCaptionPosition,
@@ -10,7 +11,10 @@ import type {
 import styles from './SeVideoHero.module.scss'
 
 export interface SeVideoHeroProps {
-  /** The background video. Without `src` the hero shows its poster as a still image. */
+  /**
+   * The background video: an MP4/WebM file, or a Vimeo or YouTube link played muted in background
+   * mode. Without `src` the hero shows its poster as a still image.
+   */
   video?: SeVideoHeroVideo
   title?: string
   subtitle?: string
@@ -61,31 +65,60 @@ export function SeVideoHero({
   testId = 'se-video-hero',
 }: SeVideoHeroProps) {
   const src = video?.src
-  const { videoRef, isPlaying, toggle } = useSeVideoHeroPlayback({ autoplay, src })
+  const mobileSrc = video?.mobileSrc
   const poster = video?.poster
+  const { videoRef, iframeRef, isPlaying, active, fileOnly, playsFile, embedStarted, embedRatio, onEmbedLoad, toggle } = useSeVideoHeroPlayback({
+    autoplay,
+    src,
+    mobileSrc,
+  })
 
   if (!src && !poster) return null
 
   const target = link?.linkTargetBlank ? { target: '_blank', rel: 'noopener noreferrer' } : {}
-  const media = src ? (
-    <video
-      ref={videoRef}
-      className={styles.media}
-      poster={poster}
-      muted
-      loop={loop}
-      playsInline
-      preload="metadata"
-      aria-label={video?.alt}
-      data-fs-video-hero-video
-      key={src}
-    >
-      {video?.mobileSrc && <source src={video.mobileSrc} media="(max-width: 767px)" />}
-      <source src={src} />
-    </video>
-  ) : (
+  const posterImage = poster ? (
     <img className={styles.media} src={poster} alt={video?.alt ?? ''} data-fs-video-hero-poster />
-  )
+  ) : null
+  const embedUrl = active && !playsFile ? seVideoHeroEmbedUrl(active, { autoplay: embedStarted, loop }) : undefined
+
+  let media = posterImage
+  if (src && playsFile) {
+    media = (
+      <video
+        ref={videoRef}
+        className={styles.media}
+        poster={poster}
+        muted
+        loop={loop}
+        playsInline
+        preload="metadata"
+        aria-label={video?.alt}
+        data-fs-video-hero-video
+        key={fileOnly ? src : active?.id}
+      >
+        {fileOnly && mobileSrc && <source src={mobileSrc} media="(max-width: 767px)" />}
+        <source src={fileOnly ? src : active?.id} />
+      </video>
+    )
+  } else if (embedUrl && (embedStarted || !poster)) {
+    media = (
+      <>
+        {posterImage}
+        <iframe
+          ref={iframeRef}
+          key={embedUrl}
+          className={styles.embed}
+          src={embedUrl}
+          title={video?.alt || title || 'Background video'}
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+          tabIndex={-1}
+          onLoad={onEmbedLoad}
+          style={{ '--se-video-hero-embed-ratio': embedRatio } as CSSProperties}
+          data-fs-video-hero-embed={active?.kind}
+        />
+      </>
+    )
+  }
 
   return (
     <section
@@ -105,7 +138,7 @@ export function SeVideoHero({
         ) : (
           media
         )}
-        {src && (
+        {src && (playsFile || embedUrl) && (
           <button
             type="button"
             className={styles.toggle}

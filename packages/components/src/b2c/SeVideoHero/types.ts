@@ -1,7 +1,7 @@
 export type SeVideoHeroVideo = {
-  /** MP4 or WebM URL. Without it the hero shows the poster only. */
+  /** MP4 or WebM file URL, or a Vimeo or YouTube link. Without it the hero shows the poster only. */
   src?: string
-  /** Optional portrait cut for screens under 768px. Falls back to `src`. */
+  /** Optional portrait cut for screens under 768px, a file or an embed link like `src`. Falls back to `src`. */
   mobileSrc?: string
   /** Image shown before the video plays, and instead of it under reduced motion. */
   poster?: string

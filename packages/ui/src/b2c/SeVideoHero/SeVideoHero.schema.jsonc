@@ -2,7 +2,7 @@
   "$extends": ["#/$defs/base-component"],
   "$componentKey": "SeVideoHero",
   "$componentTitle": "SE Video Hero",
-  "description": "Full-bleed background video (muted, looping, with a pause button) and a caption bar with a title and arrow link.",
+  "description": "Full-bleed background video (a file, Vimeo or YouTube; muted, looping, with a pause button) and a caption bar with a title and arrow link.",
   "type": "object",
   "required": ["video"],
   "properties": {
@@ -12,12 +12,12 @@
       "properties": {
         "src": {
           "title": "Video URL",
-          "description": "MP4 or WebM. Keep it short and light: it autoplays muted.",
+          "description": "An MP4 or WebM file, or a Vimeo or YouTube link (played muted in background mode). Keep it short: it autoplays.",
           "type": "string"
         },
         "mobileSrc": {
           "title": "Mobile video URL",
-          "description": "Optional portrait cut for screens under 768px.",
+          "description": "Optional portrait cut for screens under 768px: a file, Vimeo or YouTube link.",
           "type": "string"
         },
         "poster": {
