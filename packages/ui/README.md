@@ -115,6 +115,13 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   with an optional caption and arrow link. `columns` (1–3), `aspectRatio` (`3:4`, `4:5`, `1:1`)
   and `captionPosition` (`below` or `overlay`). Built by the store-clone pipeline. No GraphQL.
 
+- **`SeVideoHero`** — full-bleed background video with the caption bar of a hero (title,
+  subtitle, arrow link) below it or over its bottom edge. Autoplays muted and looping, never
+  under `prefers-reduced-motion` (it shows the `poster` instead), and always has a pause/play
+  button. Optional portrait `video.mobileSrc` under 768px; `aspectRatio` (`16:9`, `21:9`, `4:3`)
+  and `mobileAspectRatio` (`2:3`, `9:16`, `1:1`). Without `video.src` it renders the poster as
+  a still hero. No GraphQL.
+
 - **`SeProductImageGrid`** — dense grid of product cut-out images on a light background, each
   linking to its product page, no names or prices ("shop the look" walls). `columns.desktop` /
   `columns.mobile` (default 6 / 4) and an empty-state message. Items are typed in the CMS today;
