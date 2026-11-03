@@ -1,5 +1,11 @@
 # @vtex-us-se/components
 
+## 0.10.0
+
+### Minor Changes
+
+- 1b14fc3: Add `SeVideoHero`: a full-bleed background video hero (muted autoplay and loop, pause button, poster under reduced motion, optional mobile video) with the caption bar of a hero. `@vtex-us-se/components` adds its `useSeVideoHeroPlayback` hook and types.
+
 ## 0.9.0
 
 ### Minor Changes
