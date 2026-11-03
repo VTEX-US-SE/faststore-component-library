@@ -38,7 +38,9 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
   `filterItemsWithImage` helper (drops CMS rows that have no image yet). No GraphQL.
 
 - **`SeVideoHero`** — `useSeVideoHeroPlayback`: muted autoplay that respects
-  `prefers-reduced-motion`, plus the play/pause state behind the hero's pause button. No GraphQL.
+  `prefers-reduced-motion`, plus the play/pause state behind the hero's pause button, for a `<video>` file or a Vimeo/YouTube
+  embed. `parseSeVideoHeroSource`, `seVideoHeroEmbedUrl` and `seVideoHeroEmbedCommand` tell the
+  link kinds apart and build the background-mode player URL and its pause/play messages. No GraphQL.
 
 - **`SeProductReviews`** — `useSeProductReviews` / `summarizeSeProductReviews` /
   `selectSeProductReviews`: average and count, filter by rating, sort by date or rating. No

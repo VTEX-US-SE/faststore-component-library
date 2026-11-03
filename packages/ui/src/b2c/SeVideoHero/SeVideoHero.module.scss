@@ -49,6 +49,7 @@
 
   .frame {
     position: relative;
+    container-type: size;
     width: 100%;
     overflow: hidden;
     aspect-ratio: var(--se-video-hero-mobile-aspect);
@@ -73,7 +74,25 @@
     object-fit: cover;
   }
 
+  // An embed cannot object-fit: it is sized to cover the frame at its video's ratio (16:9 until
+  // the player reports it) and centered, cropping the overflow.
+  .embed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, calc(100cqh * var(--se-video-hero-embed-ratio, 16 / 9)));
+    height: max(100%, calc(100cqw / var(--se-video-hero-embed-ratio, 16 / 9)));
+    border: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .media + .embed {
+    z-index: 1;
+  }
+
   .toggle {
+    z-index: 2;
     position: absolute;
     right: var(--fs-spacing-3);
     bottom: var(--fs-spacing-3);

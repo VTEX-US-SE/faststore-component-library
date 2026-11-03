@@ -120,7 +120,10 @@ never pulls in B2B-only dependencies (`@faststore/core`, in particular) just by 
   under `prefers-reduced-motion` (it shows the `poster` instead), and always has a pause/play
   button. Optional portrait `video.mobileSrc` under 768px; `aspectRatio` (`16:9`, `21:9`, `4:3`)
   and `mobileAspectRatio` (`2:3`, `9:16`, `1:1`). Without `video.src` it renders the poster as
-  a still hero. No GraphQL.
+  a still hero. `video.src` and `video.mobileSrc` also take a Vimeo or YouTube link (watch,
+  share, Shorts or embed URL): it plays in the provider's muted background player, sized to
+  cover the frame (Vimeo reports its real aspect ratio; YouTube is taken as 16:9), and the pause
+  button drives it through the player's postMessage API. No GraphQL.
 
 - **`SeProductImageGrid`** — dense grid of product cut-out images on a light background, each
   linking to its product page, no names or prices ("shop the look" walls). `columns.desktop` /

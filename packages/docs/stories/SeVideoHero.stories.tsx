@@ -31,6 +31,22 @@ export const CaptionOverlay: Story = {
   },
 }
 
+export const Vimeo: Story = {
+  args: {
+    video: { src: 'https://vimeo.com/1137413169', poster: PLACEHOLDER_POSTER, alt: 'Hero banner video' },
+    title: 'New arrivals',
+    link: { text: 'Shop now', url: '#new-arrivals' },
+  },
+}
+
+export const YouTube: Story = {
+  args: {
+    video: { src: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ', poster: PLACEHOLDER_POSTER, alt: 'Big Buck Bunny' },
+    title: 'New arrivals',
+    link: { text: 'Shop now', url: '#new-arrivals' },
+  },
+}
+
 export const PosterOnly: Story = {
   args: {
     video: { poster: PLACEHOLDER_POSTER, alt: 'Placeholder poster' },
