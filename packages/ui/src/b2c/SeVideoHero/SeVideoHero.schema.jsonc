@@ -1,0 +1,72 @@
+{
+  "$extends": ["#/$defs/base-component"],
+  "$componentKey": "SeVideoHero",
+  "$componentTitle": "SE Video Hero",
+  "description": "Full-bleed background video (muted, looping, with a pause button) and a caption bar with a title and arrow link.",
+  "type": "object",
+  "required": ["video"],
+  "properties": {
+    "video": {
+      "title": "Video",
+      "type": "object",
+      "properties": {
+        "src": {
+          "title": "Video URL",
+          "description": "MP4 or WebM. Keep it short and light: it autoplays muted.",
+          "type": "string"
+        },
+        "mobileSrc": {
+          "title": "Mobile video URL",
+          "description": "Optional portrait cut for screens under 768px.",
+          "type": "string"
+        },
+        "poster": {
+          "title": "Poster image",
+          "description": "Shown while the video loads, and instead of it when the visitor prefers reduced motion.",
+          "type": "string",
+          "widget": {
+            "ui:widget": "media-gallery",
+            "restrictMediaTypes": { "video": true, "image": ["png", "jpg", "jpeg", "gif", "svg", "webp"] }
+          }
+        },
+        "alt": { "title": "Video description", "description": "Announced by screen readers.", "type": "string" }
+      }
+    },
+    "title": { "title": "Title", "type": "string" },
+    "subtitle": { "title": "Subtitle", "type": "string" },
+    "link": {
+      "title": "Call to action",
+      "type": "object",
+      "properties": {
+        "text": { "title": "Text", "type": "string" },
+        "url": { "title": "URL", "type": "string" },
+        "linkTargetBlank": { "title": "Open link in new window?", "type": "boolean", "default": false }
+      }
+    },
+    "aspectRatio": {
+      "title": "Aspect ratio on desktop",
+      "type": "string",
+      "enum": ["16:9", "21:9", "4:3"],
+      "enumNames": ["Widescreen 16:9", "Cinema 21:9", "Classic 4:3"],
+      "default": "16:9"
+    },
+    "mobileAspectRatio": {
+      "title": "Aspect ratio on mobile",
+      "type": "string",
+      "enum": ["2:3", "9:16", "1:1"],
+      "enumNames": ["Portrait 2:3", "Vertical 9:16", "Square 1:1"],
+      "default": "2:3"
+    },
+    "captionPosition": {
+      "title": "Caption position",
+      "type": "string",
+      "enum": ["below", "overlay"],
+      "enumNames": ["Below the video", "Over the video"],
+      "default": "below"
+    },
+    "autoplay": { "title": "Autoplay (muted)", "type": "boolean", "default": true },
+    "loop": { "title": "Loop", "type": "boolean", "default": true },
+    "pauseLabel": { "title": "Pause button label", "type": "string", "default": "Pause video" },
+    "playLabel": { "title": "Play button label", "type": "string", "default": "Play video" }
+  }
+}

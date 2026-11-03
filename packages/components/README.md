@@ -37,6 +37,9 @@ B2B-only hooks (and their `@faststore/core` dependency) live behind
 - **`SeEditorialSplit`**, **`SeProductImageGrid`** — types only, plus the shared
   `filterItemsWithImage` helper (drops CMS rows that have no image yet). No GraphQL.
 
+- **`SeVideoHero`** — `useSeVideoHeroPlayback`: muted autoplay that respects
+  `prefers-reduced-motion`, plus the play/pause state behind the hero's pause button. No GraphQL.
+
 - **`SeProductReviews`** — `useSeProductReviews` / `summarizeSeProductReviews` /
   `selectSeProductReviews`: average and count, filter by rating, sort by date or rating. No
   GraphQL (reviews come in as a prop).
